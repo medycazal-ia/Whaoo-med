@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: whaoo
+    runtime: node
+    plan: free
+    region: frankfurt
+    buildCommand: npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: NEXT_PUBLIC_APP_URL
+        sync: false
+
+# Note : le cron des rappels push (vercel.json, /api/cron/rappels) est
+# spécifique à Vercel. Sur Render, il faudrait un "Cron Job" séparé
+# (service payant) qui appelle cette même route périodiquement — pas mis
+# en place ici tant que la plateforme finale n'est pas tranchée
+# (voir DECISIONS.md).

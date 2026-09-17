@@ -44,10 +44,12 @@ export async function signUpWithPassword(formData: FormData): Promise<void> {
   }
 
   const supabase = await createClient();
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
   const { error } = await supabase.auth.signUp({
     email,
     password,
     options: {
+      emailRedirectTo: `${appUrl}/auth/callback`,
       data: {
         nom,
         prenom,

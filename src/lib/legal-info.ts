@@ -17,17 +17,17 @@ export const EDITEUR = {
 };
 
 export const HEBERGEUR = {
-  nom: "LWS (Ligne Web Services)",
-  formeJuridique: "SARL",
-  adresse: "4 rue Galvani, 75838 Paris Cedex 17",
-  rcs: "RCS Paris B 450 453 881",
-  telephone: "01 77 62 30 03",
-  siteWeb: "www.lws.fr",
+  nom: "Render Services, Inc.",
+  formeJuridique: "Société de droit américain (Delaware, États-Unis)",
+  adresse: "525 Brannan Street, Ste 300, San Francisco, CA 94107, États-Unis",
+  rcs: "Non applicable (société immatriculée aux États-Unis, pas de RCS français)",
+  telephone: "+1 415-319-8186",
+  siteWeb: "render.com",
 };
 
-// ⚠️ Le site tourne actuellement sur Render (whaoo.onrender.com), pas sur
-// LWS. Cette fiche hébergeur doit correspondre à l'hébergeur technique réel
-// au moment de la publication — à corriger si l'hébergement effectif reste
-// Render/Vercel plutôt que LWS.
+// Le nom de domaine whaoo.site est enregistré et géré chez LWS (registrar),
+// mais l'application elle-même est hébergée techniquement chez Render —
+// deux rôles distincts. Adresse Render source : leurs conditions
+// d'utilisation officielles (render.com/terms).
 
 export const NOM_APPLICATION = "whaoo";

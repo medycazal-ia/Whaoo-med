@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+:root {
+  /* Design system "épicerie/marché" — cahier des charges section 7 */
+  --color-ardoise: #2b3a32;
+  --color-ardoise-light: #33453b;
+  --color-craie: #f1ede1;
+  --color-ticket: #fbf8f1;
+  --color-tomate: #c1452d;
+  --color-basilic: #5e7c52;
+  --color-ambre: #c98a2c;
+
+  --background: var(--color-ticket);
+  --foreground: var(--color-ardoise);
+}
+
+@theme inline {
+  --color-ardoise: var(--color-ardoise);
+  --color-ardoise-light: var(--color-ardoise-light);
+  --color-craie: var(--color-craie);
+  --color-ticket: var(--color-ticket);
+  --color-tomate: var(--color-tomate);
+  --color-basilic: var(--color-basilic);
+  --color-ambre: var(--color-ambre);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --font-heading: var(--font-space-grotesk);
+  --font-mono: var(--font-ibm-plex-mono);
+  --font-sans: var(--font-inter);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}

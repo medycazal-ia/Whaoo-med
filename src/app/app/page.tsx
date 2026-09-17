@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/lib/auth/actions";
@@ -28,7 +29,7 @@ export default async function AppHomePage({
   const moisISO = premierJourDuMois().toISOString().slice(0, 10);
   const { data: profile } = await supabase
     .from("profiles")
-    .select("prenom, referral_code")
+    .select("prenom")
     .eq("id", user.id)
     .single();
 
@@ -67,14 +68,22 @@ export default async function AppHomePage({
         <h1 className="font-heading text-xl font-semibold text-craie">
           Bonjour {profile?.prenom ?? ""}
         </h1>
-        <form action={signOut}>
-          <button
-            type="submit"
+        <div className="flex items-center gap-2">
+          <Link
+            href="/app/parrainage"
             className="rounded-lg border border-craie/30 px-3 py-1.5 text-sm text-craie hover:bg-craie/10"
           >
-            Se déconnecter
-          </button>
-        </form>
+            Parrainage
+          </Link>
+          <form action={signOut}>
+            <button
+              type="submit"
+              className="rounded-lg border border-craie/30 px-3 py-1.5 text-sm text-craie hover:bg-craie/10"
+            >
+              Se déconnecter
+            </button>
+          </form>
+        </div>
       </header>
 
       {!periode ? (
@@ -116,13 +125,6 @@ export default async function AppHomePage({
             supprimerArticle,
             definirBudget: definirBudgetMensuel,
           }}
-          footer={
-            profile?.referral_code ? (
-              <p className="px-6 pb-6 text-center text-xs text-ardoise/50">
-                Ton code de parrainage : <strong>{profile.referral_code}</strong>
-              </p>
-            ) : undefined
-          }
         />
       )}
     </main>

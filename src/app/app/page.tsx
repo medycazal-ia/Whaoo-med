@@ -39,13 +39,27 @@ export default async function AppHomePage({
     .eq("month", moisISO)
     .maybeSingle();
 
-  const { data: items } = periode
-    ? await supabase
-        .from("items")
-        .select("id, label, price, quantity, status")
-        .eq("budget_period_id", periode.id)
-        .order("created_at", { ascending: false })
-    : { data: [] };
+  // La liste "à acheter" est un pense-bête permanent (pas lié à un mois) ;
+  // seuls les achats du mois en cours comptent dans le budget affiché.
+  const [{ data: itemsAAcheter }, { data: itemsAchetesCeMois }] = await Promise.all([
+    supabase
+      .from("items")
+      .select("id, label, detail, price, quantity, status")
+      .eq("user_id", user.id)
+      .eq("status", "a_acheter")
+      .order("created_at", { ascending: false }),
+    periode
+      ? supabase
+          .from("items")
+          .select("id, label, detail, price, quantity, status")
+          .eq("user_id", user.id)
+          .eq("status", "achete")
+          .eq("achat_mois", moisISO)
+          .order("created_at", { ascending: false })
+      : Promise.resolve({ data: [] as never[] }),
+  ]);
+
+  const items = [...(itemsAAcheter ?? []), ...(itemsAchetesCeMois ?? [])];
 
   return (
     <main className="flex flex-1 flex-col bg-craie">
@@ -94,9 +108,14 @@ export default async function AppHomePage({
         <CoursesDashboard
           baseHref="/app"
           budgetAmount={periode.budget_amount}
-          items={items ?? []}
+          items={items}
           vueActive={vueActive}
-          actions={{ ajouterArticle, basculerStatutArticle, supprimerArticle }}
+          actions={{
+            ajouterArticle,
+            basculerStatutArticle,
+            supprimerArticle,
+            definirBudget: definirBudgetMensuel,
+          }}
           footer={
             profile?.referral_code ? (
               <p className="px-6 pb-6 text-center text-xs text-ardoise/50">

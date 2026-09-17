@@ -24,8 +24,10 @@ function getSpeechRecognition(): (new () => SpeechRecognitionLike) | null {
 
 export function SaisieVocale({
   ajouterArticleAction,
+  definirBudgetAction,
 }: {
   ajouterArticleAction: (formData: FormData) => Promise<void>;
+  definirBudgetAction: (formData: FormData) => Promise<void>;
 }) {
   const [ecoute, setEcoute] = useState(false);
   const [brouillon, setBrouillon] = useState<{
@@ -34,6 +36,7 @@ export function SaisieVocale({
     quantity: number;
     status: "achete" | "a_acheter";
   } | null>(null);
+  const [budgetDicte, setBudgetDicte] = useState<number | null>(null);
   const [nonSupporte, setNonSupporte] = useState(false);
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
 
@@ -49,8 +52,12 @@ export function SaisieVocale({
     recognition.interimResults = false;
     recognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
-      const parsed = parserPhraseVocale(transcript);
-      setBrouillon({ ...parsed, status: "a_acheter" });
+      const commande = parserPhraseVocale(transcript);
+      if (commande.type === "budget") {
+        setBudgetDicte(commande.montant);
+      } else {
+        setBrouillon({ ...commande.article, status: "a_acheter" });
+      }
     };
     recognition.onerror = () => setEcoute(false);
     recognition.onend = () => setEcoute(false);
@@ -66,6 +73,40 @@ export function SaisieVocale({
         La saisie vocale n&apos;est pas disponible sur ce navigateur — utilise
         la saisie manuelle ci-dessous.
       </p>
+    );
+  }
+
+  if (budgetDicte !== null) {
+    return (
+      <form
+        action={definirBudgetAction}
+        className="flex flex-col gap-2 rounded-xl border border-ambre/40 bg-ambre/10 p-4"
+        onSubmit={() => setBudgetDicte(null)}
+      >
+        <p className="text-xs font-medium text-ambre">
+          Confirme le nouveau budget du mois
+        </p>
+        <input
+          name="budgetAmount"
+          type="number"
+          step="0.01"
+          min={0}
+          defaultValue={budgetDicte}
+          className="rounded-lg border border-ardoise/20 bg-white px-3 py-2 text-ardoise"
+        />
+        <div className="flex gap-2">
+          <button type="submit" className="flex-1 rounded-lg bg-basilic px-3 py-2 font-medium text-craie">
+            Confirmer
+          </button>
+          <button
+            type="button"
+            onClick={() => setBudgetDicte(null)}
+            className="rounded-lg border border-ardoise/20 px-3 py-2 text-ardoise"
+          >
+            Annuler
+          </button>
+        </div>
+      </form>
     );
   }
 
@@ -129,12 +170,17 @@ export function SaisieVocale({
   }
 
   return (
-    <button
-      type="button"
-      onClick={demarrerEcoute}
-      className="flex items-center justify-center gap-2 rounded-xl border border-ardoise/20 bg-white px-4 py-3 font-medium text-ardoise hover:bg-ardoise/5"
-    >
-      {ecoute ? "Je t'écoute…" : "🎙️ Dicter un article"}
-    </button>
+    <div className="flex flex-col items-center gap-1">
+      <button
+        type="button"
+        onClick={demarrerEcoute}
+        className="flex items-center justify-center gap-2 rounded-xl border border-ardoise/20 bg-white px-4 py-3 font-medium text-ardoise hover:bg-ardoise/5"
+      >
+        {ecoute ? "Je t'écoute…" : "🎙️ Dicter un article"}
+      </button>
+      <p className="text-xs text-ardoise/50">
+        Fonctionne aussi pour le budget : « budget du mois 250 euros »
+      </p>
+    </div>
   );
 }

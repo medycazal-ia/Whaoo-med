@@ -6,6 +6,7 @@ import { SaisieVocale } from "@/components/saisie-vocale";
 export type ArticleCourse = {
   id: string;
   label: string;
+  detail?: string | null;
   price: number;
   quantity: number;
   status: "achete" | "a_acheter";
@@ -15,18 +16,13 @@ type CoursesActions = {
   ajouterArticle: (formData: FormData) => Promise<void>;
   basculerStatutArticle: (formData: FormData) => Promise<void>;
   supprimerArticle: (formData: FormData) => Promise<void>;
+  definirBudget: (formData: FormData) => Promise<void>;
 };
 
 const STATUT_STYLES: Record<string, string> = {
   serein: "bg-basilic/15 text-basilic",
   vigilant: "bg-ambre/15 text-ambre",
   attention: "bg-tomate/15 text-tomate",
-};
-
-const STATUT_LABELS: Record<string, string> = {
-  serein: "Serein, tu tiens le rythme",
-  vigilant: "Vigilant, ça se resserre",
-  attention: "Attention, tu dépenses trop vite",
 };
 
 export function CoursesDashboard({
@@ -57,6 +53,7 @@ export function CoursesDashboard({
   });
 
   const itemsAffiches = items.filter((item) => item.status === vueActive);
+  const itemsEnAttente = items.filter((item) => item.status === "a_acheter");
 
   return (
     <>
@@ -83,21 +80,47 @@ export function CoursesDashboard({
           <span
             className={`w-fit rounded-full px-3 py-1 text-xs font-medium ${STATUT_STYLES[rythme.statut]}`}
           >
-            {STATUT_LABELS[rythme.statut]}
+            {rythme.statutLabel}
           </span>
-          {rythme.cagnotte > 0 && (
-            <p className="text-sm text-craie/80">
-              Cagnotte du mois : <strong>{rythme.cagnotte.toFixed(2)} €</strong>
-              {rythme.palierAtteint && (
-                <> — de quoi te faire plaisir : {rythme.palierAtteint.label} 🎉</>
-              )}
-            </p>
-          )}
+          <p className="text-sm text-craie/80">
+            🐷 Cagnotte estimée : <strong>{rythme.cagnotte.toFixed(2)} €</strong>
+          </p>
+          <p className="text-xs text-craie/60">{rythme.conseilCagnotte}</p>
         </div>
       </section>
 
+      {itemsEnAttente.length > 0 && (
+        <section className="mx-auto w-full max-w-lg px-6 pt-6">
+          <div className="rounded-xl border border-ambre bg-ambre/15 p-4">
+            <p className="font-heading text-sm font-semibold text-ardoise">
+              🔔 À ne pas oublier
+            </p>
+            <ul className="mt-2 flex flex-col divide-y divide-ardoise/10">
+              {itemsEnAttente.map((item) => (
+                <li key={item.id} className="flex items-center justify-between gap-2 py-2 text-sm text-ardoise">
+                  <span>
+                    {item.label}
+                    {item.detail ? ` (${item.detail})` : ""}
+                  </span>
+                  <form action={actions.basculerStatutArticle}>
+                    <input type="hidden" name="id" value={item.id} />
+                    <input type="hidden" name="status" value="achete" />
+                    <button type="submit" className="rounded-lg bg-basilic px-2 py-1 text-xs font-medium text-craie">
+                      Acheté ✓
+                    </button>
+                  </form>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
+
       <section className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-4 px-6 py-6">
-        <SaisieVocale ajouterArticleAction={actions.ajouterArticle} />
+        <SaisieVocale
+          ajouterArticleAction={actions.ajouterArticle}
+          definirBudgetAction={actions.definirBudget}
+        />
 
         <form
           action={actions.ajouterArticle}
@@ -107,7 +130,12 @@ export function CoursesDashboard({
             name="label"
             placeholder="Article"
             required
-            className="flex-1 rounded-lg border border-ardoise/20 px-3 py-2 text-ardoise"
+            className="flex-1 basis-full rounded-lg border border-ardoise/20 px-3 py-2 text-ardoise"
+          />
+          <input
+            name="detail"
+            placeholder="Détail (poids, format…)"
+            className="flex-1 basis-full rounded-lg border border-ardoise/20 px-3 py-2 text-ardoise"
           />
           <input
             name="price"
@@ -175,6 +203,7 @@ export function CoursesDashboard({
                   {item.quantity > 1 ? `${item.quantity} × ` : ""}
                   {item.label}
                 </p>
+                <p className="text-xs text-ardoise/50">{item.detail}</p>
                 <p className="font-mono text-sm text-ardoise/60">
                   {(item.price * item.quantity).toFixed(2)} €
                 </p>

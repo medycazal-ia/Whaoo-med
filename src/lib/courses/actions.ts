@@ -43,6 +43,7 @@ export async function ajouterArticle(formData: FormData): Promise<void> {
   const { supabase, user } = await requireUser();
 
   const label = String(formData.get("label") ?? "").trim();
+  const detail = String(formData.get("detail") ?? "").trim();
   const price = Number(formData.get("price") ?? 0) || 0;
   const quantity = Math.max(1, Number(formData.get("quantity") ?? 1) || 1);
   const status = formData.get("status") === "achete" ? "achete" : "a_acheter";
@@ -51,24 +52,14 @@ export async function ajouterArticle(formData: FormData): Promise<void> {
     redirect("/app?error=article_invalide");
   }
 
-  const { data: periode } = await supabase
-    .from("budget_periods")
-    .select("id")
-    .eq("user_id", user.id)
-    .eq("month", moisEnDateISO())
-    .single();
-
-  if (!periode) {
-    redirect("/app?error=budget_manquant");
-  }
-
   await supabase.from("items").insert({
     user_id: user.id,
-    budget_period_id: periode.id,
     label,
+    detail: detail || null,
     price,
     quantity,
     status,
+    achat_mois: status === "achete" ? moisEnDateISO() : null,
   });
 
   revalidatePath("/app");
@@ -81,7 +72,11 @@ export async function basculerStatutArticle(formData: FormData): Promise<void> {
 
   await supabase
     .from("items")
-    .update({ status: nouveauStatut, updated_at: new Date().toISOString() })
+    .update({
+      status: nouveauStatut,
+      achat_mois: nouveauStatut === "achete" ? moisEnDateISO() : null,
+      updated_at: new Date().toISOString(),
+    })
     .eq("id", id)
     .eq("user_id", user.id);
 

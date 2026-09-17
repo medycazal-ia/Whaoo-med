@@ -75,6 +75,7 @@ export default async function DemoPage({
           ajouterArticle: ajouterArticleDemo,
           basculerStatutArticle: basculerStatutArticleDemo,
           supprimerArticle: supprimerArticleDemo,
+          definirBudget: definirBudgetDemo,
         }}
         footer={
           <section className="mx-auto w-full max-w-lg px-6 pb-10">

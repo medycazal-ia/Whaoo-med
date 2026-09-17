@@ -23,6 +23,7 @@ export async function ajouterArticleDemo(formData: FormData): Promise<void> {
   const label = String(formData.get("label") ?? "").trim();
   if (!label) return;
 
+  const detail = String(formData.get("detail") ?? "").trim();
   const price = Number(formData.get("price") ?? 0) || 0;
   const quantity = Math.max(1, Number(formData.get("quantity") ?? 1) || 1);
   const status = formData.get("status") === "achete" ? "achete" : "a_acheter";
@@ -30,6 +31,7 @@ export async function ajouterArticleDemo(formData: FormData): Promise<void> {
   state.items.unshift({
     id: crypto.randomUUID(),
     label,
+    detail: detail || null,
     price,
     quantity,
     status,

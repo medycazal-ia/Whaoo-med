@@ -70,31 +70,43 @@ export function normaliserLabel(texte: string): string {
 
 export type IndexCommunautaire = Record<string, number>;
 
+// Origine d'un prix affiché dans l'app : saisi à la main par l'utilisateur,
+// calculé à partir des contributions anonymes d'autres utilisateurs, ou
+// repris de la table statique indicative ci-dessus.
+export type SourcePrix = "manuel" | "communaute" | "statique";
+
+export const LABEL_SOURCE_PRIX: Record<SourcePrix, string> = {
+  manuel: "Prix saisi",
+  communaute: "Moyenne communauté",
+  statique: "Prix indicatif",
+};
+
 /**
- * Cherche une estimation de prix pour un article à partir de son nom.
- * Priorité aux prix remontés par la communauté (plus fiables, réels) s'ils
- * existent pour cet article, sinon repli sur la table statique indicative.
- * Correspondance approximative (sous-chaîne dans un sens ou dans l'autre) —
- * ne renvoie qu'une suggestion, jamais un prix garanti exact.
+ * Cherche une estimation de prix pour un article à partir de son nom, et
+ * indique d'où elle vient. Priorité aux prix remontés par la communauté
+ * (plus fiables, réels) s'ils existent pour cet article, sinon repli sur la
+ * table statique indicative. Correspondance approximative (sous-chaîne dans
+ * un sens ou dans l'autre) — ne renvoie qu'une suggestion, jamais un prix
+ * garanti exact.
  */
 export function estimerPrix(
   label: string,
   indexCommunautaire?: IndexCommunautaire,
-): number | null {
+): { prix: number; source: SourcePrix } | null {
   const normalise = normaliserLabel(label);
   if (!normalise) return null;
 
   if (indexCommunautaire) {
     for (const [cle, prix] of Object.entries(indexCommunautaire)) {
       if (normalise.includes(cle) || cle.includes(normalise)) {
-        return prix;
+        return { prix, source: "communaute" };
       }
     }
   }
 
   for (const [cle, prix] of Object.entries(PRIX_MOYENS)) {
     if (normalise.includes(cle) || cle.includes(normalise)) {
-      return prix;
+      return { prix, source: "statique" };
     }
   }
   return null;

@@ -2,7 +2,12 @@
 
 import { useRef, useState } from "react";
 import { parserPhraseVocale } from "@/lib/courses/parse-vocal";
-import { estimerPrix, type IndexCommunautaire } from "@/lib/prix-estimes";
+import {
+  estimerPrix,
+  LABEL_SOURCE_PRIX,
+  type IndexCommunautaire,
+  type SourcePrix,
+} from "@/lib/prix-estimes";
 
 type SpeechRecognitionLike = {
   lang: string;
@@ -27,10 +32,12 @@ export function SaisieVocale({
   ajouterArticleAction,
   definirBudgetAction,
   indexCommunautaire,
+  proposerPartage = false,
 }: {
   ajouterArticleAction: (formData: FormData) => Promise<void>;
   definirBudgetAction: (formData: FormData) => Promise<void>;
   indexCommunautaire?: IndexCommunautaire;
+  proposerPartage?: boolean;
 }) {
   const [ecoute, setEcoute] = useState(false);
   const [brouillon, setBrouillon] = useState<{
@@ -40,7 +47,7 @@ export function SaisieVocale({
     status: "achete" | "a_acheter";
   } | null>(null);
   const [budgetDicte, setBudgetDicte] = useState<number | null>(null);
-  const [prixEstime, setPrixEstime] = useState(false);
+  const [sourcePrix, setSourcePrix] = useState<SourcePrix | null>(null);
   const [nonSupporte, setNonSupporte] = useState(false);
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
 
@@ -64,8 +71,8 @@ export function SaisieVocale({
         if (article.price === 0) {
           const estimation = estimerPrix(article.label, indexCommunautaire);
           if (estimation !== null) {
-            article.price = estimation;
-            setPrixEstime(true);
+            article.price = estimation.prix;
+            setSourcePrix(estimation.source);
           }
         }
         setBrouillon({ ...article, status: "a_acheter" });
@@ -129,7 +136,7 @@ export function SaisieVocale({
         className="flex flex-col gap-2 rounded-xl border border-ambre/40 bg-ambre/10 p-4"
         onSubmit={() => {
           setBrouillon(null);
-          setPrixEstime(false);
+          setSourcePrix(null);
         }}
       >
         <p className="text-xs font-medium text-ambre">
@@ -148,10 +155,12 @@ export function SaisieVocale({
               type="number"
               step="0.01"
               defaultValue={brouillon.price}
-              onChange={() => setPrixEstime(false)}
+              onChange={() => setSourcePrix(null)}
               className="w-24 rounded-lg border border-ardoise/20 bg-white px-3 py-2 text-ardoise"
             />
-            {prixEstime && <span className="text-xs text-ardoise/50">Prix estimé</span>}
+            {sourcePrix && (
+              <span className="text-xs text-ardoise/50">{LABEL_SOURCE_PRIX[sourcePrix]}</span>
+            )}
           </div>
           <input
             name="quantity"
@@ -169,6 +178,22 @@ export function SaisieVocale({
             <option value="achete">Déjà acheté</option>
           </select>
         </div>
+        <input type="hidden" name="prixSource" value={sourcePrix ?? "manuel"} />
+
+        {proposerPartage && (
+          <div className="flex flex-wrap items-center gap-2 text-xs text-ardoise/70">
+            <input
+              name="enseigne"
+              placeholder="Enseigne (optionnel)"
+              className="rounded-lg border border-ardoise/20 bg-white px-2 py-1 text-ardoise"
+            />
+            <label className="flex items-center gap-1.5">
+              <input type="checkbox" name="partagerPrix" />
+              Partager ce prix (anonyme) pour aider les estimations
+            </label>
+          </div>
+        )}
+
         <div className="flex gap-2">
           <button
             type="submit"
@@ -180,7 +205,7 @@ export function SaisieVocale({
             type="button"
             onClick={() => {
               setBrouillon(null);
-              setPrixEstime(false);
+              setSourcePrix(null);
             }}
             className="rounded-lg border border-ardoise/20 px-3 py-2 text-ardoise"
           >

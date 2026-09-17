@@ -5,7 +5,7 @@ import { SaisieVocale } from "@/components/saisie-vocale";
 import { ChampsArticlePrix } from "@/components/champs-article-prix";
 import { AjouterDepuisRecette } from "@/components/ajouter-depuis-recette";
 import type { IngredientParse } from "@/lib/courses/parse-recette";
-import type { IndexCommunautaire } from "@/lib/prix-estimes";
+import { LABEL_SOURCE_PRIX, type IndexCommunautaire, type SourcePrix } from "@/lib/prix-estimes";
 
 export type ArticleCourse = {
   id: string;
@@ -14,6 +14,7 @@ export type ArticleCourse = {
   price: number;
   quantity: number;
   status: "achete" | "a_acheter";
+  prixSource?: SourcePrix | null;
 };
 
 type CoursesActions = {
@@ -134,6 +135,7 @@ export function CoursesDashboard({
           ajouterArticleAction={actions.ajouterArticle}
           definirBudgetAction={actions.definirBudget}
           indexCommunautaire={indexCommunautaire}
+          proposerPartage={proposerPartagePrix}
         />
 
         <form
@@ -206,6 +208,11 @@ export function CoursesDashboard({
                 <p className="text-xs text-ardoise/50">{item.detail}</p>
                 <p className="font-mono text-sm text-ardoise/60">
                   {(item.price * item.quantity).toFixed(2)} €
+                  {item.prixSource && item.prixSource !== "manuel" && (
+                    <span className="ml-2 rounded-full bg-basilic/10 px-2 py-0.5 font-sans text-[11px] font-medium text-basilic">
+                      {LABEL_SOURCE_PRIX[item.prixSource]}
+                    </span>
+                  )}
                 </p>
               </div>
               <div className="flex gap-1">

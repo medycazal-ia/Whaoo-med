@@ -49,14 +49,14 @@ export default async function AppHomePage({
   const [{ data: itemsAAcheter }, { data: itemsAchetesCeMois }] = await Promise.all([
     supabase
       .from("items")
-      .select("id, label, detail, price, quantity, status")
+      .select("id, label, detail, price, quantity, status, prix_source")
       .eq("user_id", user.id)
       .eq("status", "a_acheter")
       .order("created_at", { ascending: false }),
     periode
       ? supabase
           .from("items")
-          .select("id, label, detail, price, quantity, status")
+          .select("id, label, detail, price, quantity, status, prix_source")
           .eq("user_id", user.id)
           .eq("status", "achete")
           .eq("achat_mois", moisISO)
@@ -64,7 +64,9 @@ export default async function AppHomePage({
       : Promise.resolve({ data: [] as never[] }),
   ]);
 
-  const items = [...(itemsAAcheter ?? []), ...(itemsAchetesCeMois ?? [])];
+  const items = [...(itemsAAcheter ?? []), ...(itemsAchetesCeMois ?? [])].map(
+    (item) => ({ ...item, prixSource: item.prix_source }),
+  );
   const indexCommunautaire = await recupererIndexCommunautaire();
 
   return (

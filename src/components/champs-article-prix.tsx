@@ -1,7 +1,12 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { estimerPrix, type IndexCommunautaire } from "@/lib/prix-estimes";
+import {
+  estimerPrix,
+  LABEL_SOURCE_PRIX,
+  type IndexCommunautaire,
+  type SourcePrix,
+} from "@/lib/prix-estimes";
 
 export function ChampsArticlePrix({
   defaultStatus,
@@ -13,7 +18,7 @@ export function ChampsArticlePrix({
   proposerPartage?: boolean;
 }) {
   const priceRef = useRef<HTMLInputElement>(null);
-  const [estimee, setEstimee] = useState(false);
+  const [source, setSource] = useState<SourcePrix | null>(null);
 
   return (
     <>
@@ -27,8 +32,8 @@ export function ChampsArticlePrix({
           if (!priceInput || priceInput.value) return;
           const estimation = estimerPrix(e.target.value, indexCommunautaire);
           if (estimation !== null) {
-            priceInput.value = String(estimation);
-            setEstimee(true);
+            priceInput.value = String(estimation.prix);
+            setSource(estimation.source);
           }
         }}
       />
@@ -46,10 +51,13 @@ export function ChampsArticlePrix({
           min={0}
           placeholder="Prix"
           className="w-24 rounded-lg border border-ardoise/20 px-3 py-2 text-ardoise"
-          onChange={() => setEstimee(false)}
+          onChange={() => setSource(null)}
         />
-        {estimee && <span className="text-xs text-ardoise/50">Prix estimé</span>}
+        {source && (
+          <span className="text-xs text-ardoise/50">{LABEL_SOURCE_PRIX[source]}</span>
+        )}
       </div>
+      <input type="hidden" name="prixSource" value={source ?? "manuel"} />
       <input
         name="quantity"
         type="number"

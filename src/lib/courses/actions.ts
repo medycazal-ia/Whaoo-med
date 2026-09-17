@@ -4,7 +4,12 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { premierJourDuMois } from "@/lib/courses/rythme";
-import { normaliserLabel, type IndexCommunautaire } from "@/lib/prix-estimes";
+import { normaliserLabel, type IndexCommunautaire, type SourcePrix } from "@/lib/prix-estimes";
+
+function lireSourcePrix(formData: FormData): SourcePrix {
+  const valeur = formData.get("prixSource");
+  return valeur === "communaute" || valeur === "statique" ? valeur : "manuel";
+}
 
 function moisEnDateISO(reference = new Date()): string {
   return premierJourDuMois(reference).toISOString().slice(0, 10);
@@ -50,6 +55,7 @@ export async function ajouterArticle(formData: FormData): Promise<void> {
   const status = formData.get("status") === "achete" ? "achete" : "a_acheter";
   const partagerPrix = formData.get("partagerPrix") === "on";
   const enseigne = String(formData.get("enseigne") ?? "").trim();
+  const prixSource = lireSourcePrix(formData);
 
   if (!label) {
     redirect("/app?error=article_invalide");
@@ -63,6 +69,7 @@ export async function ajouterArticle(formData: FormData): Promise<void> {
     quantity,
     status,
     achat_mois: status === "achete" ? moisEnDateISO() : null,
+    prix_source: prixSource,
   });
 
   // Contribution communautaire de prix (section "prix estimés", inspirée

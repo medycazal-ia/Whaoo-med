@@ -121,7 +121,7 @@ export default async function Home({
       </section>
 
       {supportLinkUrl && (
-        <footer className="border-t border-craie/10 px-6 py-8 text-center">
+        <div className="border-t border-craie/10 px-6 py-8 text-center">
           <p className="mx-auto max-w-md text-xs text-craie/50">
             Cette appli est gratuite à l&apos;usage de base et développée
             seule. Si elle te rend service, tu peux{" "}
@@ -132,8 +132,20 @@ export default async function Home({
             obligation — chaque contribution aide à continuer sans faire
             payer l&apos;essentiel.
           </p>
-        </footer>
+        </div>
       )}
+
+      <footer className="flex flex-wrap justify-center gap-4 border-t border-craie/10 px-6 py-6 text-xs text-craie/50">
+        <Link href="/mentions-legales" className="underline">
+          Mentions légales
+        </Link>
+        <Link href="/confidentialite" className="underline">
+          Politique de confidentialité
+        </Link>
+        <Link href="/cgu" className="underline">
+          Conditions générales d&apos;utilisation
+        </Link>
+      </footer>
     </main>
   );
 }

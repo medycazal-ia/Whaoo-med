@@ -2,7 +2,7 @@
   "name": "whaoo — courses et budget",
   "short_name": "whaoo",
   "description": "Note tes courses à la voix, suis ton budget du mois en temps réel et laisse ta cagnotte se remplir toute seule.",
-  "start_url": "/app",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#FBF8F1",

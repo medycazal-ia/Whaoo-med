@@ -71,7 +71,7 @@ export default async function AppHomePage({
 
   return (
     <main className="flex flex-1 flex-col bg-craie">
-      <header className="flex flex-wrap items-center justify-between gap-2 bg-ardoise px-3 py-3 sm:px-6 sm:py-4">
+      <header className="flex flex-wrap items-center justify-between gap-2 bg-kaki px-3 py-3 sm:px-6 sm:py-4">
         <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           <Image
             src={avatarSrc(profile?.avatar_id)}

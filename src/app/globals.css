@@ -9,6 +9,7 @@
   --color-tomate: #c1452d;
   --color-basilic: #5e7c52;
   --color-ambre: #c98a2c;
+  --color-kaki: #4a4229;
 
   --background: var(--color-ticket);
   --foreground: var(--color-ardoise);
@@ -22,6 +23,7 @@
   --color-tomate: var(--color-tomate);
   --color-basilic: var(--color-basilic);
   --color-ambre: var(--color-ambre);
+  --color-kaki: var(--color-kaki);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);

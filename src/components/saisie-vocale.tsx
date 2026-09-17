@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { parserPhraseVocale } from "@/lib/courses/parse-vocal";
+import { estimerPrix } from "@/lib/prix-estimes";
 
 type SpeechRecognitionLike = {
   lang: string;
@@ -37,6 +38,7 @@ export function SaisieVocale({
     status: "achete" | "a_acheter";
   } | null>(null);
   const [budgetDicte, setBudgetDicte] = useState<number | null>(null);
+  const [prixEstime, setPrixEstime] = useState(false);
   const [nonSupporte, setNonSupporte] = useState(false);
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
 
@@ -56,7 +58,15 @@ export function SaisieVocale({
       if (commande.type === "budget") {
         setBudgetDicte(commande.montant);
       } else {
-        setBrouillon({ ...commande.article, status: "a_acheter" });
+        const article = commande.article;
+        if (article.price === 0) {
+          const estimation = estimerPrix(article.label);
+          if (estimation !== null) {
+            article.price = estimation;
+            setPrixEstime(true);
+          }
+        }
+        setBrouillon({ ...article, status: "a_acheter" });
       }
     };
     recognition.onerror = () => setEcoute(false);
@@ -115,7 +125,10 @@ export function SaisieVocale({
       <form
         action={ajouterArticleAction}
         className="flex flex-col gap-2 rounded-xl border border-ambre/40 bg-ambre/10 p-4"
-        onSubmit={() => setBrouillon(null)}
+        onSubmit={() => {
+          setBrouillon(null);
+          setPrixEstime(false);
+        }}
       >
         <p className="text-xs font-medium text-ambre">
           Vérifie avant d&apos;enregistrer — la reconnaissance vocale n&apos;est
@@ -127,13 +140,17 @@ export function SaisieVocale({
           className="rounded-lg border border-ardoise/20 bg-white px-3 py-2 text-ardoise"
         />
         <div className="flex gap-2">
-          <input
-            name="price"
-            type="number"
-            step="0.01"
-            defaultValue={brouillon.price}
-            className="w-24 rounded-lg border border-ardoise/20 bg-white px-3 py-2 text-ardoise"
-          />
+          <div className="flex flex-col gap-1">
+            <input
+              name="price"
+              type="number"
+              step="0.01"
+              defaultValue={brouillon.price}
+              onChange={() => setPrixEstime(false)}
+              className="w-24 rounded-lg border border-ardoise/20 bg-white px-3 py-2 text-ardoise"
+            />
+            {prixEstime && <span className="text-xs text-ardoise/50">Prix estimé</span>}
+          </div>
           <input
             name="quantity"
             type="number"
@@ -159,7 +176,10 @@ export function SaisieVocale({
           </button>
           <button
             type="button"
-            onClick={() => setBrouillon(null)}
+            onClick={() => {
+              setBrouillon(null);
+              setPrixEstime(false);
+            }}
             className="rounded-lg border border-ardoise/20 px-3 py-2 text-ardoise"
           >
             Annuler

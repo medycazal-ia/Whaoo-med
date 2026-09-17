@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { calculerRythme, premierJourDuMois } from "@/lib/courses/rythme";
 import { SaisieVocale } from "@/components/saisie-vocale";
+import { ChampsArticlePrix } from "@/components/champs-article-prix";
 
 export type ArticleCourse = {
   id: string;
@@ -130,40 +131,7 @@ export function CoursesDashboard({
           action={actions.ajouterArticle}
           className="flex flex-wrap gap-2 rounded-xl border border-ardoise/10 bg-white p-4"
         >
-          <input
-            name="label"
-            placeholder="Article"
-            required
-            className="flex-1 basis-full rounded-lg border border-ardoise/20 px-3 py-2 text-ardoise"
-          />
-          <input
-            name="detail"
-            placeholder="Détail (poids, format…)"
-            className="flex-1 basis-full rounded-lg border border-ardoise/20 px-3 py-2 text-ardoise"
-          />
-          <input
-            name="price"
-            type="number"
-            step="0.01"
-            min={0}
-            placeholder="Prix"
-            className="w-24 rounded-lg border border-ardoise/20 px-3 py-2 text-ardoise"
-          />
-          <input
-            name="quantity"
-            type="number"
-            min={1}
-            defaultValue={1}
-            className="w-20 rounded-lg border border-ardoise/20 px-3 py-2 text-ardoise"
-          />
-          <select
-            name="status"
-            defaultValue={vueActive}
-            className="rounded-lg border border-ardoise/20 px-3 py-2 text-ardoise"
-          >
-            <option value="a_acheter">À acheter plus tard</option>
-            <option value="achete">Déjà acheté</option>
-          </select>
+          <ChampsArticlePrix defaultStatus={vueActive} />
           <button
             type="submit"
             className="rounded-lg bg-ardoise px-4 py-2 font-medium text-craie hover:bg-ardoise-light"

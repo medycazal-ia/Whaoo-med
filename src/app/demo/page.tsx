@@ -50,7 +50,7 @@ export default async function DemoPage({
         </div>
       </header>
 
-      <div className="mx-auto w-full max-w-lg px-6 pt-4">
+      <div className="mx-auto w-full max-w-lg md:max-w-2xl lg:max-w-4xl px-6 pt-4">
         <form action={definirBudgetDemo} className="flex items-center gap-2 text-sm text-ardoise/70">
           Budget du mois :
           <input
@@ -80,7 +80,7 @@ export default async function DemoPage({
           ajouterArticlesEnLot: ajouterArticlesEnLotDemo,
         }}
         footer={
-          <section className="mx-auto w-full max-w-lg px-6 pb-10">
+          <section className="mx-auto w-full max-w-lg md:max-w-2xl lg:max-w-4xl px-6 pb-10">
             <h2 className="font-heading text-lg font-semibold text-ardoise">
               Historique (démo)
             </h2>

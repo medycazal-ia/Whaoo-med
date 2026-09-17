@@ -107,7 +107,7 @@ export default async function AppHomePage({
       </header>
 
       {!periode ? (
-        <section className="mx-auto mt-8 w-full max-w-sm rounded-2xl bg-white p-6 shadow">
+        <section className="mx-auto mt-8 w-full max-w-sm md:max-w-md rounded-2xl bg-white p-6 shadow">
           <h2 className="font-heading text-lg font-semibold text-ardoise">
             Nouveau mois, quel budget ?
           </h2>

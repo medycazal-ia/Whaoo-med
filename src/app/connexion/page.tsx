@@ -19,7 +19,7 @@ export default async function ConnexionPage({
 
   return (
     <main className="flex flex-1 items-center justify-center bg-ardoise px-6 py-12">
-      <div className="w-full max-w-sm rounded-2xl bg-ticket p-8 shadow-xl">
+      <div className="w-full max-w-sm md:max-w-md rounded-2xl bg-ticket p-8 shadow-xl">
         <h1 className="font-heading text-2xl font-semibold text-ardoise">
           Content de te revoir
         </h1>

@@ -73,7 +73,7 @@ export function CoursesDashboard({
       {banner}
 
       <section className="bg-ardoise px-6 pb-6">
-        <div className="mx-auto flex max-w-lg flex-col gap-3 rounded-2xl bg-ardoise-light p-5">
+        <div className="mx-auto flex max-w-lg md:max-w-2xl lg:max-w-4xl flex-col gap-3 rounded-2xl bg-ardoise-light p-5">
           <div className="flex items-baseline justify-between font-mono text-craie">
             <span className="text-2xl font-semibold">
               {totalDepense.toFixed(2)} €
@@ -103,7 +103,7 @@ export function CoursesDashboard({
       </section>
 
       {itemsEnAttente.length > 0 && (
-        <section className="mx-auto w-full max-w-lg px-6 pt-6">
+        <section className="mx-auto w-full max-w-lg md:max-w-2xl lg:max-w-4xl px-6 pt-6">
           <div className="rounded-xl border border-ambre bg-ambre/15 p-4">
             <p className="font-heading text-sm font-semibold text-ardoise">
               🔔 À ne pas oublier
@@ -129,7 +129,7 @@ export function CoursesDashboard({
         </section>
       )}
 
-      <section className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-4 px-6 py-6">
+      <section className="mx-auto flex w-full max-w-lg md:max-w-2xl lg:max-w-4xl flex-1 flex-col gap-4 px-6 py-6">
         <SaisieVocale
           ajouterArticleAction={actions.ajouterArticle}
           definirBudgetAction={actions.definirBudget}
@@ -187,9 +187,9 @@ export function CoursesDashboard({
           </Link>
         </div>
 
-        <ul className="flex flex-col gap-2">
+        <ul className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-3">
           {itemsAffiches.length === 0 && (
-            <p className="rounded-lg bg-white p-4 text-center text-sm text-ardoise/60">
+            <p className="col-span-full rounded-lg bg-white p-4 text-center text-sm text-ardoise/60">
               Rien ici pour l&apos;instant.
             </p>
           )}

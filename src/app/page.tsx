@@ -45,7 +45,12 @@ async function recupererCodeParrainage(): Promise<string | null> {
   }
 }
 
-export default async function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ compte_supprime?: string }>;
+}) {
+  const { compte_supprime } = await searchParams;
   const referralCode = await recupererCodeParrainage();
   const supportLinkUrl = process.env.SUPPORT_LINK_URL;
 
@@ -62,6 +67,12 @@ export default async function Home() {
           Se connecter
         </Link>
       </header>
+
+      {compte_supprime && (
+        <p className="mx-6 mt-2 rounded-lg bg-basilic/15 px-4 py-2 text-center text-sm text-basilic">
+          Ton compte et tes données ont bien été supprimés.
+        </p>
+      )}
 
       <section className="flex flex-col items-center gap-4 px-6 pb-10 pt-4 text-center text-craie">
         <h1 className="max-w-lg font-heading text-3xl font-semibold">

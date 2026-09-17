@@ -75,6 +75,12 @@ export default async function AppHomePage({
           >
             Parrainage
           </Link>
+          <Link
+            href="/app/parametres"
+            className="rounded-lg border border-craie/30 px-3 py-1.5 text-sm text-craie hover:bg-craie/10"
+          >
+            Paramètres
+          </Link>
           <form action={signOut}>
             <button
               type="submit"

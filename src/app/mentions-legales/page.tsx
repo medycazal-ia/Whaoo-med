@@ -2,7 +2,7 @@ import { EDITEUR, HEBERGEUR, NOM_APPLICATION } from "@/lib/legal-info";
 
 export default function MentionsLegalesPage() {
   return (
-    <main className="mx-auto max-w-2xl px-6 py-12 text-ardoise">
+    <main className="mx-auto max-w-2xl px-4 sm:px-6 py-12 text-ardoise">
       <h1 className="font-heading text-2xl font-semibold">Mentions légales</h1>
 
       <section className="mt-6">

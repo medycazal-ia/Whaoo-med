@@ -73,7 +73,7 @@ export function CoursesDashboard({
     <>
       {banner}
 
-      <section className="px-6 pt-6 pb-6">
+      <section className="px-4 sm:px-6 pt-6 pb-6">
         <div className="mx-auto flex max-w-lg md:max-w-2xl lg:max-w-4xl flex-col gap-3 rounded-2xl bg-ardoise p-5">
           <div className="flex items-baseline justify-between font-mono text-craie">
             <span className="text-2xl font-semibold">
@@ -104,7 +104,7 @@ export function CoursesDashboard({
       </section>
 
       {itemsEnAttente.length > 0 && (
-        <section className="mx-auto w-full max-w-lg md:max-w-2xl lg:max-w-4xl px-6 pt-6">
+        <section className="mx-auto w-full max-w-lg md:max-w-2xl lg:max-w-4xl px-4 sm:px-6 pt-6">
           <div className="rounded-xl border border-ambre bg-ambre/15 p-4">
             <p className="font-heading text-sm font-semibold text-ardoise">
               🔔 À ne pas oublier
@@ -130,7 +130,7 @@ export function CoursesDashboard({
         </section>
       )}
 
-      <section className="mx-auto flex w-full max-w-lg md:max-w-2xl lg:max-w-4xl flex-1 flex-col gap-4 px-6 py-6">
+      <section className="mx-auto flex w-full max-w-lg md:max-w-2xl lg:max-w-4xl flex-1 flex-col gap-4 px-4 sm:px-6 py-6">
         <SaisieVocale
           ajouterArticleAction={actions.ajouterArticle}
           definirBudgetAction={actions.definirBudget}

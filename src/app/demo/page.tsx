@@ -24,7 +24,7 @@ export default async function DemoPage({
 
   return (
     <main className="flex flex-1 flex-col bg-craie">
-      <div className="bg-ambre px-6 py-2 text-center text-sm font-medium text-ardoise">
+      <div className="bg-ambre px-4 sm:px-6 py-2 text-center text-sm font-medium text-ardoise">
         Mode démo — tes modifications ne seront pas conservées
       </div>
 
@@ -50,7 +50,7 @@ export default async function DemoPage({
         </div>
       </header>
 
-      <div className="mx-auto w-full max-w-lg md:max-w-2xl lg:max-w-4xl px-6 pt-4">
+      <div className="mx-auto w-full max-w-lg md:max-w-2xl lg:max-w-4xl px-4 sm:px-6 pt-4">
         <form action={definirBudgetDemo} className="flex items-center gap-2 text-sm text-ardoise/70">
           Budget du mois :
           <input
@@ -80,7 +80,7 @@ export default async function DemoPage({
           ajouterArticlesEnLot: ajouterArticlesEnLotDemo,
         }}
         footer={
-          <section className="mx-auto w-full max-w-lg md:max-w-2xl lg:max-w-4xl px-6 pb-10">
+          <section className="mx-auto w-full max-w-lg md:max-w-2xl lg:max-w-4xl px-4 sm:px-6 pb-10">
             <h2 className="font-heading text-lg font-semibold text-ardoise">
               Historique (démo)
             </h2>

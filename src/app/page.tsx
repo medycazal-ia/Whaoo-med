@@ -57,7 +57,7 @@ export default async function Home({
 
   return (
     <main className="flex flex-1 flex-col bg-ardoise">
-      <header className="flex items-center justify-between px-6 py-4">
+      <header className="flex items-center justify-between px-4 sm:px-6 py-4">
         <span className="font-heading text-lg font-semibold text-craie">
           🛒 whaoo
         </span>
@@ -75,7 +75,7 @@ export default async function Home({
         </p>
       )}
 
-      <section className="flex flex-col items-center gap-4 px-6 pb-10 pt-4 text-center text-craie">
+      <section className="flex flex-col items-center gap-4 px-4 sm:px-6 pb-10 pt-4 text-center text-craie">
         <h1 className="max-w-lg font-heading text-3xl font-semibold">
           Tes courses, sans les mauvaises surprises en caisse
         </h1>
@@ -109,7 +109,7 @@ export default async function Home({
         <BoutonInstaller />
       </section>
 
-      <section className="mx-auto grid w-full max-w-3xl gap-4 px-6 pb-16 sm:grid-cols-3">
+      <section className="mx-auto grid w-full max-w-3xl gap-4 px-4 sm:px-6 pb-16 sm:grid-cols-3">
         {ARGUMENTS.map((arg) => (
           <div
             key={arg.titre}
@@ -123,7 +123,7 @@ export default async function Home({
       </section>
 
       {supportLinkUrl && (
-        <div className="border-t border-craie/10 px-6 py-8 text-center">
+        <div className="border-t border-craie/10 px-4 sm:px-6 py-8 text-center">
           <p className="mx-auto max-w-md text-xs text-craie/50">
             Cette appli est gratuite à l&apos;usage de base et développée
             seule. Si elle te rend service, tu peux{" "}
@@ -137,7 +137,7 @@ export default async function Home({
         </div>
       )}
 
-      <footer className="flex flex-wrap justify-center gap-4 border-t border-craie/10 px-6 py-6 text-xs text-craie/50">
+      <footer className="flex flex-wrap justify-center gap-4 border-t border-craie/10 px-4 sm:px-6 py-6 text-xs text-craie/50">
         <Link href="/mentions-legales" className="underline">
           Mentions légales
         </Link>

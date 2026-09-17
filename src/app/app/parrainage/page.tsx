@@ -40,7 +40,7 @@ export default async function ParrainagePage() {
         </h1>
       </header>
 
-      <section className="mx-auto w-full max-w-lg md:max-w-2xl lg:max-w-4xl px-6 py-6">
+      <section className="mx-auto w-full max-w-lg md:max-w-2xl lg:max-w-4xl px-4 sm:px-6 py-6">
         <div className="rounded-2xl bg-white p-5">
           <p className="text-sm text-ardoise/70">Ton lien de parrainage</p>
           <p className="mt-1 break-all font-mono text-sm text-ardoise">

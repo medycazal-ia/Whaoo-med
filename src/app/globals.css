@@ -31,6 +31,26 @@
   --font-heading: var(--font-space-grotesk);
   --font-mono: var(--font-ibm-plex-mono);
   --font-sans: var(--font-inter);
+
+  /* Échelle de police relevée d'environ 12-15 % : l'appli est utilisée
+     quasi exclusivement sur smartphone, les tailles par défaut de
+     Tailwind (pensées pour du desktop dense) y paraissent trop petites.
+     On ne touche pas à l'échelle d'espacement (padding/gap), seulement
+     au texte, pour ne pas regonfler artificiellement les marges. */
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.125rem;
+  --text-sm: 0.9375rem;
+  --text-sm--line-height: 1.375rem;
+  --text-base: 1.0625rem;
+  --text-base--line-height: 1.625rem;
+  --text-lg: 1.1875rem;
+  --text-lg--line-height: 1.75rem;
+  --text-xl: 1.375rem;
+  --text-xl--line-height: 1.875rem;
+  --text-2xl: 1.625rem;
+  --text-2xl--line-height: 2rem;
+  --text-3xl: 2rem;
+  --text-3xl--line-height: 2.25rem;
 }
 
 body {

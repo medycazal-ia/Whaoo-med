@@ -35,11 +35,13 @@ create index if not exists items_achat_mois_idx on public.items (user_id, achat_
 alter table public.budget_periods enable row level security;
 alter table public.items enable row level security;
 
+drop policy if exists "Un utilisateur gère ses propres périodes de budget" on public.budget_periods;
 create policy "Un utilisateur gère ses propres périodes de budget"
   on public.budget_periods for all
   using (auth.uid() = user_id)
   with check (auth.uid() = user_id);
 
+drop policy if exists "Un utilisateur gère ses propres articles" on public.items;
 create policy "Un utilisateur gère ses propres articles"
   on public.items for all
   using (auth.uid() = user_id)

@@ -14,6 +14,7 @@ create index if not exists push_subscriptions_user_id_idx on public.push_subscri
 
 alter table public.push_subscriptions enable row level security;
 
+drop policy if exists "Un utilisateur gère ses propres abonnements push" on public.push_subscriptions;
 create policy "Un utilisateur gère ses propres abonnements push"
   on public.push_subscriptions for all
   using (auth.uid() = user_id)

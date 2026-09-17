@@ -18,10 +18,12 @@ create table if not exists public.profiles (
 
 alter table public.profiles enable row level security;
 
+drop policy if exists "Un utilisateur voit son propre profil" on public.profiles;
 create policy "Un utilisateur voit son propre profil"
   on public.profiles for select
   using (auth.uid() = id);
 
+drop policy if exists "Un utilisateur modifie son propre profil" on public.profiles;
 create policy "Un utilisateur modifie son propre profil"
   on public.profiles for update
   using (auth.uid() = id);

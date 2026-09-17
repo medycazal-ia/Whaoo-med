@@ -22,6 +22,23 @@ export const metadata: Metadata = {
   title: "whaoo — tes courses, sans les mauvaises surprises en caisse",
   description:
     "Note tes courses à la voix, suis ton budget du mois en temps réel et laisse ta cagnotte se remplir toute seule.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "whaoo",
+  },
+  icons: {
+    icon: [
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
+};
+
+export const viewport = {
+  themeColor: "#2B3A32",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

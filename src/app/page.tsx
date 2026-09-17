@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { BoutonInstaller } from "@/components/bouton-installer";
 
 const ARGUMENTS = [
   {
@@ -105,6 +106,7 @@ export default async function Home({
             Inviter quelqu&apos;un
           </Link>
         )}
+        <BoutonInstaller />
       </section>
 
       <section className="mx-auto grid w-full max-w-3xl gap-4 px-6 pb-16 sm:grid-cols-3">

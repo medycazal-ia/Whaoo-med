@@ -1,0 +1,16 @@
+{
+  "name": "whaoo — courses et budget",
+  "short_name": "whaoo",
+  "description": "Note tes courses à la voix, suis ton budget du mois en temps réel et laisse ta cagnotte se remplir toute seule.",
+  "start_url": "/app",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#FBF8F1",
+  "theme_color": "#2B3A32",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -31,7 +31,7 @@ export default async function ParrainagePage() {
 
   return (
     <main className="flex flex-1 flex-col bg-craie">
-      <header className="flex items-center gap-3 bg-ardoise px-6 py-4">
+      <header className="flex items-center gap-3 bg-ardoise px-3 py-3 sm:px-6 sm:py-4">
         <Link href="/app" className="text-sm text-craie/70 hover:text-craie">
           ← Retour
         </Link>

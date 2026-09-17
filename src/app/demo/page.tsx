@@ -28,22 +28,22 @@ export default async function DemoPage({
         Mode démo — tes modifications ne seront pas conservées
       </div>
 
-      <header className="flex flex-wrap items-center justify-between gap-2 bg-ardoise px-6 py-4">
-        <h1 className="font-heading text-xl font-semibold text-craie">
+      <header className="flex flex-wrap items-center justify-between gap-2 bg-ardoise px-3 py-3 sm:px-6 sm:py-4">
+        <h1 className="truncate font-heading text-base font-semibold text-craie sm:text-xl">
           Bienvenue dans la démo
         </h1>
-        <div className="flex gap-2">
+        <div className="flex shrink-0 gap-1.5 sm:gap-2">
           <form action={reinitialiserDemo}>
             <button
               type="submit"
-              className="rounded-lg border border-craie/30 px-3 py-1.5 text-sm text-craie hover:bg-craie/10"
+              className="rounded-lg border border-craie/30 px-2 py-1.5 text-xs text-craie hover:bg-craie/10 sm:px-3 sm:text-sm"
             >
               Réinitialiser
             </button>
           </form>
           <Link
             href="/inscription"
-            className="rounded-lg bg-basilic px-3 py-1.5 text-sm font-medium text-craie hover:opacity-90"
+            className="rounded-lg bg-basilic px-2 py-1.5 text-xs font-medium text-craie hover:opacity-90 sm:px-3 sm:text-sm"
           >
             Créer mon compte
           </Link>

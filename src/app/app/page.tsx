@@ -71,38 +71,44 @@ export default async function AppHomePage({
 
   return (
     <main className="flex flex-1 flex-col bg-craie">
-      <header className="flex items-center justify-between bg-ardoise px-6 py-4">
-        <div className="flex items-center gap-3">
+      <header className="flex flex-wrap items-center justify-between gap-2 bg-ardoise px-3 py-3 sm:px-6 sm:py-4">
+        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           <Image
             src={avatarSrc(profile?.avatar_id)}
             alt=""
             width={36}
             height={36}
-            className="rounded-full"
+            className="h-8 w-8 shrink-0 rounded-full sm:h-9 sm:w-9"
           />
-          <h1 className="font-heading text-xl font-semibold text-craie">
+          <h1 className="truncate font-heading text-base font-semibold text-craie sm:text-xl">
             Bonjour {profile?.prenom ?? ""}
           </h1>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-1 sm:gap-2">
           <Link
             href="/app/parrainage"
-            className="rounded-lg border border-craie/30 px-3 py-1.5 text-sm text-craie hover:bg-craie/10"
+            title="Parrainage"
+            className="rounded-lg border border-craie/30 px-2 py-1.5 text-xs text-craie hover:bg-craie/10 sm:px-3 sm:text-sm"
           >
-            Parrainage
+            <span aria-hidden className="sm:hidden">🎁</span>
+            <span className="hidden sm:inline">Parrainage</span>
           </Link>
           <Link
             href="/app/parametres"
-            className="rounded-lg border border-craie/30 px-3 py-1.5 text-sm text-craie hover:bg-craie/10"
+            title="Paramètres"
+            className="rounded-lg border border-craie/30 px-2 py-1.5 text-xs text-craie hover:bg-craie/10 sm:px-3 sm:text-sm"
           >
-            Paramètres
+            <span aria-hidden className="sm:hidden">⚙️</span>
+            <span className="hidden sm:inline">Paramètres</span>
           </Link>
           <form action={signOut}>
             <button
               type="submit"
-              className="rounded-lg border border-craie/30 px-3 py-1.5 text-sm text-craie hover:bg-craie/10"
+              title="Se déconnecter"
+              className="rounded-lg border border-craie/30 px-2 py-1.5 text-xs text-craie hover:bg-craie/10 sm:px-3 sm:text-sm"
             >
-              Se déconnecter
+              <span aria-hidden className="sm:hidden">🚪</span>
+              <span className="hidden sm:inline">Se déconnecter</span>
             </button>
           </form>
         </div>

@@ -73,8 +73,8 @@ export function CoursesDashboard({
     <>
       {banner}
 
-      <section className="bg-ardoise px-6 pb-6">
-        <div className="mx-auto flex max-w-lg md:max-w-2xl lg:max-w-4xl flex-col gap-3 rounded-2xl bg-ardoise-light p-5">
+      <section className="px-6 pt-6 pb-6">
+        <div className="mx-auto flex max-w-lg md:max-w-2xl lg:max-w-4xl flex-col gap-3 rounded-2xl bg-ardoise p-5">
           <div className="flex items-baseline justify-between font-mono text-craie">
             <span className="text-2xl font-semibold">
               {totalDepense.toFixed(2)} €

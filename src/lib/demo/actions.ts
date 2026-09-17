@@ -41,6 +41,27 @@ export async function ajouterArticleDemo(formData: FormData): Promise<void> {
   revalidatePath("/demo");
 }
 
+export type IngredientALotter = { label: string; detail: string | null; quantity: number };
+
+export async function ajouterArticlesEnLotDemo(items: IngredientALotter[]): Promise<void> {
+  const cookieStore = await cookies();
+  const state = lireEtatDemo(cookieStore);
+
+  for (const item of items) {
+    state.items.unshift({
+      id: crypto.randomUUID(),
+      label: item.label,
+      detail: item.detail,
+      price: 0,
+      quantity: item.quantity,
+      status: "a_acheter",
+    });
+  }
+
+  await ecrireEtatDemo(state);
+  revalidatePath("/demo");
+}
+
 export async function basculerStatutArticleDemo(formData: FormData): Promise<void> {
   const cookieStore = await cookies();
   const state = lireEtatDemo(cookieStore);

@@ -65,6 +65,29 @@ export async function ajouterArticle(formData: FormData): Promise<void> {
   revalidatePath("/app");
 }
 
+export type IngredientALotter = { label: string; detail: string | null; quantity: number };
+
+// Ajout en lot depuis une liste d'ingrédients collée (ex. recette) —
+// appelé directement depuis un composant client, pas via un <form>.
+export async function ajouterArticlesEnLot(items: IngredientALotter[]): Promise<void> {
+  const { supabase, user } = await requireUser();
+  if (items.length === 0) return;
+
+  await supabase.from("items").insert(
+    items.map((item) => ({
+      user_id: user.id,
+      label: item.label,
+      detail: item.detail,
+      price: 0,
+      quantity: item.quantity,
+      status: "a_acheter" as const,
+      achat_mois: null,
+    })),
+  );
+
+  revalidatePath("/app");
+}
+
 export async function basculerStatutArticle(formData: FormData): Promise<void> {
   const { supabase, user } = await requireUser();
   const id = String(formData.get("id") ?? "");

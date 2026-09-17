@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/lib/auth/actions";
 import {
   ajouterArticle,
+  ajouterArticlesEnLot,
   basculerStatutArticle,
   definirBudgetMensuel,
   supprimerArticle,
@@ -141,6 +142,7 @@ export default async function AppHomePage({
             basculerStatutArticle,
             supprimerArticle,
             definirBudget: definirBudgetMensuel,
+            ajouterArticlesEnLot,
           }}
           pdfHref="/app/export-pdf"
           listePdfHref="/app/export-liste-pdf"

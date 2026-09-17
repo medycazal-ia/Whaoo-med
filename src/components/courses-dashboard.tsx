@@ -3,6 +3,8 @@ import Link from "next/link";
 import { calculerRythme, premierJourDuMois } from "@/lib/courses/rythme";
 import { SaisieVocale } from "@/components/saisie-vocale";
 import { ChampsArticlePrix } from "@/components/champs-article-prix";
+import { AjouterDepuisRecette } from "@/components/ajouter-depuis-recette";
+import type { IngredientParse } from "@/lib/courses/parse-recette";
 
 export type ArticleCourse = {
   id: string;
@@ -18,6 +20,7 @@ type CoursesActions = {
   basculerStatutArticle: (formData: FormData) => Promise<void>;
   supprimerArticle: (formData: FormData) => Promise<void>;
   definirBudget: (formData: FormData) => Promise<void>;
+  ajouterArticlesEnLot: (items: IngredientParse[]) => Promise<void>;
 };
 
 const STATUT_STYLES: Record<string, string> = {
@@ -139,6 +142,8 @@ export function CoursesDashboard({
             Ajouter
           </button>
         </form>
+
+        <AjouterDepuisRecette ajouterEnLotAction={actions.ajouterArticlesEnLot} />
 
         <div className="flex flex-wrap gap-x-4 gap-y-1">
           {pdfHref && (

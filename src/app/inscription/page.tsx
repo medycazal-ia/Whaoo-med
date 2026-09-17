@@ -1,5 +1,7 @@
 import Link from "next/link";
+import Image from "next/image";
 import { signUpWithPassword } from "@/lib/auth/actions";
+import { AVATARS } from "@/lib/avatars";
 
 const ERROR_MESSAGES: Record<string, string> = {
   missing_fields: "Merci de remplir tous les champs obligatoires.",
@@ -34,7 +36,7 @@ export default async function InscriptionPage({
 
         <form action={signUpWithPassword} className="mt-6 flex flex-col gap-3">
           <div className="flex gap-3">
-            <label className="flex flex-1 flex-col gap-1 text-sm text-ardoise">
+            <label className="flex min-w-0 flex-1 flex-col gap-1 text-sm text-ardoise">
               Prénom
               <input
                 type="text"
@@ -44,7 +46,7 @@ export default async function InscriptionPage({
                 className="rounded-lg border border-ardoise/20 bg-white px-3 py-2 text-ardoise outline-none focus:border-basilic"
               />
             </label>
-            <label className="flex flex-1 flex-col gap-1 text-sm text-ardoise">
+            <label className="flex min-w-0 flex-1 flex-col gap-1 text-sm text-ardoise">
               Nom
               <input
                 type="text"
@@ -86,6 +88,29 @@ export default async function InscriptionPage({
               className="rounded-lg border border-ardoise/20 bg-white px-3 py-2 text-ardoise outline-none focus:border-basilic"
             />
           </label>
+          <div className="flex flex-col gap-1 text-sm text-ardoise">
+            Avatar <span className="text-ardoise/50">(optionnel)</span>
+            <div className="grid grid-cols-5 gap-2">
+              {AVATARS.map((avatar, i) => (
+                <label key={avatar.id} className="cursor-pointer">
+                  <input
+                    type="radio"
+                    name="avatarId"
+                    value={avatar.id}
+                    defaultChecked={i === 0}
+                    className="peer sr-only"
+                  />
+                  <Image
+                    src={`/avatars/${avatar.id}.svg`}
+                    alt={avatar.label}
+                    width={40}
+                    height={40}
+                    className="rounded-full ring-2 ring-transparent peer-checked:ring-basilic"
+                  />
+                </label>
+              ))}
+            </div>
+          </div>
           <label className="flex flex-col gap-1 text-sm text-ardoise">
             Code de parrainage{" "}
             <span className="text-ardoise/50">(optionnel)</span>

@@ -29,6 +29,7 @@ export async function signUpWithPassword(formData: FormData): Promise<void> {
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
   const telephone = String(formData.get("telephone") ?? "").trim();
+  const avatarId = String(formData.get("avatarId") ?? "").trim();
   const referralCodeUsed = String(formData.get("referralCode") ?? "").trim();
   const cguAccepted = formData.get("cguAccepted") === "on";
   const rgpdConsent = formData.get("rgpdConsent") === "on";
@@ -51,6 +52,7 @@ export async function signUpWithPassword(formData: FormData): Promise<void> {
         nom,
         prenom,
         telephone: telephone || null,
+        avatar_id: avatarId || null,
         referral_code_used: referralCodeUsed ? referralCodeUsed.toUpperCase() : null,
       },
     },

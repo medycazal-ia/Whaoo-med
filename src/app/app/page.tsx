@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/lib/auth/actions";
@@ -10,6 +11,7 @@ import {
 } from "@/lib/courses/actions";
 import { premierJourDuMois } from "@/lib/courses/rythme";
 import { CoursesDashboard } from "@/components/courses-dashboard";
+import { avatarSrc } from "@/lib/avatars";
 
 export default async function AppHomePage({
   searchParams,
@@ -29,7 +31,7 @@ export default async function AppHomePage({
   const moisISO = premierJourDuMois().toISOString().slice(0, 10);
   const { data: profile } = await supabase
     .from("profiles")
-    .select("prenom")
+    .select("prenom, avatar_id")
     .eq("id", user.id)
     .single();
 
@@ -65,9 +67,18 @@ export default async function AppHomePage({
   return (
     <main className="flex flex-1 flex-col bg-craie">
       <header className="flex items-center justify-between bg-ardoise px-6 py-4">
-        <h1 className="font-heading text-xl font-semibold text-craie">
-          Bonjour {profile?.prenom ?? ""}
-        </h1>
+        <div className="flex items-center gap-3">
+          <Image
+            src={avatarSrc(profile?.avatar_id)}
+            alt=""
+            width={36}
+            height={36}
+            className="rounded-full"
+          />
+          <h1 className="font-heading text-xl font-semibold text-craie">
+            Bonjour {profile?.prenom ?? ""}
+          </h1>
+        </div>
         <div className="flex items-center gap-2">
           <Link
             href="/app/parrainage"

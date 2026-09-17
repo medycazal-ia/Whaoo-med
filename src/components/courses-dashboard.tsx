@@ -34,6 +34,7 @@ export function CoursesDashboard({
   banner,
   footer,
   pdfHref,
+  listePdfHref,
 }: {
   baseHref: string;
   budgetAmount: number;
@@ -42,6 +43,7 @@ export function CoursesDashboard({
   actions: CoursesActions;
   banner?: ReactNode;
   pdfHref?: string;
+  listePdfHref?: string;
   footer?: ReactNode;
 }) {
   const totalDepense = items
@@ -170,14 +172,18 @@ export function CoursesDashboard({
           </button>
         </form>
 
-        {pdfHref && (
-          <a
-            href={pdfHref}
-            className="self-start text-sm text-ardoise/60 underline"
-          >
-            🖨️ Facture PDF du mois
-          </a>
-        )}
+        <div className="flex flex-wrap gap-x-4 gap-y-1">
+          {pdfHref && (
+            <a href={pdfHref} className="text-sm text-ardoise/60 underline">
+              🖨️ Facture PDF du mois
+            </a>
+          )}
+          {listePdfHref && (
+            <a href={listePdfHref} className="text-sm text-ardoise/60 underline">
+              🖨️ Liste de courses PDF
+            </a>
+          )}
+        </div>
 
         <div className="flex gap-2">
           <Link

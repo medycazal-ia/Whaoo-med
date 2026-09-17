@@ -143,6 +143,7 @@ export default async function AppHomePage({
             definirBudget: definirBudgetMensuel,
           }}
           pdfHref="/app/export-pdf"
+          listePdfHref="/app/export-liste-pdf"
         />
       )}
     </main>

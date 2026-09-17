@@ -6,13 +6,13 @@
 
 export const EDITEUR = {
   nom: "La Maison du Crel",
-  formeJuridique: "[À COMPLÉTER : forme juridique — SARL, SAS, entreprise individuelle...]",
+  formeJuridique: "Entreprise individuelle",
   adresse: "231 rue du Faubourg Saint-Honoré, 75001 Paris",
   siret: "[À COMPLÉTER : numéro SIRET]",
-  capitalSocial: "[À COMPLÉTER : capital social, si société]",
-  rcs: "[À COMPLÉTER : ville d'immatriculation RCS]",
-  tva: "[À COMPLÉTER : numéro de TVA intracommunautaire, si applicable]",
-  directeurPublication: "[À COMPLÉTER : nom du directeur de la publication]",
+  capitalSocial: "Non applicable (entreprise individuelle)",
+  rcs: "Non applicable (entreprise individuelle, immatriculée au Registre National des Entreprises)",
+  tva: "[À COMPLÉTER : numéro de TVA intracommunautaire, ou \"non applicable, art. 293 B du CGI\" si en franchise en base]",
+  directeurPublication: "Medy Cazal",
   emailContact: "[À COMPLÉTER : email de contact]",
 };
 

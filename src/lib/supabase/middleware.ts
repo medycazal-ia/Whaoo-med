@@ -6,9 +6,24 @@ const PROTECTED_PREFIXES = ["/app"];
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
 
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  // Tant que le projet Supabase n'est pas configuré (avant que l'utilisateur
+  // ait fourni ses clés, cf. DECISIONS.md), on laisse passer les pages
+  // publiques plutôt que de faire échouer toute l'app avec une 500.
+  if (!supabaseUrl || !supabaseAnonKey) {
+    const isProtected = PROTECTED_PREFIXES.some((prefix) =>
+      request.nextUrl.pathname.startsWith(prefix),
+    );
+    return isProtected
+      ? NextResponse.redirect(new URL("/connexion", request.url))
+      : response;
+  }
+
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    supabaseUrl,
+    supabaseAnonKey,
     {
       cookies: {
         getAll() {

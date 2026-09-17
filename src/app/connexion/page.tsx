@@ -92,6 +92,13 @@ export default async function ConnexionPage({
             Créer un compte
           </Link>
         </p>
+
+        <Link
+          href="/demo"
+          className="mt-3 block text-center text-sm text-ardoise/60 underline"
+        >
+          Essayer la démo, sans inscription
+        </Link>
       </div>
     </main>
   );

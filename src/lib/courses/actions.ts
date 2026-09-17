@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { premierJourDuMois } from "@/lib/courses/rythme";
+import { normaliserLabel, type IndexCommunautaire } from "@/lib/prix-estimes";
 
 function moisEnDateISO(reference = new Date()): string {
   return premierJourDuMois(reference).toISOString().slice(0, 10);
@@ -47,6 +48,8 @@ export async function ajouterArticle(formData: FormData): Promise<void> {
   const price = Number(formData.get("price") ?? 0) || 0;
   const quantity = Math.max(1, Number(formData.get("quantity") ?? 1) || 1);
   const status = formData.get("status") === "achete" ? "achete" : "a_acheter";
+  const partagerPrix = formData.get("partagerPrix") === "on";
+  const enseigne = String(formData.get("enseigne") ?? "").trim();
 
   if (!label) {
     redirect("/app?error=article_invalide");
@@ -62,7 +65,30 @@ export async function ajouterArticle(formData: FormData): Promise<void> {
     achat_mois: status === "achete" ? moisEnDateISO() : null,
   });
 
+  // Contribution communautaire de prix (section "prix estimés", inspirée
+  // de Kiprix) : uniquement si l'utilisateur l'a explicitement choisi et
+  // qu'il s'agit d'un prix réellement payé.
+  if (partagerPrix && price > 0) {
+    await supabase.from("prix_communautaires").insert({
+      user_id: user.id,
+      label_normalise: normaliserLabel(label),
+      enseigne: enseigne || null,
+      price,
+    });
+  }
+
   revalidatePath("/app");
+}
+
+export async function recupererIndexCommunautaire(): Promise<IndexCommunautaire> {
+  const { supabase } = await requireUser();
+  const { data } = await supabase.rpc("prix_communautaires_stats");
+
+  const index: IndexCommunautaire = {};
+  for (const ligne of data ?? []) {
+    index[ligne.label_normalise] = ligne.prix_moyen;
+  }
+  return index;
 }
 
 export type IngredientALotter = { label: string; detail: string | null; quantity: number };

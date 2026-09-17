@@ -60,7 +60,7 @@ const PRIX_MOYENS: Record<string, number> = {
   "sardines": 1.5,
 };
 
-function normaliser(texte: string): string {
+export function normaliserLabel(texte: string): string {
   return texte
     .toLowerCase()
     .normalize("NFD")
@@ -68,14 +68,29 @@ function normaliser(texte: string): string {
     .trim();
 }
 
+export type IndexCommunautaire = Record<string, number>;
+
 /**
  * Cherche une estimation de prix pour un article à partir de son nom.
+ * Priorité aux prix remontés par la communauté (plus fiables, réels) s'ils
+ * existent pour cet article, sinon repli sur la table statique indicative.
  * Correspondance approximative (sous-chaîne dans un sens ou dans l'autre) —
  * ne renvoie qu'une suggestion, jamais un prix garanti exact.
  */
-export function estimerPrix(label: string): number | null {
-  const normalise = normaliser(label);
+export function estimerPrix(
+  label: string,
+  indexCommunautaire?: IndexCommunautaire,
+): number | null {
+  const normalise = normaliserLabel(label);
   if (!normalise) return null;
+
+  if (indexCommunautaire) {
+    for (const [cle, prix] of Object.entries(indexCommunautaire)) {
+      if (normalise.includes(cle) || cle.includes(normalise)) {
+        return prix;
+      }
+    }
+  }
 
   for (const [cle, prix] of Object.entries(PRIX_MOYENS)) {
     if (normalise.includes(cle) || cle.includes(normalise)) {

@@ -8,6 +8,7 @@ import {
   ajouterArticlesEnLot,
   basculerStatutArticle,
   definirBudgetMensuel,
+  recupererIndexCommunautaire,
   supprimerArticle,
 } from "@/lib/courses/actions";
 import { premierJourDuMois } from "@/lib/courses/rythme";
@@ -64,6 +65,7 @@ export default async function AppHomePage({
   ]);
 
   const items = [...(itemsAAcheter ?? []), ...(itemsAchetesCeMois ?? [])];
+  const indexCommunautaire = await recupererIndexCommunautaire();
 
   return (
     <main className="flex flex-1 flex-col bg-craie">
@@ -146,6 +148,8 @@ export default async function AppHomePage({
           }}
           pdfHref="/app/export-pdf"
           listePdfHref="/app/export-liste-pdf"
+          indexCommunautaire={indexCommunautaire}
+          proposerPartagePrix
         />
       )}
     </main>

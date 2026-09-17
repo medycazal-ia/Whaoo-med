@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { parserPhraseVocale } from "@/lib/courses/parse-vocal";
-import { estimerPrix } from "@/lib/prix-estimes";
+import { estimerPrix, type IndexCommunautaire } from "@/lib/prix-estimes";
 
 type SpeechRecognitionLike = {
   lang: string;
@@ -26,9 +26,11 @@ function getSpeechRecognition(): (new () => SpeechRecognitionLike) | null {
 export function SaisieVocale({
   ajouterArticleAction,
   definirBudgetAction,
+  indexCommunautaire,
 }: {
   ajouterArticleAction: (formData: FormData) => Promise<void>;
   definirBudgetAction: (formData: FormData) => Promise<void>;
+  indexCommunautaire?: IndexCommunautaire;
 }) {
   const [ecoute, setEcoute] = useState(false);
   const [brouillon, setBrouillon] = useState<{
@@ -60,7 +62,7 @@ export function SaisieVocale({
       } else {
         const article = commande.article;
         if (article.price === 0) {
-          const estimation = estimerPrix(article.label);
+          const estimation = estimerPrix(article.label, indexCommunautaire);
           if (estimation !== null) {
             article.price = estimation;
             setPrixEstime(true);

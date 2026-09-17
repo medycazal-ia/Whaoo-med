@@ -1,9 +1,17 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { estimerPrix } from "@/lib/prix-estimes";
+import { estimerPrix, type IndexCommunautaire } from "@/lib/prix-estimes";
 
-export function ChampsArticlePrix({ defaultStatus }: { defaultStatus: "achete" | "a_acheter" }) {
+export function ChampsArticlePrix({
+  defaultStatus,
+  indexCommunautaire,
+  proposerPartage = false,
+}: {
+  defaultStatus: "achete" | "a_acheter";
+  indexCommunautaire?: IndexCommunautaire;
+  proposerPartage?: boolean;
+}) {
   const priceRef = useRef<HTMLInputElement>(null);
   const [estimee, setEstimee] = useState(false);
 
@@ -17,7 +25,7 @@ export function ChampsArticlePrix({ defaultStatus }: { defaultStatus: "achete" |
         onBlur={(e) => {
           const priceInput = priceRef.current;
           if (!priceInput || priceInput.value) return;
-          const estimation = estimerPrix(e.target.value);
+          const estimation = estimerPrix(e.target.value, indexCommunautaire);
           if (estimation !== null) {
             priceInput.value = String(estimation);
             setEstimee(true);
@@ -57,6 +65,20 @@ export function ChampsArticlePrix({ defaultStatus }: { defaultStatus: "achete" |
         <option value="a_acheter">À acheter plus tard</option>
         <option value="achete">Déjà acheté</option>
       </select>
+
+      {proposerPartage && (
+        <div className="flex basis-full flex-wrap items-center gap-2 text-xs text-ardoise/70">
+          <input
+            name="enseigne"
+            placeholder="Enseigne (optionnel)"
+            className="rounded-lg border border-ardoise/20 px-2 py-1 text-ardoise"
+          />
+          <label className="flex items-center gap-1.5">
+            <input type="checkbox" name="partagerPrix" />
+            Partager ce prix (anonyme) pour aider les estimations
+          </label>
+        </div>
+      )}
     </>
   );
 }

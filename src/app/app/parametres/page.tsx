@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { supprimerMonCompte } from "@/lib/compte/actions";
+import { ActiverNotifications } from "@/components/activer-notifications";
 
 const ERROR_MESSAGES: Record<string, string> = {
   confirmation: "Tape exactement SUPPRIMER pour confirmer.",
@@ -33,6 +34,15 @@ export default async function ParametresPage({
       </header>
 
       <section className="mx-auto flex w-full max-w-lg flex-col gap-6 px-6 py-6">
+        <div className="rounded-2xl bg-white p-5">
+          <h2 className="font-heading text-lg font-semibold text-ardoise">
+            Rappels
+          </h2>
+          <div className="mt-1">
+            <ActiverNotifications />
+          </div>
+        </div>
+
         <div className="rounded-2xl bg-white p-5">
           <h2 className="font-heading text-lg font-semibold text-ardoise">
             Tes données

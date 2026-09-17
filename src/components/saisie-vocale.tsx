@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { ajouterArticle } from "@/lib/courses/actions";
 import { parserPhraseVocale } from "@/lib/courses/parse-vocal";
 
 type SpeechRecognitionLike = {
@@ -23,7 +22,11 @@ function getSpeechRecognition(): (new () => SpeechRecognitionLike) | null {
   return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;
 }
 
-export function SaisieVocale() {
+export function SaisieVocale({
+  ajouterArticleAction,
+}: {
+  ajouterArticleAction: (formData: FormData) => Promise<void>;
+}) {
   const [ecoute, setEcoute] = useState(false);
   const [brouillon, setBrouillon] = useState<{
     label: string;
@@ -69,7 +72,7 @@ export function SaisieVocale() {
   if (brouillon) {
     return (
       <form
-        action={ajouterArticle}
+        action={ajouterArticleAction}
         className="flex flex-col gap-2 rounded-xl border border-ambre/40 bg-ambre/10 p-4"
         onSubmit={() => setBrouillon(null)}
       >

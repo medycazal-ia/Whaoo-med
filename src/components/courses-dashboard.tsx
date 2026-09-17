@@ -33,6 +33,7 @@ export function CoursesDashboard({
   actions,
   banner,
   footer,
+  pdfHref,
 }: {
   baseHref: string;
   budgetAmount: number;
@@ -40,6 +41,7 @@ export function CoursesDashboard({
   vueActive: "achete" | "a_acheter";
   actions: CoursesActions;
   banner?: ReactNode;
+  pdfHref?: string;
   footer?: ReactNode;
 }) {
   const totalDepense = items
@@ -167,6 +169,15 @@ export function CoursesDashboard({
             Ajouter
           </button>
         </form>
+
+        {pdfHref && (
+          <a
+            href={pdfHref}
+            className="self-start text-sm text-ardoise/60 underline"
+          >
+            🖨️ Facture PDF du mois
+          </a>
+        )}
 
         <div className="flex gap-2">
           <Link

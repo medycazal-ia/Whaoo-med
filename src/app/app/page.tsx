@@ -131,6 +131,7 @@ export default async function AppHomePage({
             supprimerArticle,
             definirBudget: definirBudgetMensuel,
           }}
+          pdfHref="/app/export-pdf"
         />
       )}
     </main>

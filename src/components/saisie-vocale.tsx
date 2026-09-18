@@ -78,10 +78,18 @@ export function SaisieVocale({
 
   if (nonSupporte) {
     return (
-      <p className="text-sm text-ardoise/60">
-        La saisie vocale n&apos;est pas disponible sur ce navigateur — utilise
-        la saisie manuelle ci-dessous.
-      </p>
+      <div className="rounded-xl border border-ambre/40 bg-ambre/10 p-3 text-sm text-ardoise/80">
+        <p>
+          La dictée intégrée à whaoo n&apos;est pas disponible sur Safari
+          (iPhone/iPad) — c&apos;est une limitation d&apos;Apple, pas de
+          l&apos;appli.
+        </p>
+        <p className="mt-1">
+          💡 Astuce : dans le champ « Article » ci-dessous, appuie sur le
+          petit micro 🎤 du clavier de ton iPhone/iPad pour dicter — le
+          texte s&apos;écrit tout seul.
+        </p>
+      </div>
     );
   }
 

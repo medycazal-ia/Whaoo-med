@@ -18,6 +18,13 @@ export const FAQ: QuestionFaq[] = [
     motsCles: ["ajouter", "article", "courses", "liste"],
   },
   {
+    id: "dictee-iphone-ipad",
+    question: "La dictée ne fonctionne pas sur mon iPhone ou iPad, pourquoi ?",
+    reponse:
+      "C'est une limitation de Safari/Apple : la dictée intégrée de whaoo n'y est pas disponible (ni sur iPhone ni sur iPad), Apple n'ayant jamais ajouté cette fonction aux navigateurs. Astuce : dans le champ « Article », utilise le petit micro 🎤 du clavier iOS, qui dicte directement dans le champ.",
+    motsCles: ["iphone", "ipad", "safari", "apple", "micro", "marche pas", "fonctionne pas", "tablette"],
+  },
+  {
     id: "phrases-vocales",
     question: "Quelles phrases puis-je dire pour dicter un article ?",
     reponse:

@@ -115,6 +115,18 @@ export function CoursesDashboard({
         </div>
       </section>
 
+      <section className="mx-auto flex w-full max-w-lg md:max-w-2xl lg:max-w-4xl flex-col gap-4 px-4 sm:px-6 pt-6">
+        <SaisieVocale
+          ajouterArticleAction={actions.ajouterArticle}
+          definirBudgetAction={actions.definirBudget}
+          indexCommunautaire={indexCommunautaire}
+          proposerPartage={proposerPartagePrix}
+          onAide={() => setAideOuverte(true)}
+        />
+        <AideVocale />
+        {aideOuverte && <FaqPanel onFermer={() => setAideOuverte(false)} />}
+      </section>
+
       {itemsEnAttente.length > 0 && (
         <section className="mx-auto w-full max-w-lg md:max-w-2xl lg:max-w-4xl px-4 sm:px-6 pt-6">
           <div className="rounded-xl border border-ambre bg-ambre/15 p-4">
@@ -143,16 +155,6 @@ export function CoursesDashboard({
       )}
 
       <section className="mx-auto flex w-full max-w-lg md:max-w-2xl lg:max-w-4xl flex-1 flex-col gap-4 px-4 sm:px-6 py-6">
-        <SaisieVocale
-          ajouterArticleAction={actions.ajouterArticle}
-          definirBudgetAction={actions.definirBudget}
-          indexCommunautaire={indexCommunautaire}
-          proposerPartage={proposerPartagePrix}
-          onAide={() => setAideOuverte(true)}
-        />
-        <AideVocale />
-        {aideOuverte && <FaqPanel onFermer={() => setAideOuverte(false)} />}
-
         <form
           action={actions.ajouterArticle}
           className="flex flex-wrap gap-2 rounded-xl border border-ardoise/10 bg-white p-4"

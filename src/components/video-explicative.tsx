@@ -5,6 +5,7 @@ import Link from "next/link";
 
 export function VideoExplicative() {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [demarree, setDemarree] = useState(false);
   const [terminee, setTerminee] = useState(false);
 
@@ -18,7 +19,7 @@ export function VideoExplicative() {
   }
 
   return (
-    <div className="w-full max-w-2xl">
+    <div ref={containerRef} className="w-full max-w-2xl scroll-mt-4">
       <div className="relative overflow-hidden rounded-2xl border border-craie/15 bg-black/20">
         <video
           ref={videoRef}
@@ -27,7 +28,12 @@ export function VideoExplicative() {
           playsInline
           poster="/videos/whaoo-demo-poster.jpg"
           className="w-full"
-          onPlay={() => setDemarree(true)}
+          onPlay={() => {
+            if (!demarree) {
+              containerRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
+            setDemarree(true);
+          }}
           onEnded={() => setTerminee(true)}
         >
           <source src="/videos/whaoo-demo.mp4" type="video/mp4" />

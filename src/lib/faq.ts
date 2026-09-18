@@ -11,6 +11,13 @@ export type QuestionFaq = {
 // dicté), sans dépendre d'un service externe.
 export const FAQ: QuestionFaq[] = [
   {
+    id: "scenario-usage-type",
+    question: "Comment se déroule une utilisation typique de whaoo ?",
+    reponse:
+      "Tu es dans ta cuisine, tu vois qu'il manque du lait, des œufs, du pain : tu le dis à voix haute ou tu le tapes, whaoo ajoute chaque article à ta liste avec une estimation de prix. Au supermarché, tu coches chaque article dans ton caddie (« Marquer acheté »), puis tu ajustes les prix avec ceux réellement payés sur ton ticket — ton budget se met à jour tout seul. Pour aller plus loin : colle une liste d'ingrédients de recette pour l'ajouter en un clic, ou prépare une liste de courses mensuelle récurrente à réutiliser chaque mois sans tout retaper.",
+    motsCles: ["scenario", "utilisation", "exemple", "typique", "comment ca marche", "cas d'usage"],
+  },
+  {
     id: "ajouter-article",
     question: "Comment ajouter un article à ma liste de courses ?",
     reponse:

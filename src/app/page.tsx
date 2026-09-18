@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { BoutonInstaller } from "@/components/bouton-installer";
+import { VideoExplicative } from "@/components/video-explicative";
 
 const ARGUMENTS = [
   {
@@ -85,22 +86,7 @@ export default async function Home({
           tu peux te faire plaisir — sans tableur, sans y penser.
         </p>
 
-        <div className="mt-2 w-full max-w-2xl">
-          <div className="overflow-hidden rounded-2xl border border-craie/15 bg-black/20">
-            <video
-              controls
-              preload="metadata"
-              playsInline
-              poster="/videos/whaoo-demo-poster.jpg"
-              className="w-full"
-            >
-              <source src="/videos/whaoo-demo.mp4" type="video/mp4" />
-            </video>
-          </div>
-          <p className="mt-2 text-center text-xs text-craie/50">
-            Voir comment ça marche en 40 secondes
-          </p>
-        </div>
+        <VideoExplicative />
 
         <div className="mt-2 flex flex-col gap-3 sm:flex-row">
           <Link

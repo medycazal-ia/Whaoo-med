@@ -17,6 +17,11 @@ const SCENARIOS: Record<string, { titre: string; video: string; poster: string }
     video: "/videos/whaoo-scenario3.mp4",
     poster: "/videos/whaoo-scenario3-poster.jpg",
   },
+  "4": {
+    titre: "Medy, le créateur de whaoo, te présente l'appli",
+    video: "/videos/whaoo-scenario4.mp4",
+    poster: "/videos/whaoo-scenario4-poster.jpg",
+  },
 };
 
 export function generateStaticParams() {

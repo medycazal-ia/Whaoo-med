@@ -149,11 +149,6 @@ export function TeleprompterStudio() {
     };
   }, [defilementActif, vitesse]);
 
-  // Le changement de script remet le défilement à zéro.
-  useEffect(() => {
-    reinitialiserDefilement();
-  }, [scriptId]);
-
   useEffect(() => {
     return () => {
       streamRef.current?.getTracks().forEach((track) => track.stop());
@@ -179,7 +174,10 @@ export function TeleprompterStudio() {
         Scénario à présenter
         <select
           value={scriptId}
-          onChange={(e) => setScriptId(e.target.value)}
+          onChange={(e) => {
+            setScriptId(e.target.value);
+            reinitialiserDefilement();
+          }}
           className="rounded-lg border border-ardoise/20 bg-white px-3 py-2 text-ardoise"
         >
           {SCRIPTS_TELEPROMPTER.map((s) => (
@@ -196,7 +194,8 @@ export function TeleprompterStudio() {
           autoPlay
           muted
           playsInline
-          className={`aspect-[9/16] w-full object-cover ${miroir ? "-scale-x-100" : ""}`}
+          className="aspect-[9/16] w-full object-cover"
+          style={miroir ? { transform: "scaleX(-1)" } : undefined}
         />
 
         {!camerActive && (

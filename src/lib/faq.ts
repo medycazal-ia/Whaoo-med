@@ -18,6 +18,13 @@ export const FAQ: QuestionFaq[] = [
     motsCles: ["scenario", "utilisation", "exemple", "typique", "comment ca marche", "cas d'usage"],
   },
   {
+    id: "pour-qui-est-whaoo",
+    question: "whaoo est fait pour quel genre de profil ?",
+    reponse:
+      "Deux profils types : tu dois tenir un budget serré ce mois-ci — whaoo te montre en temps réel où tu en es pour ne jamais dépasser sans t'en rendre compte, et si tu économises, ta cagnotte se remplit pour un petit plaisir mérité. Ou à l'inverse, tu sais que tu craques facilement sur les bonbons, les chips ou les pâtisseries — en voyant leur poids dans ton budget affiché noir sur blanc, whaoo t'aide à en prendre conscience et à réduire, sans culpabiliser. Que tu veuilles serrer les cordons de la bourse ou te faire plaisir intelligemment, whaoo s'adapte.",
+    motsCles: ["budget serre", "economie", "gourmand", "bonbons", "gourmandise", "pour qui", "profil"],
+  },
+  {
     id: "ajouter-article",
     question: "Comment ajouter un article à ma liste de courses ?",
     reponse:

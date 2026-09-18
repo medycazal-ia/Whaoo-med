@@ -84,6 +84,24 @@ export default async function Home({
           tes achats, suit ton budget du mois en temps réel, et te dit quand
           tu peux te faire plaisir — sans tableur, sans y penser.
         </p>
+
+        <div className="mt-2 w-full max-w-2xl">
+          <div className="overflow-hidden rounded-2xl border border-craie/15 bg-black/20">
+            <video
+              controls
+              preload="metadata"
+              playsInline
+              poster="/videos/whaoo-demo-poster.jpg"
+              className="w-full"
+            >
+              <source src="/videos/whaoo-demo.mp4" type="video/mp4" />
+            </video>
+          </div>
+          <p className="mt-2 text-center text-xs text-craie/50">
+            Voir comment ça marche en 40 secondes
+          </p>
+        </div>
+
         <div className="mt-2 flex flex-col gap-3 sm:flex-row">
           <Link
             href="/demo"
@@ -107,23 +125,6 @@ export default async function Home({
           </Link>
         )}
         <BoutonInstaller />
-      </section>
-
-      <section className="mx-auto w-full max-w-2xl px-4 sm:px-6 pb-10">
-        <div className="overflow-hidden rounded-2xl border border-craie/15 bg-black/20">
-          <video
-            controls
-            preload="metadata"
-            playsInline
-            poster="/videos/whaoo-demo-poster.jpg"
-            className="w-full"
-          >
-            <source src="/videos/whaoo-demo.mp4" type="video/mp4" />
-          </video>
-        </div>
-        <p className="mt-2 text-center text-xs text-craie/50">
-          Voir comment ça marche en 40 secondes
-        </p>
       </section>
 
       <section className="mx-auto grid w-full max-w-3xl gap-4 px-4 sm:px-6 pb-16 sm:grid-cols-3">

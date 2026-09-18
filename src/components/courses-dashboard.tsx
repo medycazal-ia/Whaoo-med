@@ -10,6 +10,7 @@ import { AideVocale } from "@/components/aide-vocale";
 import { BudgetFlottant } from "@/components/budget-flottant";
 import { FaqPanel } from "@/components/faq-panel";
 import { ScannerTicket } from "@/components/scanner-ticket";
+import { PromotionsLocales } from "@/components/promotions-locales";
 import type { IngredientParse } from "@/lib/courses/parse-recette";
 import { LABEL_SOURCE_PRIX, type IndexCommunautaire, type SourcePrix } from "@/lib/prix-estimes";
 
@@ -177,6 +178,8 @@ export function CoursesDashboard({
         {actions.contribuerPrixTicket && (
           <ScannerTicket contribuerAction={actions.contribuerPrixTicket} />
         )}
+
+        <PromotionsLocales />
 
         <div className="flex flex-wrap gap-x-4 gap-y-1">
           {pdfHref && (

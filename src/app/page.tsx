@@ -128,15 +128,23 @@ export default async function Home({
 
       {supportLinkUrl && (
         <div className="border-t border-craie/10 px-4 sm:px-6 py-8 text-center">
-          <p className="mx-auto max-w-md text-xs text-craie/50">
+          <p className="mx-auto max-w-md text-sm text-craie/70">
             Cette appli est gratuite à l&apos;usage de base et développée
-            seule. Si elle te rend service, tu peux{" "}
+            seule. Si elle te rend service, une contribution libre est
+            toujours appréciée —{" "}
+            <strong className="text-craie">entièrement facultative, sans
+            aucune obligation</strong>. Le paiement passe par{" "}
             <a href={supportLinkUrl} className="underline" target="_blank" rel="noreferrer">
-              soutenir son développement
-            </a>{" "}
-            et celui d&apos;autres outils pratiques et accessibles, sans
-            obligation — chaque contribution aide à continuer sans faire
-            payer l&apos;essentiel.
+              Lydia
+            </a>
+            , une plateforme bancaire française sécurisée : whaoo ne voit
+            ni ne conserve aucune donnée bancaire.
+          </p>
+          <audio controls preload="none" className="mx-auto mt-3 h-9 max-w-xs">
+            <source src="/audio/soutien.mp3" type="audio/mpeg" />
+          </audio>
+          <p className="mx-auto mt-1 max-w-md text-xs text-craie/40">
+            🔊 Message vocal (15 secondes)
           </p>
         </div>
       )}

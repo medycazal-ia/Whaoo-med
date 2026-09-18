@@ -8,6 +8,11 @@ export function VideoExplicative() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [demarree, setDemarree] = useState(false);
   const [terminee, setTerminee] = useState(false);
+  const [promptFerme, setPromptFerme] = useState(false);
+
+  function lancerLecture() {
+    videoRef.current?.play();
+  }
 
   function rejouer() {
     const video = videoRef.current;
@@ -15,8 +20,11 @@ export function VideoExplicative() {
     video.currentTime = 0;
     video.play();
     setTerminee(false);
+    setPromptFerme(false);
     setDemarree(true);
   }
+
+  const afficherPrompt = terminee && !promptFerme;
 
   return (
     <div ref={containerRef} className="w-full max-w-2xl scroll-mt-4">
@@ -40,14 +48,22 @@ export function VideoExplicative() {
         </video>
 
         {!demarree && !terminee && (
-          <div className="pointer-events-none absolute inset-x-0 top-[28%] flex justify-center px-4">
+          <div className="absolute inset-x-0 top-[6%] flex flex-col items-center gap-3 px-4">
             <span className="rounded-full bg-ambre px-4 py-2 text-center text-sm font-medium text-ardoise shadow-lg">
-              🎬 40 secondes pour tout comprendre — clique ▶
+              🎬 40 secondes pour tout comprendre
             </span>
+            <button
+              type="button"
+              onClick={lancerLecture}
+              aria-label="Lancer la vidéo"
+              className="flex h-16 w-16 items-center justify-center rounded-full bg-craie/95 text-ardoise shadow-lg transition hover:scale-105"
+            >
+              <span className="ml-1 text-2xl">▶</span>
+            </button>
           </div>
         )}
 
-        {terminee && (
+        {afficherPrompt && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-ardoise/95 px-6 text-center">
             <p className="font-heading text-lg font-semibold text-craie">
               Convaincu·e ?
@@ -68,6 +84,13 @@ export function VideoExplicative() {
                 className="rounded-lg border border-craie/40 px-4 py-2 text-sm text-craie hover:bg-craie/10"
               >
                 Revoir la vidéo
+              </button>
+              <button
+                type="button"
+                onClick={() => setPromptFerme(true)}
+                className="rounded-lg px-4 py-2 text-sm text-craie/60 hover:text-craie"
+              >
+                Plus tard
               </button>
             </div>
           </div>

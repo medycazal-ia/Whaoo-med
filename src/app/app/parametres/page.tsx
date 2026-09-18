@@ -22,6 +22,8 @@ export default async function ParametresPage({
 
   if (!user) redirect("/connexion");
 
+  const supportLinkUrl = process.env.SUPPORT_LINK_URL;
+
   return (
     <main className="flex flex-1 flex-col bg-craie">
       <header className="flex items-center gap-3 bg-kaki px-3 py-3 sm:px-6 sm:py-4">
@@ -58,6 +60,29 @@ export default async function ParametresPage({
             Exporter mes données
           </a>
         </div>
+
+        {supportLinkUrl && (
+          <div className="rounded-2xl bg-white p-5">
+            <h2 className="font-heading text-lg font-semibold text-ardoise">
+              Soutenir whaoo
+            </h2>
+            <p className="mt-1 text-sm text-ardoise/70">
+              whaoo est gratuite à l&apos;usage de base et développée seule.
+              Si elle te rend service, une contribution libre est toujours
+              appréciée —{" "}
+              <strong className="text-ardoise">entièrement facultative,
+              sans aucune obligation</strong>. Le paiement passe par{" "}
+              <a href={supportLinkUrl} className="underline" target="_blank" rel="noreferrer">
+                Lydia
+              </a>
+              , une plateforme bancaire française sécurisée : whaoo ne voit
+              ni ne conserve aucune donnée bancaire.
+            </p>
+            <audio controls preload="none" className="mt-3 h-9 max-w-xs">
+              <source src="/audio/soutien.mp3" type="audio/mpeg" />
+            </audio>
+          </div>
+        )}
 
         <div className="rounded-2xl border border-tomate/30 bg-tomate/5 p-5">
           <h2 className="font-heading text-lg font-semibold text-tomate">

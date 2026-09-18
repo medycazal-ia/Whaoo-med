@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { FaqPanel } from "@/components/faq-panel";
+
+// Masqué sur les pages qui ne sont pas l'appli elle-même (site de
+// présentation pour investisseurs, studio d'enregistrement, pages de
+// partage) — la FAQ de l'appli n'y a pas sa place.
+const PREFIXES_MASQUES = ["/pitch", "/studio", "/s/"];
 
 const NB_APPARITIONS_MAX = 3;
 const PREMIER_DELAI_MS = 8000;
@@ -15,6 +21,7 @@ const DUREE_INDICE_MS = 5500;
  * ou cliquer, puis se range dans un rond « ❓ » discret.
  */
 export function BoutonAideFlottant() {
+  const pathname = usePathname();
   const [panelOuvert, setPanelOuvert] = useState(false);
   const [indiceVisible, setIndiceVisible] = useState(false);
   const [apparitions, setApparitions] = useState(0);
@@ -36,6 +43,10 @@ export function BoutonAideFlottant() {
     const masquer = setTimeout(() => setIndiceVisible(false), DUREE_INDICE_MS);
     return () => clearTimeout(masquer);
   }, [indiceVisible]);
+
+  if (PREFIXES_MASQUES.some((prefixe) => pathname?.startsWith(prefixe))) {
+    return null;
+  }
 
   return (
     <>

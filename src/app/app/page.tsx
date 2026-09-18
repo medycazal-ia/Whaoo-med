@@ -7,6 +7,7 @@ import {
   ajouterArticle,
   ajouterArticlesEnLot,
   basculerStatutArticle,
+  contribuerPrixDepuisTicket,
   definirBudgetMensuel,
   recupererIndexCommunautaire,
   supprimerArticle,
@@ -153,6 +154,7 @@ export default async function AppHomePage({
             supprimerArticle,
             definirBudget: definirBudgetMensuel,
             ajouterArticlesEnLot,
+            contribuerPrixTicket: contribuerPrixDepuisTicket,
           }}
           pdfHref="/app/export-pdf"
           listePdfHref="/app/export-liste-pdf"

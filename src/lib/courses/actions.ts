@@ -130,6 +130,30 @@ export async function ajouterArticlesEnLot(items: IngredientALotter[]): Promise<
   revalidatePath("/app");
 }
 
+export type LigneTicketAContribuer = { label: string; price: number };
+
+// Contribution en lot de prix repérés sur un ticket de caisse scanné
+// (OCR côté navigateur, jamais envoyé à un serveur tiers). Alimente
+// uniquement l'index communautaire, ne touche pas la liste de courses de
+// l'utilisateur.
+export async function contribuerPrixDepuisTicket(
+  lignes: LigneTicketAContribuer[],
+): Promise<void> {
+  const { supabase, user } = await requireUser();
+  if (lignes.length === 0) return;
+
+  await supabase.from("prix_communautaires").insert(
+    lignes.map((ligne) => ({
+      user_id: user.id,
+      label_normalise: normaliserLabel(ligne.label),
+      enseigne: null,
+      price: ligne.price,
+    })),
+  );
+
+  revalidatePath("/app");
+}
+
 export async function basculerStatutArticle(formData: FormData): Promise<void> {
   const { supabase, user } = await requireUser();
   const id = String(formData.get("id") ?? "");

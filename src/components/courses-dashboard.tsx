@@ -1,4 +1,6 @@
-import type { ReactNode } from "react";
+"use client";
+
+import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import { calculerRythme, premierJourDuMois } from "@/lib/courses/rythme";
 import { SaisieVocale } from "@/components/saisie-vocale";
@@ -6,6 +8,8 @@ import { ChampsArticlePrix } from "@/components/champs-article-prix";
 import { AjouterDepuisRecette } from "@/components/ajouter-depuis-recette";
 import { AideVocale } from "@/components/aide-vocale";
 import { BudgetFlottant } from "@/components/budget-flottant";
+import { FaqPanel } from "@/components/faq-panel";
+import { ScannerTicket } from "@/components/scanner-ticket";
 import type { IngredientParse } from "@/lib/courses/parse-recette";
 import { LABEL_SOURCE_PRIX, type IndexCommunautaire, type SourcePrix } from "@/lib/prix-estimes";
 
@@ -25,6 +29,7 @@ type CoursesActions = {
   supprimerArticle: (formData: FormData) => Promise<void>;
   definirBudget: (formData: FormData) => Promise<void>;
   ajouterArticlesEnLot: (items: IngredientParse[]) => Promise<void>;
+  contribuerPrixTicket?: (lignes: { label: string; price: number }[]) => Promise<void>;
 };
 
 const STATUT_STYLES: Record<string, string> = {
@@ -58,6 +63,8 @@ export function CoursesDashboard({
   indexCommunautaire?: IndexCommunautaire;
   proposerPartagePrix?: boolean;
 }) {
+  const [aideOuverte, setAideOuverte] = useState(false);
+
   const totalDepense = items
     .filter((item) => item.status === "achete")
     .reduce((total, item) => total + item.price * item.quantity, 0);
@@ -140,8 +147,10 @@ export function CoursesDashboard({
           definirBudgetAction={actions.definirBudget}
           indexCommunautaire={indexCommunautaire}
           proposerPartage={proposerPartagePrix}
+          onAide={() => setAideOuverte(true)}
         />
         <AideVocale />
+        {aideOuverte && <FaqPanel onFermer={() => setAideOuverte(false)} />}
 
         <form
           action={actions.ajouterArticle}
@@ -164,6 +173,10 @@ export function CoursesDashboard({
           ajouterEnLotAction={actions.ajouterArticlesEnLot}
           indexCommunautaire={indexCommunautaire}
         />
+
+        {actions.contribuerPrixTicket && (
+          <ScannerTicket contribuerAction={actions.contribuerPrixTicket} />
+        )}
 
         <div className="flex flex-wrap gap-x-4 gap-y-1">
           {pdfHref && (

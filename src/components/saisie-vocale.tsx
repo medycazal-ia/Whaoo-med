@@ -16,11 +16,13 @@ export function SaisieVocale({
   definirBudgetAction,
   indexCommunautaire,
   proposerPartage = false,
+  onAide,
 }: {
   ajouterArticleAction: (formData: FormData) => Promise<void>;
   definirBudgetAction: (formData: FormData) => Promise<void>;
   indexCommunautaire?: IndexCommunautaire;
   proposerPartage?: boolean;
+  onAide?: () => void;
 }) {
   const [ecoute, setEcoute] = useState(false);
   const [brouillon, setBrouillon] = useState<{
@@ -47,6 +49,10 @@ export function SaisieVocale({
     recognition.interimResults = false;
     recognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
+      if (/\baide\b/i.test(transcript)) {
+        onAide?.();
+        return;
+      }
       const commande = parserPhraseVocale(transcript);
       if (commande.type === "budget") {
         setBudgetDicte(commande.montant);
@@ -219,7 +225,8 @@ export function SaisieVocale({
         {ecoute ? "Je t'écoute…" : "🎙️ Dicter un article"}
       </button>
       <p className="text-xs text-ardoise/50">
-        Fonctionne aussi pour le budget : « budget du mois 250 euros »
+        Fonctionne aussi pour le budget (« budget du mois 250 euros ») et
+        pour l&apos;aide (« aide moi »)
       </p>
     </div>
   );

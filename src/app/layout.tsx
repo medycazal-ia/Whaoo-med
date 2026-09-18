@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Space_Grotesk, IBM_Plex_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { EnregistrerServiceWorker } from "@/components/enregistrer-service-worker";
+import { BoutonAideFlottant } from "@/components/bouton-aide-flottant";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
@@ -52,6 +53,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col">
         <EnregistrerServiceWorker />
         {children}
+        <BoutonAideFlottant />
       </body>
     </html>
   );

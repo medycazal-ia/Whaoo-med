@@ -7,6 +7,7 @@ import {
   type IndexCommunautaire,
   type SourcePrix,
 } from "@/lib/prix-estimes";
+import { BoutonCorrigerPrixVocal } from "@/components/bouton-corriger-prix-vocal";
 
 export function ChampsArticlePrix({
   defaultStatus,
@@ -18,7 +19,18 @@ export function ChampsArticlePrix({
   proposerPartage?: boolean;
 }) {
   const priceRef = useRef<HTMLInputElement>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [source, setSource] = useState<SourcePrix | null>(null);
+
+  function proposerPrix(label: string) {
+    const priceInput = priceRef.current;
+    if (!priceInput || priceInput.value) return;
+    const estimation = estimerPrix(label, indexCommunautaire);
+    if (estimation !== null) {
+      priceInput.value = String(estimation.prix);
+      setSource(estimation.source);
+    }
+  }
 
   return (
     <>
@@ -27,14 +39,14 @@ export function ChampsArticlePrix({
         placeholder="Article"
         required
         className="flex-1 basis-full rounded-lg border border-ardoise/20 px-3 py-2 text-ardoise"
+        onChange={(e) => {
+          const valeur = e.target.value;
+          if (debounceRef.current) clearTimeout(debounceRef.current);
+          debounceRef.current = setTimeout(() => proposerPrix(valeur), 500);
+        }}
         onBlur={(e) => {
-          const priceInput = priceRef.current;
-          if (!priceInput || priceInput.value) return;
-          const estimation = estimerPrix(e.target.value, indexCommunautaire);
-          if (estimation !== null) {
-            priceInput.value = String(estimation.prix);
-            setSource(estimation.source);
-          }
+          if (debounceRef.current) clearTimeout(debounceRef.current);
+          proposerPrix(e.target.value);
         }}
       />
       <input
@@ -43,16 +55,24 @@ export function ChampsArticlePrix({
         className="flex-1 basis-full rounded-lg border border-ardoise/20 px-3 py-2 text-ardoise"
       />
       <div className="flex flex-col gap-1">
-        <input
-          ref={priceRef}
-          name="price"
-          type="number"
-          step="0.01"
-          min={0}
-          placeholder="Prix"
-          className="w-24 rounded-lg border border-ardoise/20 px-3 py-2 text-ardoise"
-          onChange={() => setSource(null)}
-        />
+        <div className="flex gap-1">
+          <input
+            ref={priceRef}
+            name="price"
+            type="number"
+            step="0.01"
+            min={0}
+            placeholder="Prix"
+            className="w-24 rounded-lg border border-ardoise/20 px-3 py-2 text-ardoise"
+            onChange={() => setSource(null)}
+          />
+          <BoutonCorrigerPrixVocal
+            onPrixCorrige={(prix) => {
+              if (priceRef.current) priceRef.current.value = String(prix);
+              setSource(null);
+            }}
+          />
+        </div>
         {source && (
           <span className="text-xs text-ardoise/50">{LABEL_SOURCE_PRIX[source]}</span>
         )}

@@ -8,25 +8,8 @@ import {
   type IndexCommunautaire,
   type SourcePrix,
 } from "@/lib/prix-estimes";
-
-type SpeechRecognitionLike = {
-  lang: string;
-  interimResults: boolean;
-  onresult: ((event: { results: { [i: number]: { [j: number]: { transcript: string } } } }) => void) | null;
-  onerror: (() => void) | null;
-  onend: (() => void) | null;
-  start: () => void;
-  stop: () => void;
-};
-
-function getSpeechRecognition(): (new () => SpeechRecognitionLike) | null {
-  if (typeof window === "undefined") return null;
-  const w = window as unknown as {
-    SpeechRecognition?: new () => SpeechRecognitionLike;
-    webkitSpeechRecognition?: new () => SpeechRecognitionLike;
-  };
-  return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;
-}
+import { getSpeechRecognition, type SpeechRecognitionLike } from "@/lib/voice/speech-recognition";
+import { BoutonCorrigerPrixVocal } from "@/components/bouton-corriger-prix-vocal";
 
 export function SaisieVocale({
   ajouterArticleAction,
@@ -50,6 +33,7 @@ export function SaisieVocale({
   const [sourcePrix, setSourcePrix] = useState<SourcePrix | null>(null);
   const [nonSupporte, setNonSupporte] = useState(false);
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
+  const priceRef = useRef<HTMLInputElement>(null);
 
   function demarrerEcoute() {
     const SpeechRecognitionCtor = getSpeechRecognition();
@@ -150,14 +134,23 @@ export function SaisieVocale({
         />
         <div className="flex gap-2">
           <div className="flex flex-col gap-1">
-            <input
-              name="price"
-              type="number"
-              step="0.01"
-              defaultValue={brouillon.price}
-              onChange={() => setSourcePrix(null)}
-              className="w-24 rounded-lg border border-ardoise/20 bg-white px-3 py-2 text-ardoise"
-            />
+            <div className="flex gap-1">
+              <input
+                ref={priceRef}
+                name="price"
+                type="number"
+                step="0.01"
+                defaultValue={brouillon.price}
+                onChange={() => setSourcePrix(null)}
+                className="w-24 rounded-lg border border-ardoise/20 bg-white px-3 py-2 text-ardoise"
+              />
+              <BoutonCorrigerPrixVocal
+                onPrixCorrige={(prix) => {
+                  if (priceRef.current) priceRef.current.value = String(prix);
+                  setSourcePrix(null);
+                }}
+              />
+            </div>
             {sourcePrix && (
               <span className="text-xs text-ardoise/50">{LABEL_SOURCE_PRIX[sourcePrix]}</span>
             )}

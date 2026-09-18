@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { premierJourDuMois } from "@/lib/courses/rythme";
-import { normaliserLabel, type IndexCommunautaire, type SourcePrix } from "@/lib/prix-estimes";
+import { estimerPrix, normaliserLabel, type IndexCommunautaire, type SourcePrix } from "@/lib/prix-estimes";
 
 function lireSourcePrix(formData: FormData): SourcePrix {
   const valeur = formData.get("prixSource");
@@ -102,20 +102,29 @@ export type IngredientALotter = { label: string; detail: string | null; quantity
 
 // Ajout en lot depuis une liste d'ingrédients collée (ex. recette) —
 // appelé directement depuis un composant client, pas via un <form>.
+// Chaque ingrédient reçoit une estimation de prix automatique (communauté
+// puis table statique), comme pour un ajout manuel ou vocal — le prix ne
+// doit pas être proposé seulement quand l'utilisateur tape lui-même.
 export async function ajouterArticlesEnLot(items: IngredientALotter[]): Promise<void> {
   const { supabase, user } = await requireUser();
   if (items.length === 0) return;
 
+  const indexCommunautaire = await recupererIndexCommunautaire();
+
   await supabase.from("items").insert(
-    items.map((item) => ({
-      user_id: user.id,
-      label: item.label,
-      detail: item.detail,
-      price: 0,
-      quantity: item.quantity,
-      status: "a_acheter" as const,
-      achat_mois: null,
-    })),
+    items.map((item) => {
+      const estimation = estimerPrix(item.label, indexCommunautaire);
+      return {
+        user_id: user.id,
+        label: item.label,
+        detail: item.detail,
+        price: estimation?.prix ?? 0,
+        prix_source: estimation?.source ?? null,
+        quantity: item.quantity,
+        status: "a_acheter" as const,
+        achat_mois: null,
+      };
+    }),
   );
 
   revalidatePath("/app");

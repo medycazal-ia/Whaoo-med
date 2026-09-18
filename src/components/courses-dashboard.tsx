@@ -4,6 +4,8 @@ import { calculerRythme, premierJourDuMois } from "@/lib/courses/rythme";
 import { SaisieVocale } from "@/components/saisie-vocale";
 import { ChampsArticlePrix } from "@/components/champs-article-prix";
 import { AjouterDepuisRecette } from "@/components/ajouter-depuis-recette";
+import { AideVocale } from "@/components/aide-vocale";
+import { BudgetFlottant } from "@/components/budget-flottant";
 import type { IngredientParse } from "@/lib/courses/parse-recette";
 import { LABEL_SOURCE_PRIX, type IndexCommunautaire, type SourcePrix } from "@/lib/prix-estimes";
 
@@ -73,6 +75,8 @@ export function CoursesDashboard({
     <>
       {banner}
 
+      <BudgetFlottant totalDepense={totalDepense} budgetAmount={budgetAmount} />
+
       <section className="px-4 sm:px-6 pt-6 pb-6">
         <div className="mx-auto flex max-w-lg md:max-w-2xl lg:max-w-4xl flex-col gap-3 rounded-2xl bg-ardoise p-5">
           <div className="flex items-baseline justify-between font-mono text-craie">
@@ -137,6 +141,7 @@ export function CoursesDashboard({
           indexCommunautaire={indexCommunautaire}
           proposerPartage={proposerPartagePrix}
         />
+        <AideVocale />
 
         <form
           action={actions.ajouterArticle}
@@ -155,7 +160,10 @@ export function CoursesDashboard({
           </button>
         </form>
 
-        <AjouterDepuisRecette ajouterEnLotAction={actions.ajouterArticlesEnLot} />
+        <AjouterDepuisRecette
+          ajouterEnLotAction={actions.ajouterArticlesEnLot}
+          indexCommunautaire={indexCommunautaire}
+        />
 
         <div className="flex flex-wrap gap-x-4 gap-y-1">
           {pdfHref && (

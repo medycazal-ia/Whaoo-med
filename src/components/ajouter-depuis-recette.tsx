@@ -2,11 +2,14 @@
 
 import { useState } from "react";
 import { parserListeIngredients, type IngredientParse } from "@/lib/courses/parse-recette";
+import { estimerPrix, type IndexCommunautaire } from "@/lib/prix-estimes";
 
 export function AjouterDepuisRecette({
   ajouterEnLotAction,
+  indexCommunautaire,
 }: {
   ajouterEnLotAction: (items: IngredientParse[]) => Promise<void>;
+  indexCommunautaire?: IndexCommunautaire;
 }) {
   const [ouvert, setOuvert] = useState(false);
   const [texte, setTexte] = useState("");
@@ -72,13 +75,21 @@ export function AjouterDepuisRecette({
             Vérifie avant d&apos;ajouter :
           </p>
           <ul className="flex flex-col gap-1 text-sm text-ardoise">
-            {apercu.map((ingredient, i) => (
-              <li key={i}>
-                {ingredient.quantity > 1 ? `${ingredient.quantity} × ` : ""}
-                {ingredient.label}
-                {ingredient.detail ? ` (${ingredient.detail})` : ""}
-              </li>
-            ))}
+            {apercu.map((ingredient, i) => {
+              const estimation = estimerPrix(ingredient.label, indexCommunautaire);
+              return (
+                <li key={i}>
+                  {ingredient.quantity > 1 ? `${ingredient.quantity} × ` : ""}
+                  {ingredient.label}
+                  {ingredient.detail ? ` (${ingredient.detail})` : ""}
+                  {estimation && (
+                    <span className="ml-1 text-xs text-ardoise/50">
+                      (~{estimation.prix.toFixed(2)} €)
+                    </span>
+                  )}
+                </li>
+              );
+            })}
           </ul>
           <div className="flex gap-2">
             <button

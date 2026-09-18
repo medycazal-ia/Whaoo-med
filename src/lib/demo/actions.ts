@@ -8,6 +8,7 @@ import {
   lireEtatDemo,
   type DemoState,
 } from "@/lib/demo/state";
+import { estimerPrix } from "@/lib/prix-estimes";
 
 async function ecrireEtatDemo(state: DemoState) {
   const cookieStore = await cookies();
@@ -48,11 +49,13 @@ export async function ajouterArticlesEnLotDemo(items: IngredientALotter[]): Prom
   const state = lireEtatDemo(cookieStore);
 
   for (const item of items) {
+    const estimation = estimerPrix(item.label);
     state.items.unshift({
       id: crypto.randomUUID(),
       label: item.label,
       detail: item.detail,
-      price: 0,
+      price: estimation?.prix ?? 0,
+      prixSource: estimation?.source ?? null,
       quantity: item.quantity,
       status: "a_acheter",
     });

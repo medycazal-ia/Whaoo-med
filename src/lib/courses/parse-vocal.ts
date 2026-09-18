@@ -54,3 +54,27 @@ function parserArticle(phrase: string): ArticleParse {
 
   return { label: label || phrase.trim(), price, quantity };
 }
+
+/**
+ * Analyse une courte phrase dictée pour corriger un prix seul (ex. après
+ * avoir cliqué sur le micro à côté du champ prix : « trois euros
+ * cinquante », « 2 euros », ou juste « 2,50 »). Contrairement à
+ * parserPhraseVocale, ne s'occupe que du prix, pas de l'article.
+ */
+export function parserPrixVocal(phrase: string): number | null {
+  const lower = phrase.trim().toLowerCase();
+
+  const matchPrix = lower.match(/(\d+(?:[.,]\d+)?)\s*(?:€|euros?)(?:\s*(\d{1,2}))?/i);
+  if (matchPrix) {
+    const entier = parseFloat(matchPrix[1].replace(",", "."));
+    const centimes = matchPrix[2] ? parseInt(matchPrix[2], 10) / 100 : 0;
+    return Math.round((entier + centimes) * 100) / 100;
+  }
+
+  const matchNombre = lower.match(/(\d+(?:[.,]\d+)?)/);
+  if (matchNombre) {
+    return parseFloat(matchNombre[1].replace(",", "."));
+  }
+
+  return null;
+}

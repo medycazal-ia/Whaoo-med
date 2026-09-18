@@ -109,6 +109,23 @@ export default async function Home({
         <BoutonInstaller />
       </section>
 
+      <section className="mx-auto w-full max-w-2xl px-4 sm:px-6 pb-10">
+        <div className="overflow-hidden rounded-2xl border border-craie/15 bg-black/20">
+          <video
+            controls
+            preload="metadata"
+            playsInline
+            poster="/videos/whaoo-demo-poster.jpg"
+            className="w-full"
+          >
+            <source src="/videos/whaoo-demo.mp4" type="video/mp4" />
+          </video>
+        </div>
+        <p className="mt-2 text-center text-xs text-craie/50">
+          Voir comment ça marche en 40 secondes
+        </p>
+      </section>
+
       <section className="mx-auto grid w-full max-w-3xl gap-4 px-4 sm:px-6 pb-16 sm:grid-cols-3">
         {ARGUMENTS.map((arg) => (
           <div

@@ -9,7 +9,20 @@ import {
   type SourcePrix,
 } from "@/lib/prix-estimes";
 import { getSpeechRecognition, type SpeechRecognitionLike } from "@/lib/voice/speech-recognition";
+import { transcrireAudio } from "@/lib/voice/transcription";
 import { BoutonCorrigerPrixVocal } from "@/components/bouton-corriger-prix-vocal";
+
+const MIME_TYPES_CANDIDATS = ["audio/webm", "audio/mp4", "audio/ogg"];
+const DUREE_MAX_ENREGISTREMENT_MS = 15000;
+
+function choisirMimeType(): string {
+  for (const type of MIME_TYPES_CANDIDATS) {
+    if (typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported(type)) {
+      return type;
+    }
+  }
+  return "";
+}
 
 export function SaisieVocale({
   ajouterArticleAction,
@@ -37,6 +50,35 @@ export function SaisieVocale({
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
   const priceRef = useRef<HTMLInputElement>(null);
 
+  // Solution de repli pour Safari (iOS/iPadOS), qui n'implémente pas
+  // SpeechRecognition mais sait très bien enregistrer de l'audio.
+  const [enregistrement, setEnregistrement] = useState(false);
+  const [transcriptionEnCours, setTranscriptionEnCours] = useState(false);
+  const [erreurAudio, setErreurAudio] = useState<string | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
+
+  function traiterTranscription(transcript: string) {
+    if (/\baide\b/i.test(transcript)) {
+      onAide?.();
+      return;
+    }
+    const commande = parserPhraseVocale(transcript);
+    if (commande.type === "budget") {
+      setBudgetDicte(commande.montant);
+    } else {
+      const article = commande.article;
+      if (article.price === 0) {
+        const estimation = estimerPrix(article.label, indexCommunautaire);
+        if (estimation !== null) {
+          article.price = estimation.prix;
+          setSourcePrix(estimation.source);
+        }
+      }
+      setBrouillon({ ...article, status: "a_acheter" });
+    }
+  }
+
   function demarrerEcoute() {
     const SpeechRecognitionCtor = getSpeechRecognition();
     if (!SpeechRecognitionCtor) {
@@ -48,25 +90,7 @@ export function SaisieVocale({
     recognition.lang = "fr-FR";
     recognition.interimResults = false;
     recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
-      if (/\baide\b/i.test(transcript)) {
-        onAide?.();
-        return;
-      }
-      const commande = parserPhraseVocale(transcript);
-      if (commande.type === "budget") {
-        setBudgetDicte(commande.montant);
-      } else {
-        const article = commande.article;
-        if (article.price === 0) {
-          const estimation = estimerPrix(article.label, indexCommunautaire);
-          if (estimation !== null) {
-            article.price = estimation.prix;
-            setSourcePrix(estimation.source);
-          }
-        }
-        setBrouillon({ ...article, status: "a_acheter" });
-      }
+      traiterTranscription(event.results[0][0].transcript);
     };
     recognition.onerror = () => setEcoute(false);
     recognition.onend = () => setEcoute(false);
@@ -76,21 +100,56 @@ export function SaisieVocale({
     recognition.start();
   }
 
-  if (nonSupporte) {
-    return (
-      <div className="rounded-xl border border-ambre/40 bg-ambre/10 p-3 text-sm text-ardoise/80">
-        <p>
-          La dictée intégrée à whaoo n&apos;est pas disponible sur Safari
-          (iPhone/iPad) — c&apos;est une limitation d&apos;Apple, pas de
-          l&apos;appli.
-        </p>
-        <p className="mt-1">
-          💡 Astuce : dans le champ « Article » ci-dessous, appuie sur le
-          petit micro 🎤 du clavier de ton iPhone/iPad pour dicter — le
-          texte s&apos;écrit tout seul.
-        </p>
-      </div>
-    );
+  async function demarrerEnregistrementAudio() {
+    setErreurAudio(null);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mimeType = choisirMimeType();
+      const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+      chunksRef.current = [];
+
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunksRef.current.push(e.data);
+      };
+
+      recorder.onstop = async () => {
+        stream.getTracks().forEach((track) => track.stop());
+        setEnregistrement(false);
+        setTranscriptionEnCours(true);
+        try {
+          const extension = mimeType.includes("mp4") ? "mp4" : mimeType.includes("ogg") ? "ogg" : "webm";
+          const blob = new Blob(chunksRef.current, { type: mimeType || "audio/webm" });
+          const formData = new FormData();
+          formData.append("audio", blob, `dictee.${extension}`);
+          const texte = await transcrireAudio(formData);
+          if (!texte.trim()) {
+            setErreurAudio("Rien compris — réessaie en parlant bien près du micro.");
+          } else {
+            traiterTranscription(texte);
+          }
+        } catch {
+          setErreurAudio("La transcription a échoué, réessaie.");
+        } finally {
+          setTranscriptionEnCours(false);
+        }
+      };
+
+      recorder.start();
+      mediaRecorderRef.current = recorder;
+      setEnregistrement(true);
+
+      setTimeout(() => {
+        if (recorder.state === "recording") recorder.stop();
+      }, DUREE_MAX_ENREGISTREMENT_MS);
+    } catch {
+      setErreurAudio(
+        "Impossible d'accéder au micro — vérifie l'autorisation dans les réglages de ton navigateur.",
+      );
+    }
+  }
+
+  function arreterEnregistrementAudio() {
+    mediaRecorderRef.current?.stop();
   }
 
   if (budgetDicte !== null) {
@@ -220,6 +279,40 @@ export function SaisieVocale({
           </button>
         </div>
       </form>
+    );
+  }
+
+  if (nonSupporte) {
+    return (
+      <div className="flex flex-col gap-2 rounded-xl border border-ambre/40 bg-ambre/10 p-3 text-sm text-ardoise/80">
+        <p>
+          La dictée intégrée à whaoo n&apos;est pas disponible sur Safari
+          (iPhone/iPad) — c&apos;est une limitation d&apos;Apple, pas de
+          l&apos;appli.
+        </p>
+
+        {erreurAudio && <p className="text-tomate">{erreurAudio}</p>}
+
+        {transcriptionEnCours ? (
+          <p>Transcription en cours…</p>
+        ) : (
+          <button
+            type="button"
+            onClick={enregistrement ? arreterEnregistrementAudio : demarrerEnregistrementAudio}
+            className={`self-start rounded-lg px-4 py-2 font-medium text-craie ${
+              enregistrement ? "bg-tomate" : "bg-ardoise hover:bg-ardoise-light"
+            }`}
+          >
+            {enregistrement ? "⏹️ Arrêter et envoyer" : "🎙️ Dicter quand même (via le micro)"}
+          </button>
+        )}
+
+        <p className="text-xs text-ardoise/60">
+          💡 Autre solution : dans le champ « Article » ci-dessous, appuie
+          sur le petit micro 🎤 du clavier de ton iPhone/iPad pour dicter —
+          le texte s&apos;écrit tout seul.
+        </p>
+      </div>
     );
   }
 

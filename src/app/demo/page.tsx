@@ -7,6 +7,7 @@ import {
   definirBudgetDemo,
   reinitialiserDemo,
   supprimerArticleDemo,
+  supprimerListeNommeeDemo,
 } from "@/lib/demo/actions";
 import { historiqueDemo, lireEtatDemo } from "@/lib/demo/state";
 import { CoursesDashboard } from "@/components/courses-dashboard";
@@ -76,6 +77,7 @@ export default async function DemoPage({
           ajouterArticle: ajouterArticleDemo,
           basculerStatutArticle: basculerStatutArticleDemo,
           supprimerArticle: supprimerArticleDemo,
+          supprimerListeNommee: supprimerListeNommeeDemo,
           definirBudget: definirBudgetDemo,
           ajouterArticlesEnLot: ajouterArticlesEnLotDemo,
         }}

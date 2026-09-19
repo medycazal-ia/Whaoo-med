@@ -29,6 +29,7 @@ type CoursesActions = {
   ajouterArticle: (formData: FormData) => Promise<void>;
   basculerStatutArticle: (formData: FormData) => Promise<void>;
   supprimerArticle: (formData: FormData) => Promise<void>;
+  supprimerListeNommee: (formData: FormData) => Promise<void>;
   definirBudget: (formData: FormData) => Promise<void>;
   ajouterArticlesEnLot: (items: IngredientParse[], listeNom: string | null) => Promise<void>;
   contribuerPrixTicket?: (lignes: { label: string; price: number }[]) => Promise<void>;
@@ -79,6 +80,50 @@ export function CoursesDashboard({
 
   const itemsAffiches = items.filter((item) => item.status === vueActive);
   const itemsEnAttente = items.filter((item) => item.status === "a_acheter");
+
+  // Regroupe les articles en attente par nom de liste (ex. une recette ou un
+  // régime importé) — les articles sans nom restent affichés à part, sans
+  // en-tête ni suppression groupée puisqu'il n'y a rien à nommer.
+  const itemsSansNom = itemsEnAttente.filter((item) => !item.listeNom);
+  const groupesNommes = Array.from(
+    itemsEnAttente.reduce((groupes, item) => {
+      if (!item.listeNom) return groupes;
+      const liste = groupes.get(item.listeNom) ?? [];
+      liste.push(item);
+      groupes.set(item.listeNom, liste);
+      return groupes;
+    }, new Map<string, ArticleCourse[]>()),
+  );
+
+  function ligneAttente(item: ArticleCourse) {
+    return (
+      <li key={item.id} className="flex items-center justify-between gap-2 py-2 text-sm text-ardoise">
+        <span>
+          {item.label}
+          {item.detail ? ` (${item.detail})` : ""}
+        </span>
+        <div className="flex shrink-0 items-center gap-1">
+          <form action={actions.basculerStatutArticle}>
+            <input type="hidden" name="id" value={item.id} />
+            <input type="hidden" name="status" value="achete" />
+            <button type="submit" className="rounded-lg bg-basilic px-2 py-1 text-xs font-medium text-craie">
+              Acheté ✓
+            </button>
+          </form>
+          <form action={actions.supprimerArticle}>
+            <input type="hidden" name="id" value={item.id} />
+            <button
+              type="submit"
+              aria-label="Supprimer cet article"
+              className="rounded-lg border border-tomate/40 px-2 py-1 text-xs text-tomate"
+            >
+              ✕
+            </button>
+          </form>
+        </div>
+      </li>
+    );
+  }
 
   return (
     <>
@@ -134,23 +179,29 @@ export function CoursesDashboard({
             <p className="font-heading text-sm font-semibold text-ardoise">
               🔔 À ne pas oublier
             </p>
-            <ul className="mt-2 flex flex-col divide-y divide-ardoise/10">
-              {itemsEnAttente.map((item) => (
-                <li key={item.id} className="flex items-center justify-between gap-2 py-2 text-sm text-ardoise">
-                  <span>
-                    {item.label}
-                    {item.detail ? ` (${item.detail})` : ""}
-                  </span>
-                  <form action={actions.basculerStatutArticle}>
-                    <input type="hidden" name="id" value={item.id} />
-                    <input type="hidden" name="status" value="achete" />
-                    <button type="submit" className="rounded-lg bg-basilic px-2 py-1 text-xs font-medium text-craie">
-                      Acheté ✓
+
+            {itemsSansNom.length > 0 && (
+              <ul className="mt-2 flex flex-col divide-y divide-ardoise/10">
+                {itemsSansNom.map((item) => ligneAttente(item))}
+              </ul>
+            )}
+
+            {groupesNommes.map(([nom, itemsDuGroupe]) => (
+              <div key={nom} className="mt-3">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-xs font-medium text-ambre">📋 {nom}</p>
+                  <form action={actions.supprimerListeNommee}>
+                    <input type="hidden" name="listeNom" value={nom} />
+                    <button type="submit" className="text-xs text-tomate underline">
+                      Supprimer cette liste
                     </button>
                   </form>
-                </li>
-              ))}
-            </ul>
+                </div>
+                <ul className="mt-1 flex flex-col divide-y divide-ardoise/10">
+                  {itemsDuGroupe.map((item) => ligneAttente(item))}
+                </ul>
+              </div>
+            ))}
           </div>
         </section>
       )}

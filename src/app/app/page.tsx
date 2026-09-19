@@ -11,6 +11,7 @@ import {
   definirBudgetMensuel,
   recupererIndexCommunautaire,
   supprimerArticle,
+  supprimerListeNommee,
 } from "@/lib/courses/actions";
 import { premierJourDuMois } from "@/lib/courses/rythme";
 import { CoursesDashboard } from "@/components/courses-dashboard";
@@ -152,6 +153,7 @@ export default async function AppHomePage({
             ajouterArticle,
             basculerStatutArticle,
             supprimerArticle,
+            supprimerListeNommee,
             definirBudget: definirBudgetMensuel,
             ajouterArticlesEnLot,
             contribuerPrixTicket: contribuerPrixDepuisTicket,

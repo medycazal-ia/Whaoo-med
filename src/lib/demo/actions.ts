@@ -94,6 +94,20 @@ export async function supprimerArticleDemo(formData: FormData): Promise<void> {
   revalidatePath("/demo");
 }
 
+export async function supprimerListeNommeeDemo(formData: FormData): Promise<void> {
+  const cookieStore = await cookies();
+  const state = lireEtatDemo(cookieStore);
+  const listeNom = String(formData.get("listeNom") ?? "");
+  if (!listeNom) return;
+
+  state.items = state.items.filter(
+    (item) => !(item.status === "a_acheter" && item.listeNom === listeNom),
+  );
+
+  await ecrireEtatDemo(state);
+  revalidatePath("/demo");
+}
+
 export async function definirBudgetDemo(formData: FormData): Promise<void> {
   const cookieStore = await cookies();
   const state = lireEtatDemo(cookieStore);

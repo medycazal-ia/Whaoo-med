@@ -184,3 +184,20 @@ export async function supprimerArticle(formData: FormData): Promise<void> {
 
   revalidatePath("/app");
 }
+
+// Efface en bloc tous les articles "à acheter" d'une liste nommée (ex. une
+// recette ou un régime importé) — ne touche jamais les articles déjà achetés.
+export async function supprimerListeNommee(formData: FormData): Promise<void> {
+  const { supabase, user } = await requireUser();
+  const listeNom = String(formData.get("listeNom") ?? "");
+  if (!listeNom) return;
+
+  await supabase
+    .from("items")
+    .delete()
+    .eq("user_id", user.id)
+    .eq("status", "a_acheter")
+    .eq("liste_nom", listeNom);
+
+  revalidatePath("/app");
+}

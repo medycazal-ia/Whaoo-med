@@ -15,25 +15,38 @@ export function ScannerTicket({
   const [statut, setStatut] = useState<"idle" | "analyse" | "pret" | "erreur" | "envoye">("idle");
   const [progression, setProgression] = useState(0);
   const [lignes, setLignes] = useState<LigneEditable[]>([]);
+  const [texteBrut, setTexteBrut] = useState<string | null>(null);
+  const [afficherTexteBrut, setAfficherTexteBrut] = useState(false);
 
   function reinitialiser() {
     setOuvert(false);
     setStatut("idle");
     setProgression(0);
     setLignes([]);
+    setTexteBrut(null);
+    setAfficherTexteBrut(false);
   }
 
   async function analyserImage(fichier: File) {
     setStatut("analyse");
     setProgression(0);
+    setTexteBrut(null);
     try {
       const imageReduite = await redimensionnerImage(fichier);
       const Tesseract = (await import("tesseract.js")).default;
-      const { data } = await Tesseract.recognize(imageReduite, "fra", {
+      // PSM.SINGLE_COLUMN : un ticket de caisse est une seule colonne de
+      // texte de tailles variables — le mode "page complète" par défaut
+      // se trompe souvent sur ce type de mise en page étroite.
+      const worker = await Tesseract.createWorker("fra", undefined, {
         logger: (m) => {
           if (m.status === "recognizing text") setProgression(Math.round(m.progress * 100));
         },
       });
+      await worker.setParameters({ tessedit_pageseg_mode: Tesseract.PSM.SINGLE_COLUMN });
+      const { data } = await worker.recognize(imageReduite);
+      await worker.terminate();
+
+      setTexteBrut(data.text);
       const detectees = parserTicket(data.text);
       setLignes(detectees.map((ligne) => ({ ...ligne, inclure: true })));
       setStatut("pret");
@@ -172,6 +185,23 @@ export function ScannerTicket({
                 ))}
               </ul>
             </>
+          )}
+          {texteBrut && (
+            <div>
+              <button
+                type="button"
+                onClick={() => setAfficherTexteBrut((v) => !v)}
+                className="text-xs text-ardoise/50 underline"
+              >
+                {afficherTexteBrut ? "Cacher" : "Voir"} le texte brut détecté
+                (debug)
+              </button>
+              {afficherTexteBrut && (
+                <pre className="mt-1 max-h-40 overflow-auto whitespace-pre-wrap rounded-lg bg-ardoise/5 p-2 text-xs text-ardoise/70">
+                  {texteBrut}
+                </pre>
+              )}
+            </div>
           )}
           <div className="flex gap-2">
             {lignes.length > 0 && (

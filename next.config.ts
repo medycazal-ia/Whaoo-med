@@ -19,6 +19,21 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+
+  // Une fois les deux domaines personnalisés vérifiés sur Render,
+  // www.whaoo.site redirige vers l'apex whaoo.site pour n'avoir qu'une
+  // seule URL canonique — ne peut évidemment rien faire pour un domaine
+  // qui n'arrive pas du tout à se connecter (voir avec Render/LWS).
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.whaoo.site" }],
+        destination: "https://whaoo.site/:path*",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

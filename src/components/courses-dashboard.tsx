@@ -67,6 +67,16 @@ export function CoursesDashboard({
   proposerPartagePrix?: boolean;
 }) {
   const [aideOuverte, setAideOuverte] = useState(false);
+  const [listesCachees, setListesCachees] = useState<Set<string>>(new Set());
+
+  function basculerListeCachee(nom: string) {
+    setListesCachees((precedent) => {
+      const suivant = new Set(precedent);
+      if (suivant.has(nom)) suivant.delete(nom);
+      else suivant.add(nom);
+      return suivant;
+    });
+  }
 
   const totalDepense = items
     .filter((item) => item.status === "achete")
@@ -186,22 +196,36 @@ export function CoursesDashboard({
               </ul>
             )}
 
-            {groupesNommes.map(([nom, itemsDuGroupe]) => (
-              <div key={nom} className="mt-3">
-                <div className="flex items-center justify-between gap-2">
-                  <p className="text-xs font-medium text-ambre">📋 {nom}</p>
-                  <form action={actions.supprimerListeNommee}>
-                    <input type="hidden" name="listeNom" value={nom} />
-                    <button type="submit" className="text-xs text-tomate underline">
-                      Supprimer cette liste
-                    </button>
-                  </form>
+            {groupesNommes.map(([nom, itemsDuGroupe]) => {
+              const cachee = listesCachees.has(nom);
+              return (
+                <div key={nom} className="mt-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => basculerListeCachee(nom)}
+                        className="text-xs text-ardoise/60 underline"
+                      >
+                        {cachee ? "👁️ Afficher cette liste" : "🙈 Cacher cette liste"}
+                      </button>
+                      <p className="text-xs font-medium text-ambre">📋 {nom}</p>
+                    </div>
+                    <form action={actions.supprimerListeNommee}>
+                      <input type="hidden" name="listeNom" value={nom} />
+                      <button type="submit" className="text-xs text-tomate underline">
+                        Supprimer cette liste
+                      </button>
+                    </form>
+                  </div>
+                  {!cachee && (
+                    <ul className="mt-1 flex flex-col divide-y divide-ardoise/10">
+                      {itemsDuGroupe.map((item) => ligneAttente(item))}
+                    </ul>
+                  )}
                 </div>
-                <ul className="mt-1 flex flex-col divide-y divide-ardoise/10">
-                  {itemsDuGroupe.map((item) => ligneAttente(item))}
-                </ul>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
       )}

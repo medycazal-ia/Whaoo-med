@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { parserTicket, type LigneTicket } from "@/lib/ticket/parse-ticket";
+import { redimensionnerImage } from "@/lib/ticket/redimensionner-image";
 
 type LigneEditable = LigneTicket & { inclure: boolean };
 
@@ -26,8 +27,9 @@ export function ScannerTicket({
     setStatut("analyse");
     setProgression(0);
     try {
+      const imageReduite = await redimensionnerImage(fichier);
       const Tesseract = (await import("tesseract.js")).default;
-      const { data } = await Tesseract.recognize(fichier, "fra", {
+      const { data } = await Tesseract.recognize(imageReduite, "fra", {
         logger: (m) => {
           if (m.status === "recognizing text") setProgression(Math.round(m.progress * 100));
         },

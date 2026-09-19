@@ -24,7 +24,7 @@ export default async function DemoPage({
   const state = lireEtatDemo(cookieStore);
 
   return (
-    <main className="flex flex-1 flex-col bg-craie">
+    <main className="flex flex-1 flex-col fond-marche">
       <div className="bg-ambre px-4 sm:px-6 py-2 text-center text-sm font-medium text-ardoise">
         Mode démo — tes modifications ne seront pas conservées
       </div>

@@ -57,7 +57,7 @@ export default async function Home({
   const supportLinkUrl = process.env.SUPPORT_LINK_URL;
 
   return (
-    <main className="flex flex-1 flex-col bg-craie">
+    <main className="flex flex-1 flex-col fond-marche">
       <header className="flex items-center justify-between px-4 sm:px-6 py-4">
         <span className="font-heading text-lg font-semibold text-ardoise">
           🛒 whaoo

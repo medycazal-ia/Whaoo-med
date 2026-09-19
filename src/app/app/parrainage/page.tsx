@@ -30,7 +30,7 @@ export default async function ParrainagePage() {
   const lienParrainage = `${appUrl}/inscription?parrain=${profile?.referral_code ?? ""}`;
 
   return (
-    <main className="flex flex-1 flex-col bg-craie">
+    <main className="flex flex-1 flex-col fond-marche">
       <header className="flex items-center gap-3 bg-gradient-to-r from-kaki to-basilic px-3 py-3 sm:px-6 sm:py-4">
         <Link href="/app" className="text-sm text-craie/70 hover:text-craie">
           ← Retour

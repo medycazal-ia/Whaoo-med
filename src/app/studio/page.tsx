@@ -7,7 +7,7 @@ export const metadata = {
 
 export default function StudioPage() {
   return (
-    <main className="min-h-screen bg-craie">
+    <main className="min-h-screen fond-marche">
       <TeleprompterStudio />
     </main>
   );

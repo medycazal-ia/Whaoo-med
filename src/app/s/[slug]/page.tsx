@@ -38,7 +38,7 @@ export default async function PartagePage({
   if (!scenario) notFound();
 
   return (
-    <main className="flex min-h-screen flex-col items-center gap-6 bg-craie px-4 py-8">
+    <main className="flex min-h-screen flex-col items-center gap-6 fond-marche px-4 py-8">
       <h1 className="text-center font-heading text-2xl font-semibold text-ardoise">
         whaoo 🛒
       </h1>

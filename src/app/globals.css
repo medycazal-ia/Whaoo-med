@@ -7,8 +7,8 @@
      utilisées dans les composants ; seules les valeurs changent. */
   --color-ardoise: #1e3a34;
   --color-ardoise-light: #2a4d45;
-  --color-craie: #faf7f0;
-  --color-ticket: #fffdf9;
+  --color-craie: #e9f3e1;
+  --color-ticket: #fbfdf8;
   --color-tomate: #e2492e;
   --color-basilic: #3fa35b;
   --color-ambre: #f0a93a;
@@ -60,4 +60,16 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+}
+
+/* Fond des grands écrans de l'appli : vert pastel avec de petites fleurs
+   et fruits en motif discret, jamais assez sombre pour gêner la lecture.
+   Volontairement une classe à part (pas la teinte de bg-craie elle-même)
+   pour ne pas appliquer le motif aux petits éléments qui utilisent aussi
+   ce ton (badges, pastilles). */
+.fond-marche {
+  background-color: var(--color-craie);
+  background-image: url("/patterns/fond-fruits-fleurs.svg");
+  background-repeat: repeat;
+  background-size: 200px 200px;
 }

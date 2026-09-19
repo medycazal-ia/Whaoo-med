@@ -72,7 +72,7 @@ export default async function AppHomePage({
   const indexCommunautaire = await recupererIndexCommunautaire();
 
   return (
-    <main className="flex flex-1 flex-col bg-craie">
+    <main className="flex flex-1 flex-col fond-marche">
       <header className="flex flex-wrap items-center justify-between gap-2 bg-gradient-to-r from-kaki to-basilic px-3 py-3 sm:px-6 sm:py-4">
         <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           <Image

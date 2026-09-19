@@ -6,7 +6,7 @@ const EMAIL_CONTACT = "contact@medy.site";
 
 export function PitchPage({ lang, contenu }: { lang: LangPitch; contenu: ContenuPitch }) {
   return (
-    <main className="min-h-screen bg-craie text-ardoise">
+    <main className="min-h-screen fond-marche text-ardoise">
       <header className="sticky top-0 z-10 flex items-center justify-between border-b border-ardoise/10 bg-craie/95 px-4 py-3 backdrop-blur sm:px-8">
         <span className="font-heading text-lg font-semibold">🛒 {contenu.nomBouton}</span>
         <nav className="flex gap-1 text-sm">

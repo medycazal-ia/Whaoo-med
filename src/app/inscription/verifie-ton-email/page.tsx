@@ -1,6 +1,6 @@
 export default function VerifieTonEmailPage() {
   return (
-    <main className="flex flex-1 items-center justify-center bg-ardoise px-4 sm:px-6 py-12">
+    <main className="flex flex-1 items-center justify-center bg-craie px-4 sm:px-6 py-12">
       <div className="w-full max-w-sm md:max-w-md rounded-2xl bg-ticket p-8 text-center shadow-xl">
         <h1 className="font-heading text-2xl font-semibold text-ardoise">
           Vérifie ta boîte mail

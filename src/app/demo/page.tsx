@@ -29,7 +29,7 @@ export default async function DemoPage({
         Mode démo — tes modifications ne seront pas conservées
       </div>
 
-      <header className="flex flex-wrap items-center justify-between gap-2 bg-kaki px-3 py-3 sm:px-6 sm:py-4">
+      <header className="flex flex-wrap items-center justify-between gap-2 bg-gradient-to-r from-kaki to-basilic px-3 py-3 sm:px-6 sm:py-4">
         <h1 className="truncate font-heading text-base font-semibold text-craie sm:text-xl">
           Bienvenue dans la démo
         </h1>

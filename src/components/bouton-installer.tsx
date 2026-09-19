@@ -52,7 +52,7 @@ export function BoutonInstaller() {
           await promptEvent.userChoice;
           setPromptEvent(null);
         }}
-        className="rounded-lg border border-craie/40 px-4 py-2 text-sm font-medium text-craie hover:bg-craie/10"
+        className="rounded-lg border border-ardoise/30 px-4 py-2 text-sm font-medium text-ardoise hover:bg-ardoise/5"
       >
         📲 Installer l&apos;application
       </button>
@@ -65,12 +65,12 @@ export function BoutonInstaller() {
         <button
           type="button"
           onClick={() => setAfficherInstructionsIOS((v) => !v)}
-          className="rounded-lg border border-craie/40 px-4 py-2 text-sm font-medium text-craie hover:bg-craie/10"
+          className="rounded-lg border border-ardoise/30 px-4 py-2 text-sm font-medium text-ardoise hover:bg-ardoise/5"
         >
           📲 Installer l&apos;application
         </button>
         {afficherInstructionsIOS && (
-          <p className="mt-2 max-w-xs text-xs text-craie/60">
+          <p className="mt-2 max-w-xs text-xs text-ardoise/60">
             Sur iPhone : appuie sur <strong>Partager</strong> (l&apos;icône
             avec la flèche) puis <strong>« Sur l&apos;écran d&apos;accueil »</strong>.
           </p>

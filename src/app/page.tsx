@@ -57,14 +57,14 @@ export default async function Home({
   const supportLinkUrl = process.env.SUPPORT_LINK_URL;
 
   return (
-    <main className="flex flex-1 flex-col bg-ardoise">
+    <main className="flex flex-1 flex-col bg-craie">
       <header className="flex items-center justify-between px-4 sm:px-6 py-4">
-        <span className="font-heading text-lg font-semibold text-craie">
+        <span className="font-heading text-lg font-semibold text-ardoise">
           🛒 whaoo
         </span>
         <Link
           href="/connexion"
-          className="rounded-lg border border-craie/30 px-3 py-1.5 text-sm text-craie hover:bg-craie/10"
+          className="rounded-lg border border-ardoise/20 px-3 py-1.5 text-sm text-ardoise hover:bg-ardoise/5"
         >
           Se connecter
         </Link>
@@ -76,11 +76,11 @@ export default async function Home({
         </p>
       )}
 
-      <section className="flex flex-col items-center gap-4 px-4 sm:px-6 pb-10 pt-4 text-center text-craie">
+      <section className="flex flex-col items-center gap-4 px-4 sm:px-6 pb-10 pt-4 text-center text-ardoise">
         <h1 className="max-w-lg font-heading text-3xl font-semibold">
           Tes courses, sans les mauvaises surprises en caisse
         </h1>
-        <p className="max-w-md text-craie/80">
+        <p className="max-w-md text-ardoise/70">
           Une appli simple qui note tes courses à la voix pendant que tu fais
           tes achats, suit ton budget du mois en temps réel, et te dit quand
           tu peux te faire plaisir — sans tableur, sans y penser.
@@ -91,7 +91,7 @@ export default async function Home({
         <div className="mt-2 flex flex-col gap-3 sm:flex-row">
           <Link
             href="/demo"
-            className="rounded-lg border border-craie/40 px-5 py-3 font-medium text-craie hover:bg-craie/10"
+            className="rounded-lg border border-ardoise/30 px-5 py-3 font-medium text-ardoise hover:bg-ardoise/5"
           >
             Essayer la démo
           </Link>
@@ -105,7 +105,7 @@ export default async function Home({
         {referralCode && (
           <Link
             href={`/inscription?parrain=${referralCode}`}
-            className="text-sm text-craie/60 underline"
+            className="text-sm text-ardoise/60 underline"
           >
             Inviter quelqu&apos;un
           </Link>
@@ -117,22 +117,22 @@ export default async function Home({
         {ARGUMENTS.map((arg) => (
           <div
             key={arg.titre}
-            className="flex flex-col gap-2 rounded-2xl bg-ardoise-light p-5 text-craie"
+            className="flex flex-col gap-2 rounded-2xl bg-white p-5 text-ardoise shadow-sm"
           >
             <span className="text-2xl">{arg.icon}</span>
             <h2 className="font-heading text-base font-semibold">{arg.titre}</h2>
-            <p className="text-sm text-craie/70">{arg.texte}</p>
+            <p className="text-sm text-ardoise/70">{arg.texte}</p>
           </div>
         ))}
       </section>
 
       {supportLinkUrl && (
-        <div className="border-t border-craie/10 px-4 sm:px-6 py-8 text-center">
-          <p className="mx-auto max-w-md text-sm text-craie/70">
+        <div className="border-t border-ardoise/10 px-4 sm:px-6 py-8 text-center">
+          <p className="mx-auto max-w-md text-sm text-ardoise/70">
             Cette appli est gratuite à l&apos;usage de base et développée
             seule. Si elle te rend service, une contribution libre est
             toujours appréciée —{" "}
-            <strong className="text-craie">entièrement facultative, sans
+            <strong className="text-ardoise">entièrement facultative, sans
             aucune obligation</strong>. Le paiement passe par{" "}
             <a href={supportLinkUrl} className="underline" target="_blank" rel="noreferrer">
               Lydia
@@ -143,13 +143,13 @@ export default async function Home({
           <audio controls preload="none" className="mx-auto mt-3 h-9 max-w-xs">
             <source src="/audio/soutien.mp3" type="audio/mpeg" />
           </audio>
-          <p className="mx-auto mt-1 max-w-md text-xs text-craie/40">
+          <p className="mx-auto mt-1 max-w-md text-xs text-ardoise/40">
             🔊 Message vocal (15 secondes)
           </p>
         </div>
       )}
 
-      <footer className="flex flex-wrap justify-center gap-4 border-t border-craie/10 px-4 sm:px-6 py-6 text-xs text-craie/50">
+      <footer className="flex flex-wrap justify-center gap-4 border-t border-ardoise/10 px-4 sm:px-6 py-6 text-xs text-ardoise/50">
         <Link href="/mentions-legales" className="underline">
           Mentions légales
         </Link>

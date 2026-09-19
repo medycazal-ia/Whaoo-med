@@ -1,15 +1,18 @@
 @import "tailwindcss";
 
 :root {
-  /* Design system "épicerie/marché" — cahier des charges section 7 */
-  --color-ardoise: #2b3a32;
-  --color-ardoise-light: #33453b;
-  --color-craie: #f1ede1;
-  --color-ticket: #fbf8f1;
-  --color-tomate: #c1452d;
-  --color-basilic: #5e7c52;
-  --color-ambre: #c98a2c;
-  --color-kaki: #4a4229;
+  /* Design system "épicerie/marché" — v2, plus clair/gai/dynamique suite
+     aux retours de testeurs (la v1 paraissait trop sombre et terne). Les
+     noms de tokens restent identiques pour ne pas toucher aux classes
+     utilisées dans les composants ; seules les valeurs changent. */
+  --color-ardoise: #1e3a34;
+  --color-ardoise-light: #2a4d45;
+  --color-craie: #faf7f0;
+  --color-ticket: #fffdf9;
+  --color-tomate: #e2492e;
+  --color-basilic: #3fa35b;
+  --color-ambre: #f0a93a;
+  --color-kaki: #1fa97c;
 
   --background: var(--color-ticket);
   --foreground: var(--color-ardoise);

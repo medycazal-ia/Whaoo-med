@@ -35,10 +35,13 @@ type CoursesActions = {
   contribuerPrixTicket?: (lignes: { label: string; price: number }[]) => Promise<void>;
 };
 
+// Pastilles pensées pour la carte budget au fond sombre (dégradé
+// kaki→ardoise) : un fond clair opaque garantit le contraste, quelle que
+// soit la couleur de statut.
 const STATUT_STYLES: Record<string, string> = {
-  serein: "bg-basilic/15 text-basilic",
-  vigilant: "bg-ambre/15 text-ambre",
-  attention: "bg-tomate/15 text-tomate",
+  serein: "bg-craie text-basilic",
+  vigilant: "bg-craie text-ambre",
+  attention: "bg-craie text-tomate",
 };
 
 export function CoursesDashboard({
@@ -142,7 +145,7 @@ export function CoursesDashboard({
       <BudgetFlottant totalDepense={totalDepense} budgetAmount={budgetAmount} />
 
       <section className="px-4 sm:px-6 pt-6 pb-6">
-        <div className="mx-auto flex max-w-lg md:max-w-2xl lg:max-w-4xl flex-col gap-3 rounded-2xl bg-ardoise p-5">
+        <div className="mx-auto flex max-w-lg md:max-w-2xl lg:max-w-4xl flex-col gap-3 rounded-2xl bg-gradient-to-br from-kaki to-ardoise p-5 shadow-lg">
           <div className="flex items-baseline justify-between font-mono text-craie">
             <span className="text-2xl font-semibold">
               {totalDepense.toFixed(2)} €

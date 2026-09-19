@@ -105,7 +105,10 @@ export type IngredientALotter = { label: string; detail: string | null; quantity
 // Chaque ingrédient reçoit une estimation de prix automatique (communauté
 // puis table statique), comme pour un ajout manuel ou vocal — le prix ne
 // doit pas être proposé seulement quand l'utilisateur tape lui-même.
-export async function ajouterArticlesEnLot(items: IngredientALotter[]): Promise<void> {
+export async function ajouterArticlesEnLot(
+  items: IngredientALotter[],
+  listeNom: string | null = null,
+): Promise<void> {
   const { supabase, user } = await requireUser();
   if (items.length === 0) return;
 
@@ -123,6 +126,7 @@ export async function ajouterArticlesEnLot(items: IngredientALotter[]): Promise<
         quantity: item.quantity,
         status: "a_acheter" as const,
         achat_mois: null,
+        liste_nom: listeNom,
       };
     }),
   );

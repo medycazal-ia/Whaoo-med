@@ -5,7 +5,7 @@ import Link from "next/link";
 import { calculerRythme, premierJourDuMois } from "@/lib/courses/rythme";
 import { SaisieVocale } from "@/components/saisie-vocale";
 import { ChampsArticlePrix } from "@/components/champs-article-prix";
-import { AjouterDepuisRecette } from "@/components/ajouter-depuis-recette";
+import { AjouterDepuisDocument } from "@/components/ajouter-depuis-document";
 import { AideVocale } from "@/components/aide-vocale";
 import { BudgetFlottant } from "@/components/budget-flottant";
 import { FaqPanel } from "@/components/faq-panel";
@@ -22,6 +22,7 @@ export type ArticleCourse = {
   quantity: number;
   status: "achete" | "a_acheter";
   prixSource?: SourcePrix | null;
+  listeNom?: string | null;
 };
 
 type CoursesActions = {
@@ -29,7 +30,7 @@ type CoursesActions = {
   basculerStatutArticle: (formData: FormData) => Promise<void>;
   supprimerArticle: (formData: FormData) => Promise<void>;
   definirBudget: (formData: FormData) => Promise<void>;
-  ajouterArticlesEnLot: (items: IngredientParse[]) => Promise<void>;
+  ajouterArticlesEnLot: (items: IngredientParse[], listeNom: string | null) => Promise<void>;
   contribuerPrixTicket?: (lignes: { label: string; price: number }[]) => Promise<void>;
 };
 
@@ -172,7 +173,7 @@ export function CoursesDashboard({
           </button>
         </form>
 
-        <AjouterDepuisRecette
+        <AjouterDepuisDocument
           ajouterEnLotAction={actions.ajouterArticlesEnLot}
           indexCommunautaire={indexCommunautaire}
         />
@@ -237,6 +238,11 @@ export function CoursesDashboard({
                   {item.prixSource && item.prixSource !== "manuel" && (
                     <span className="ml-2 rounded-full bg-basilic/10 px-2 py-0.5 font-sans text-[11px] font-medium text-basilic">
                       {LABEL_SOURCE_PRIX[item.prixSource]}
+                    </span>
+                  )}
+                  {item.listeNom && (
+                    <span className="ml-2 rounded-full bg-ambre/10 px-2 py-0.5 font-sans text-[11px] font-medium text-ambre">
+                      📋 {item.listeNom}
                     </span>
                   )}
                 </p>

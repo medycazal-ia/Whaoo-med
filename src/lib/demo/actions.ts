@@ -44,7 +44,10 @@ export async function ajouterArticleDemo(formData: FormData): Promise<void> {
 
 export type IngredientALotter = { label: string; detail: string | null; quantity: number };
 
-export async function ajouterArticlesEnLotDemo(items: IngredientALotter[]): Promise<void> {
+export async function ajouterArticlesEnLotDemo(
+  items: IngredientALotter[],
+  listeNom: string | null = null,
+): Promise<void> {
   const cookieStore = await cookies();
   const state = lireEtatDemo(cookieStore);
 
@@ -58,6 +61,7 @@ export async function ajouterArticlesEnLotDemo(items: IngredientALotter[]): Prom
       prixSource: estimation?.source ?? null,
       quantity: item.quantity,
       status: "a_acheter",
+      listeNom,
     });
   }
 

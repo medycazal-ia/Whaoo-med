@@ -89,7 +89,7 @@ export function parserDocumentAliments(texte: string): ResultatParseDocument {
     const matchParenthese = ligne.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
     if (matchParenthese) {
       const ingredients = matchParenthese[2]
-        .split(",")
+        .split(/,|;|\/|\s+et\s+|\s+\+\s+/i)
         .map((s) => s.trim())
         .filter(Boolean);
 

@@ -17,6 +17,7 @@ export function ScannerTicket({
   const [lignes, setLignes] = useState<LigneEditable[]>([]);
   const [texteBrut, setTexteBrut] = useState<string | null>(null);
   const [afficherTexteBrut, setAfficherTexteBrut] = useState(false);
+  const [texteCopie, setTexteCopie] = useState(false);
 
   function reinitialiser() {
     setOuvert(false);
@@ -188,16 +189,31 @@ export function ScannerTicket({
           )}
           {texteBrut && (
             <div>
-              <button
-                type="button"
-                onClick={() => setAfficherTexteBrut((v) => !v)}
-                className="text-xs text-ardoise/50 underline"
-              >
-                {afficherTexteBrut ? "Cacher" : "Voir"} le texte brut détecté
-                (debug)
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setAfficherTexteBrut((v) => !v)}
+                  className="text-xs text-ardoise/50 underline"
+                >
+                  {afficherTexteBrut ? "Cacher" : "Voir"} le texte brut
+                  détecté (debug)
+                </button>
+                {afficherTexteBrut && (
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      await navigator.clipboard.writeText(texteBrut);
+                      setTexteCopie(true);
+                      setTimeout(() => setTexteCopie(false), 2000);
+                    }}
+                    className="text-xs text-basilic underline"
+                  >
+                    {texteCopie ? "Copié ✓" : "📋 Copier tout le texte"}
+                  </button>
+                )}
+              </div>
               {afficherTexteBrut && (
-                <pre className="mt-1 max-h-40 overflow-auto whitespace-pre-wrap rounded-lg bg-ardoise/5 p-2 text-xs text-ardoise/70">
+                <pre className="mt-1 max-h-64 overflow-auto whitespace-pre-wrap rounded-lg bg-ardoise/5 p-2 text-xs text-ardoise/70">
                   {texteBrut}
                 </pre>
               )}

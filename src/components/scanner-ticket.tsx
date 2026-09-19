@@ -35,15 +35,11 @@ export function ScannerTicket({
     try {
       const imageReduite = await redimensionnerImage(fichier);
       const Tesseract = (await import("tesseract.js")).default;
-      // PSM.SINGLE_COLUMN : un ticket de caisse est une seule colonne de
-      // texte de tailles variables — le mode "page complète" par défaut
-      // se trompe souvent sur ce type de mise en page étroite.
       const worker = await Tesseract.createWorker("fra", undefined, {
         logger: (m) => {
           if (m.status === "recognizing text") setProgression(Math.round(m.progress * 100));
         },
       });
-      await worker.setParameters({ tessedit_pageseg_mode: Tesseract.PSM.SINGLE_COLUMN });
       const { data } = await worker.recognize(imageReduite);
       await worker.terminate();
 

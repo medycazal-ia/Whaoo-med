@@ -69,6 +69,10 @@ export function ScannerTicket({
         fait entièrement dans ton navigateur, la photo n&apos;est envoyée
         nulle part.
       </p>
+      <p className="text-xs text-ardoise/50">
+        💡 Pour une meilleure lecture : à plat, bien à plat sous une bonne
+        lumière, ticket entier dans le cadre, sans reflet.
+      </p>
 
       {statut === "idle" && (
         <div className="flex gap-2">

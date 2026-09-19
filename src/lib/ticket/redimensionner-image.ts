@@ -2,8 +2,11 @@
 // raisonnable avant de la passer à Tesseract.js. Sans ça, l'OCR sur une
 // photo plein format peut épuiser la mémoire du navigateur et faire
 // planter l'appli (observé notamment sur mobile, juste après la prise de
-// la photo) — largement plus que nécessaire pour lire du texte imprimé.
-const DIMENSION_MAX = 1600;
+// la photo). Un ticket de caisse est long et couvert de texte minuscule :
+// une limite trop basse (1600px testé initialement) rend le texte
+// illisible pour l'OCR — 2600px reste un compromis qui évite le plantage
+// mémoire sur une photo brute tout en gardant le texte net.
+const DIMENSION_MAX = 2600;
 
 export async function redimensionnerImage(fichier: File): Promise<Blob> {
   const bitmap = await createImageBitmap(fichier);
@@ -30,7 +33,7 @@ export async function redimensionnerImage(fichier: File): Promise<Blob> {
   bitmap.close();
 
   const blob = await new Promise<Blob | null>((resolve) =>
-    canvas.toBlob(resolve, "image/jpeg", 0.85),
+    canvas.toBlob(resolve, "image/jpeg", 0.92),
   );
 
   return blob ?? fichier;

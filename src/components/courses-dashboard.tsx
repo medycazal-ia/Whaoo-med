@@ -70,16 +70,9 @@ export function CoursesDashboard({
   proposerPartagePrix?: boolean;
 }) {
   const [aideOuverte, setAideOuverte] = useState(false);
-  const [listesCachees, setListesCachees] = useState<Set<string>>(new Set());
-
-  function basculerListeCachee(nom: string) {
-    setListesCachees((precedent) => {
-      const suivant = new Set(precedent);
-      if (suivant.has(nom)) suivant.delete(nom);
-      else suivant.add(nom);
-      return suivant;
-    });
-  }
+  // Repliées par défaut à l'ouverture : un seul bouton "Voir mes listes"
+  // les révèle toutes d'un coup, mis en valeur tant qu'elles sont cachées.
+  const [listesVisibles, setListesVisibles] = useState(false);
 
   const totalDepense = items
     .filter((item) => item.status === "achete")
@@ -199,21 +192,27 @@ export function CoursesDashboard({
               </ul>
             )}
 
-            {groupesNommes.map(([nom, itemsDuGroupe]) => {
-              const cachee = listesCachees.has(nom);
-              return (
+            {groupesNommes.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setListesVisibles((v) => !v)}
+                className={
+                  listesVisibles
+                    ? "mt-3 text-xs text-ardoise/60 underline"
+                    : "mt-3 w-full rounded-lg bg-ambre px-3 py-2 text-sm font-semibold text-ardoise shadow hover:opacity-90"
+                }
+              >
+                {listesVisibles
+                  ? "Masquer mes listes"
+                  : `👀 Voir mes listes (${groupesNommes.length})`}
+              </button>
+            )}
+
+            {listesVisibles &&
+              groupesNommes.map(([nom, itemsDuGroupe]) => (
                 <div key={nom} className="mt-3">
                   <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => basculerListeCachee(nom)}
-                        className="text-xs text-ardoise/60 underline"
-                      >
-                        {cachee ? "👁️ Afficher cette liste" : "🙈 Cacher cette liste"}
-                      </button>
-                      <p className="text-xs font-medium text-ambre">📋 {nom}</p>
-                    </div>
+                    <p className="text-xs font-medium text-ambre">📋 {nom}</p>
                     <form action={actions.supprimerListeNommee}>
                       <input type="hidden" name="listeNom" value={nom} />
                       <button type="submit" className="text-xs text-tomate underline">
@@ -221,14 +220,11 @@ export function CoursesDashboard({
                       </button>
                     </form>
                   </div>
-                  {!cachee && (
-                    <ul className="mt-1 flex flex-col divide-y divide-ardoise/10">
-                      {itemsDuGroupe.map((item) => ligneAttente(item))}
-                    </ul>
-                  )}
+                  <ul className="mt-1 flex flex-col divide-y divide-ardoise/10">
+                    {itemsDuGroupe.map((item) => ligneAttente(item))}
+                  </ul>
                 </div>
-              );
-            })}
+              ))}
           </div>
         </section>
       )}

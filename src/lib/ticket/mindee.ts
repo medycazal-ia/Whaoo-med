@@ -22,12 +22,13 @@ type MindeeLineItem = {
   quantity?: number | null;
 };
 
+type MindeePrediction = { line_items?: MindeeLineItem[] };
+
 type MindeeReponse = {
   document?: {
     inference?: {
-      prediction?: {
-        line_items?: MindeeLineItem[];
-      };
+      prediction?: MindeePrediction;
+      pages?: { prediction?: MindeePrediction }[];
     };
   };
   api_request?: {
@@ -74,7 +75,13 @@ export async function analyserTicketMindee(formData: FormData): Promise<Resultat
     };
   }
 
-  const items = data?.document?.inference?.prediction?.line_items ?? [];
+  // Certains produits Mindee ne remontent les line_items qu'au niveau de
+  // la page, pas dans la prédiction agrégée du document — on vérifie donc
+  // les deux emplacements (piste suggérée par l'assistant Mindee lui-même
+  // face à un écart entre le testeur en ligne et un appel API réel).
+  const itemsDocument = data?.document?.inference?.prediction?.line_items ?? [];
+  const itemsPremierePage = data?.document?.inference?.pages?.[0]?.prediction?.line_items ?? [];
+  const items = itemsDocument.length > 0 ? itemsDocument : itemsPremierePage;
 
   const lignes: LigneMindee[] = [];
   for (const item of items) {
@@ -93,7 +100,11 @@ export async function analyserTicketMindee(formData: FormData): Promise<Resultat
   }
 
   if (lignes.length === 0) {
-    return { ok: false, raison: "aucun_article" };
+    return {
+      ok: false,
+      raison: "aucun_article",
+      details: `${itemsDocument.length} ligne(s) doc, ${itemsPremierePage.length} ligne(s) page — clés reçues : ${Object.keys(data?.document?.inference?.prediction ?? {}).join(", ") || "aucune"}`,
+    };
   }
 
   return { ok: true, lignes };

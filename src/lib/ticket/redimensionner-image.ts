@@ -112,7 +112,11 @@ function appliquerNettete(
 // peut faire planter l'appli rien qu'en la préparant pour l'envoi. Pas de
 // niveaux de gris ni de netteté ici : Mindee fait sa propre analyse sur une
 // photo couleur, pas besoin (et pas souhaitable) de la lui pré-traiter.
-const DIMENSION_MAX_ENVOI = 2600;
+// Volontairement plus généreux que le plafond de l'OCR local (Tesseract,
+// qui tourne dans le navigateur) : Mindee est un service cloud sans
+// contrainte mémoire côté client, réduire l'image plus que nécessaire ne
+// ferait que dégrader la lecture pour rien.
+const DIMENSION_MAX_ENVOI = 4000;
 
 export async function redimensionnerPourEnvoi(fichier: File): Promise<Blob> {
   const bitmap = await decoderBitmapBorne(fichier, DIMENSION_MAX_ENVOI);

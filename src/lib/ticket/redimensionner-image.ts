@@ -21,6 +21,67 @@ const AGRANDISSEMENT_MAX = 2;
 // Noyau de renforcement de netteté (unsharp mask 3x3 classique).
 const NOYAU_NETTETE = [0, -1, 0, -1, 5, -1, 0, -1, 0];
 
+// Lit les dimensions d'un JPEG directement dans ses en-têtes (marqueur SOF),
+// sans décoder l'image. Sur les tests précédents (photo déjà réduite à
+// 1200x1600 par la messagerie), le décodage complet ne posait pas de
+// problème — mais une vraie photo prise en direct par l'appareil peut être
+// 4x plus grande dans chaque dimension (12+ Mpx), et c'est très
+// probablement CE décodage complet, avant toute réduction, qui épuise la
+// mémoire du navigateur sur mobile. Connaître les dimensions à l'avance
+// permet de demander au navigateur de décoder directement à une taille
+// réduite (voir decoderBitmapBorne) au lieu de matérialiser l'image
+// pleine résolution en mémoire avant de la réduire.
+async function lireDimensionsJpeg(fichier: File): Promise<{ largeur: number; hauteur: number } | null> {
+  const enTete = await fichier.slice(0, 262144).arrayBuffer();
+  const vue = new DataView(enTete);
+  if (vue.byteLength < 4 || vue.getUint16(0) !== 0xffd8) return null;
+
+  let offset = 2;
+  while (offset + 8 < vue.byteLength) {
+    if (vue.getUint8(offset) !== 0xff) {
+      offset++;
+      continue;
+    }
+    const marqueur = vue.getUint8(offset + 1);
+    if (marqueur === 0xd8 || marqueur === 0xd9) {
+      offset += 2;
+      continue;
+    }
+    const longueurSegment = vue.getUint16(offset + 2);
+    const estSOF = marqueur >= 0xc0 && marqueur <= 0xcf && marqueur !== 0xc4 && marqueur !== 0xc8 && marqueur !== 0xcc;
+    if (estSOF) {
+      return { hauteur: vue.getUint16(offset + 5), largeur: vue.getUint16(offset + 7) };
+    }
+    offset += 2 + longueurSegment;
+  }
+  return null;
+}
+
+// Décode l'image en demandant directement au navigateur une taille bornée
+// quand ses dimensions réelles sont connues à l'avance et dépassent
+// `dimensionMax`, au lieu de décoder à pleine résolution puis réduire via
+// un canvas — ce qui évite le pic mémoire du décodage complet.
+async function decoderBitmapBorne(fichier: File, dimensionMax: number): Promise<ImageBitmap> {
+  const dimensions = await lireDimensionsJpeg(fichier).catch(() => null);
+  if (dimensions) {
+    const plusGrandCote = Math.max(dimensions.largeur, dimensions.hauteur);
+    if (plusGrandCote > dimensionMax) {
+      const ratio = dimensionMax / plusGrandCote;
+      try {
+        return await createImageBitmap(fichier, {
+          resizeWidth: Math.round(dimensions.largeur * ratio),
+          resizeHeight: Math.round(dimensions.hauteur * ratio),
+          resizeQuality: "high",
+        });
+      } catch {
+        // Le navigateur ne supporte pas les options de redimensionnement à
+        // la volée — on retombe sur un décodage classique ci-dessous.
+      }
+    }
+  }
+  return createImageBitmap(fichier);
+}
+
 function appliquerNettete(
   niveaux: Uint8ClampedArray<ArrayBufferLike>,
   largeur: number,
@@ -54,7 +115,7 @@ function appliquerNettete(
 const DIMENSION_MAX_ENVOI = 2600;
 
 export async function redimensionnerPourEnvoi(fichier: File): Promise<Blob> {
-  const bitmap = await createImageBitmap(fichier);
+  const bitmap = await decoderBitmapBorne(fichier, DIMENSION_MAX_ENVOI);
   const plusGrandCote = Math.max(bitmap.width, bitmap.height);
 
   if (plusGrandCote <= DIMENSION_MAX_ENVOI) {
@@ -88,7 +149,7 @@ export async function redimensionnerPourEnvoi(fichier: File): Promise<Blob> {
 }
 
 export async function redimensionnerImage(fichier: File): Promise<Blob> {
-  const bitmap = await createImageBitmap(fichier);
+  const bitmap = await decoderBitmapBorne(fichier, DIMENSION_MAX);
   const plusGrandCote = Math.max(bitmap.width, bitmap.height);
 
   let ratio = 1;

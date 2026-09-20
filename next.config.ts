@@ -4,6 +4,15 @@ const nextConfig: NextConfig = {
   // Évite que Next.js régénère AGENTS.md/CLAUDE.md à chaque `next dev`.
   agentRules: false,
 
+  // La limite par défaut (1 Mo) est bien trop basse pour une photo de
+  // ticket de caisse envoyée à Mindee (voir scanner-ticket.tsx) — même
+  // réduite côté client, elle reste souvent au-delà de 1 Mo.
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "8mb",
+    },
+  },
+
   // Durcissement sécurité de base (section 5 du cahier des charges) —
   // HTTPS est déjà forcé automatiquement par Vercel.
   async headers() {

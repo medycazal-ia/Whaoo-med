@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { parserTicket, type LigneTicket } from "@/lib/ticket/parse-ticket";
-import { redimensionnerImage } from "@/lib/ticket/redimensionner-image";
+import { redimensionnerImage, redimensionnerPourEnvoi } from "@/lib/ticket/redimensionner-image";
 import { analyserTicketMindee } from "@/lib/ticket/mindee";
 
 type LigneEditable = LigneTicket & { inclure: boolean };
@@ -38,8 +38,14 @@ export function ScannerTicket({
       // bien plus fiable) quand il est configuré côté serveur. S'il n'est
       // pas encore configuré, échoue, ou ne trouve aucun article, on
       // retombe sur l'OCR local Tesseract plutôt que d'échouer sec.
+      // La photo brute d'un smartphone récent (10+ Mpx) est réduite avant
+      // l'envoi : sans ça, la préparer pour l'envoi peut à elle seule
+      // épuiser la mémoire du navigateur et fermer l'appli sur mobile —
+      // exactement le même plantage que celui déjà corrigé pour l'OCR
+      // local, qui se reproduit ici si on saute cette étape.
+      const imagePourEnvoi = await redimensionnerPourEnvoi(fichier);
       const formDataMindee = new FormData();
-      formDataMindee.append("ticket", fichier);
+      formDataMindee.append("ticket", imagePourEnvoi, "ticket.jpg");
       const resultatMindee = await analyserTicketMindee(formDataMindee);
 
       if (resultatMindee.ok) {

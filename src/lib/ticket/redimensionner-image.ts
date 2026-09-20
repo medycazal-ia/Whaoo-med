@@ -45,6 +45,48 @@ function appliquerNettete(
   return resultat;
 }
 
+// Plafond de taille avant envoi à un service distant (Mindee) : uniquement
+// pour éviter le même plantage mémoire mobile que le traitement Tesseract
+// ci-dessous — une photo de smartphone récent (10+ Mpx, parfois 8-15 Mo)
+// peut faire planter l'appli rien qu'en la préparant pour l'envoi. Pas de
+// niveaux de gris ni de netteté ici : Mindee fait sa propre analyse sur une
+// photo couleur, pas besoin (et pas souhaitable) de la lui pré-traiter.
+const DIMENSION_MAX_ENVOI = 2600;
+
+export async function redimensionnerPourEnvoi(fichier: File): Promise<Blob> {
+  const bitmap = await createImageBitmap(fichier);
+  const plusGrandCote = Math.max(bitmap.width, bitmap.height);
+
+  if (plusGrandCote <= DIMENSION_MAX_ENVOI) {
+    bitmap.close();
+    return fichier;
+  }
+
+  const ratio = DIMENSION_MAX_ENVOI / plusGrandCote;
+  const largeur = Math.round(bitmap.width * ratio);
+  const hauteur = Math.round(bitmap.height * ratio);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = largeur;
+  canvas.height = hauteur;
+  const contexte = canvas.getContext("2d");
+  if (!contexte) {
+    bitmap.close();
+    return fichier;
+  }
+
+  contexte.imageSmoothingEnabled = true;
+  contexte.imageSmoothingQuality = "high";
+  contexte.drawImage(bitmap, 0, 0, largeur, hauteur);
+  bitmap.close();
+
+  const blob = await new Promise<Blob | null>((resolve) =>
+    canvas.toBlob(resolve, "image/jpeg", 0.9),
+  );
+
+  return blob ?? fichier;
+}
+
 export async function redimensionnerImage(fichier: File): Promise<Blob> {
   const bitmap = await createImageBitmap(fichier);
   const plusGrandCote = Math.max(bitmap.width, bitmap.height);

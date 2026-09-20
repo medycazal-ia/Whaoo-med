@@ -2,6 +2,7 @@
 
 import { useState, type ChangeEvent } from "react";
 import { parserDocumentAliments } from "@/lib/courses/parse-document";
+import { analyserDocumentClaude } from "@/lib/courses/parse-document-ia";
 import type { IngredientParse } from "@/lib/courses/parse-recette";
 import { estimerPrix, type IndexCommunautaire } from "@/lib/prix-estimes";
 
@@ -30,11 +31,30 @@ export function AjouterDepuisDocument({
     setErreurFichier(null);
   }
 
-  function analyser() {
-    const { items, nomSuggere } = parserDocumentAliments(texte);
-    setApercu(items);
-    setCochees(items.map(() => true));
-    if (nomSuggere && !nomListe.trim()) setNomListe(nomSuggere);
+  async function analyser() {
+    setEnCours(true);
+    try {
+      // On tente d'abord la lecture par IA (Claude), qui comprend
+      // l'intention du texte quelle que soit sa formulation — le parseur
+      // par règles ci-dessous ne reconnaît qu'un jeu figé de tournures
+      // ("ou", virgule, "/") et ne généralise pas. Repli automatique sur
+      // les règles si l'IA n'est pas configurée, échoue, ou ne trouve
+      // aucun article.
+      const resultatIA = await analyserDocumentClaude(texte);
+      if (resultatIA.ok) {
+        setApercu(resultatIA.items);
+        setCochees(resultatIA.items.map(() => true));
+        if (resultatIA.nomSuggere && !nomListe.trim()) setNomListe(resultatIA.nomSuggere);
+        return;
+      }
+
+      const { items, nomSuggere } = parserDocumentAliments(texte);
+      setApercu(items);
+      setCochees(items.map(() => true));
+      if (nomSuggere && !nomListe.trim()) setNomListe(nomSuggere);
+    } finally {
+      setEnCours(false);
+    }
   }
 
   async function gererFichier(e: ChangeEvent<HTMLInputElement>) {
@@ -127,10 +147,10 @@ export function AjouterDepuisDocument({
           <button
             type="button"
             onClick={analyser}
-            disabled={!texte.trim()}
+            disabled={!texte.trim() || enCours}
             className="rounded-lg bg-ardoise px-4 py-2 text-sm font-medium text-craie disabled:opacity-50"
           >
-            Analyser
+            {enCours ? "Analyse en cours…" : "Analyser"}
           </button>
           <button
             type="button"

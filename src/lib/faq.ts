@@ -5,10 +5,11 @@ export type QuestionFaq = {
   motsCles: string[];
 };
 
-// 20 questions couvrant : usage de l'appli, sécurité, implications d'avoir
-// un compte, bénéfices apportés, la cagnotte, contacter le fondateur,
-// suggestions. Les mots-clés servent à la recherche simple (texte tapé ou
-// dicté), sans dépendre d'un service externe.
+// 26 questions couvrant : usage de l'appli, scanner de ticket, écoute
+// vocale continue, import de document par photo, sécurité, implications
+// d'avoir un compte, bénéfices apportés, la cagnotte, contacter le
+// fondateur, suggestions. Les mots-clés servent à la recherche simple
+// (texte tapé ou dicté), sans dépendre d'un service externe.
 export const FAQ: QuestionFaq[] = [
   {
     id: "scenario-usage-type",
@@ -28,8 +29,8 @@ export const FAQ: QuestionFaq[] = [
     id: "ajouter-article",
     question: "Comment ajouter un article à ma liste de courses ?",
     reponse:
-      "Deux façons : tape le nom dans le champ « Article » du formulaire, ou clique sur « 🎙️ Dicter un article » et dis par exemple « deux yaourts à un euro cinquante ».",
-    motsCles: ["ajouter", "article", "courses", "liste"],
+      "Trois façons : tape le nom dans le champ « Article » du formulaire, clique sur « 🎙️ Parlez-moi » et dis par exemple « deux yaourts à un euro cinquante », ou scanne directement un ticket de caisse. En mode écoute continue, whaoo peut aussi ajouter automatiquement plusieurs articles à la suite pendant que tu parles, sans avoir à ré-appuyer sur le bouton entre chaque article.",
+    motsCles: ["ajouter", "article", "courses", "liste", "parlez moi"],
   },
   {
     id: "dictee-iphone-ipad",
@@ -42,8 +43,8 @@ export const FAQ: QuestionFaq[] = [
     id: "phrases-vocales",
     question: "Quelles phrases puis-je dire pour dicter un article ?",
     reponse:
-      "Par exemple « deux yaourts à un euro cinquante », « trois pommes », ou juste « pain ». Le lien « Voir des exemples de phrases à dire » sous le bouton micro en donne d'autres.",
-    motsCles: ["phrase", "dicter", "voix", "vocal", "exemple"],
+      "Par exemple « deux yaourts à un euro cinquante », « trois pommes », ou juste « pain ». Tu peux aussi citer plusieurs articles dans une seule phrase, comme « du lait, des œufs et du pain » : whaoo les détecte et les ajoute un par un. Le lien « Voir des exemples de phrases à dire » sous le bouton micro en donne d'autres.",
+    motsCles: ["phrase", "dicter", "voix", "vocal", "exemple", "plusieurs articles"],
   },
   {
     id: "corriger-prix",
@@ -63,8 +64,8 @@ export const FAQ: QuestionFaq[] = [
     id: "cagnotte-utilite",
     question: "À quoi sert la cagnotte de l'appli et pourquoi ?",
     reponse:
-      "Quand tu dépenses moins que ton budget du mois, whaoo estime l'écart et te le montre comme une « cagnotte » : une façon simple de voir combien tu économises et de te motiver à continuer, ou à te faire plaisir avec.",
-    motsCles: ["cagnotte", "économie", "budget", "épargne"],
+      "La cagnotte, c'est simplement ton budget du mois auquel on retire au fur et à mesure chaque achat marqué « acheté ». Par exemple, avec 200 € de budget, dès que tu achètes pour 59 €, ta cagnotte affiche 141 € — quel que soit le jour du mois où cet achat a lieu. Elle te permet de voir en un coup d'œil ce qu'il te reste à dépenser, et à partir de certains paliers (15 €, 50 €, 150 €), whaoo te propose une idée de petit plaisir à t'offrir avec ce qu'il te reste.",
+    motsCles: ["cagnotte", "économie", "budget", "épargne", "reste", "solde"],
   },
   {
     id: "budget-mensuel",
@@ -158,10 +159,10 @@ export const FAQ: QuestionFaq[] = [
   },
   {
     id: "recette",
-    question: "Puis-je ajouter plusieurs ingrédients d'un coup depuis une recette ?",
+    question: "Puis-je ajouter plusieurs ingrédients d'un coup depuis une recette ou un document ?",
     reponse:
-      "Oui, avec « + Ajouter depuis une recette » : colle une liste (une ligne par ingrédient), whaoo l'analyse et propose même un prix pour chaque ingrédient reconnu.",
-    motsCles: ["recette", "ingrédient", "liste", "coller"],
+      "Oui, avec « + Ajouter depuis une recette » : colle un texte (recette, menu, liste) ou importe directement une photo du document. whaoo l'analyse avec une IA pour créer une ligne par article — y compris des articles non-alimentaires — et propose un prix pour chaque article reconnu. Il sépare aussi automatiquement les phrases du type « potage ou carotte » ou « miel/fromage/yaourt » en plusieurs articles distincts, sans créer de ligne inutile pour des mentions comme « autres alternatives ».",
+    motsCles: ["recette", "ingrédient", "liste", "coller", "photo", "ia", "non alimentaire", "document"],
   },
   {
     id: "installer-pwa",
@@ -169,6 +170,27 @@ export const FAQ: QuestionFaq[] = [
     reponse:
       "Depuis la page d'accueil, utilise le bouton d'installation (ou le menu de ton navigateur → « Ajouter à l'écran d'accueil »). Pas besoin de passer par l'App Store ou le Play Store.",
     motsCles: ["installer", "application", "pwa", "téléphone", "écran d'accueil"],
+  },
+  {
+    id: "scanner-ticket",
+    question: "Comment scanner un ticket de caisse ?",
+    reponse:
+      "Clique sur « 📷 Scanner un ticket », prends-le en photo ou importe une image : whaoo lit automatiquement chaque article et son prix grâce à une IA de lecture très précise, puis te propose de les ajouter. Tu peux cocher « Ajouter aussi ces articles à mon budget du mois (déjà achetés) » pour qu'ils soient comptés immédiatement dans tes dépenses de ce mois, sans avoir à repasser par « Marquer acheté ».",
+    motsCles: ["scanner", "ticket", "caisse", "photo", "ocr", "reconnaissance", "budget", "achete"],
+  },
+  {
+    id: "parlez-moi-continu",
+    question: "Comment fonctionne le bouton « Parlez-moi » en écoute continue ?",
+    reponse:
+      "Appuie une fois sur « 🎙️ Parlez-moi » : whaoo t'écoute en continu, sans que tu aies besoin de ré-appuyer entre chaque article. Dis par exemple « du lait, deux yaourts à un euro cinquante, et du pain » : whaoo reconnaît et ajoute chaque article automatiquement, et t'affiche un petit message de confirmation avec un bouton pour annuler si besoin. L'écoute continue jusqu'à ce que tu appuies à nouveau sur le bouton pour l'arrêter.",
+    motsCles: ["parlez moi", "ecoute continue", "dicter", "vocal", "automatique", "micro", "permanence"],
+  },
+  {
+    id: "import-document-photo",
+    question: "Puis-je importer une liste ou un document par photo ?",
+    reponse:
+      "Oui : depuis « + Ajouter depuis une recette », un bouton « 📷 Prendre/importer une photo » te permet de photographier ou d'importer n'importe quel document (menu, liste manuscrite, recette, ticket...). whaoo reconnaît aussi les articles non-alimentaires, sépare intelligemment les phrases comme « potage ou carotte » en plusieurs articles distincts, et ignore les mentions génériques comme « autres solutions » ou « autres alternatives ».",
+    motsCles: ["photo", "document", "importer", "recette", "menu", "non alimentaire", "scan"],
   },
 ];
 

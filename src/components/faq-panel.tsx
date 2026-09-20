@@ -6,6 +6,25 @@ import { getSpeechRecognition } from "@/lib/voice/speech-recognition";
 
 const EMAIL_CONTACT = "contact@medy.site";
 
+/**
+ * Lien discret proposé sous chaque réponse de la FAQ, pour que
+ * l'utilisateur puisse aller plus loin s'il n'est pas satisfait.
+ */
+function RelanceAide() {
+  return (
+    <p className="mt-2 text-xs text-ardoise/60">
+      Pas satisfait de cette réponse ?{" "}
+      <a
+        href={`mailto:${EMAIL_CONTACT}`}
+        className="font-medium text-basilic underline underline-offset-2"
+      >
+        Contacte le fondateur
+      </a>
+      .
+    </p>
+  );
+}
+
 export function FaqPanel({ onFermer }: { onFermer: () => void }) {
   const [recherche, setRecherche] = useState("");
   const [ouverte, setOuverte] = useState<QuestionFaq | null>(null);
@@ -74,10 +93,19 @@ export function FaqPanel({ onFermer }: { onFermer: () => void }) {
         </div>
 
         <div className="flex-1 overflow-y-auto p-3">
-          {resultat && (
+          {recherche.trim() && (
             <div className="mb-3 rounded-xl border border-basilic/40 bg-basilic/10 p-3">
-              <p className="text-sm font-semibold text-ardoise">{resultat.question}</p>
-              <p className="mt-1 text-sm text-ardoise/80">{resultat.reponse}</p>
+              {resultat ? (
+                <>
+                  <p className="text-sm font-semibold text-ardoise">{resultat.question}</p>
+                  <p className="mt-1 text-sm text-ardoise/80">{resultat.reponse}</p>
+                </>
+              ) : (
+                <p className="text-sm text-ardoise/80">
+                  Aucune réponse trouvée dans la FAQ pour cette question.
+                </p>
+              )}
+              <RelanceAide />
             </div>
           )}
 
@@ -92,7 +120,10 @@ export function FaqPanel({ onFermer }: { onFermer: () => void }) {
                   {item.question}
                 </button>
                 {ouverte?.id === item.id && (
-                  <p className="pb-2.5 text-sm text-ardoise/70">{item.reponse}</p>
+                  <div className="pb-2.5">
+                    <p className="text-sm text-ardoise/70">{item.reponse}</p>
+                    <RelanceAide />
+                  </div>
                 )}
               </li>
             ))}

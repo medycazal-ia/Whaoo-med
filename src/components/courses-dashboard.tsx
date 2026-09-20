@@ -4,6 +4,7 @@ import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import { calculerRythme, premierJourDuMois } from "@/lib/courses/rythme";
 import { nomSessionParDefaut } from "@/lib/courses/session";
+import type { ArticleCourse } from "@/lib/courses/types";
 import { SaisieVocale } from "@/components/saisie-vocale";
 import { ChampsArticlePrix } from "@/components/champs-article-prix";
 import { AjouterDepuisDocument } from "@/components/ajouter-depuis-document";
@@ -13,20 +14,12 @@ import { BudgetImmediat } from "@/components/budget-immediat";
 import { FaqPanel } from "@/components/faq-panel";
 import { ScannerTicket } from "@/components/scanner-ticket";
 import { PromotionsLocales } from "@/components/promotions-locales";
+import { LigneAttenteArticle } from "@/components/ligne-attente-article";
+import { CarteArticle } from "@/components/carte-article";
 import type { IngredientParse } from "@/lib/courses/parse-recette";
-import { LABEL_SOURCE_PRIX, type IndexCommunautaire, type SourcePrix } from "@/lib/prix-estimes";
+import type { IndexCommunautaire } from "@/lib/prix-estimes";
 
-export type ArticleCourse = {
-  id: string;
-  label: string;
-  detail?: string | null;
-  price: number;
-  quantity: number;
-  status: "achete" | "a_acheter";
-  prixSource?: SourcePrix | null;
-  listeNom?: string | null;
-  sessionCourses?: string | null;
-};
+export type { ArticleCourse };
 
 type CoursesActions = {
   ajouterArticle: (formData: FormData) => Promise<void>;
@@ -41,6 +34,7 @@ type CoursesActions = {
     sessionCourses: string | null,
   ) => Promise<void>;
   ajouterArticleAvecRetour?: (formData: FormData) => Promise<string | null>;
+  modifierArticle?: (formData: FormData) => Promise<void>;
 };
 
 // Pastilles pensées pour la carte budget au fond sombre (dégradé
@@ -88,10 +82,23 @@ export function CoursesDashboard({
   const [aideOuverte, setAideOuverte] = useState(false);
   // Repliées par défaut à l'ouverture : un seul bouton "Voir mes listes"
   // les révèle toutes d'un coup, mis en valeur tant qu'elles sont cachées.
-  const [listesVisibles, setListesVisibles] = useState(false);
+  const [listesReveleesUneFois, setListesReveleesUneFois] = useState(false);
+  // Une fois révélées, chaque liste peut être masquée individuellement
+  // (plutôt que tout ou rien) — son nom est ajouté ici tant qu'elle est
+  // repliée.
+  const [listesMasquees, setListesMasquees] = useState<Set<string>>(new Set());
   const [nomSessionActive, setNomSessionActive] = useState(
     sessionActive ?? nomSessionParDefaut(),
   );
+
+  function basculerMasquageListe(nom: string) {
+    setListesMasquees((precedent) => {
+      const suivant = new Set(precedent);
+      if (suivant.has(nom)) suivant.delete(nom);
+      else suivant.add(nom);
+      return suivant;
+    });
+  }
 
   const totalDepense = items
     .filter((item) => item.status === "achete")
@@ -120,38 +127,26 @@ export function CoursesDashboard({
     }, new Map<string, ArticleCourse[]>()),
   );
 
-  function ligneAttente(item: ArticleCourse) {
-    return (
-      <li
-        key={item.id}
-        className="flex flex-wrap items-center justify-between gap-2 py-2 text-sm text-ardoise"
-      >
-        <span className="min-w-0 break-words">
-          {item.label}
-          {item.detail ? ` (${item.detail})` : ""}
-        </span>
-        <div className="flex shrink-0 items-center gap-1">
-          <form action={actions.basculerStatutArticle}>
-            <input type="hidden" name="id" value={item.id} />
-            <input type="hidden" name="status" value="achete" />
-            <input type="hidden" name="sessionCourses" value={nomSessionActive} />
-            <button type="submit" className="rounded-lg bg-basilic px-2 py-1 text-xs font-medium text-craie">
-              Acheté ✓
-            </button>
-          </form>
-          <form action={actions.supprimerArticle}>
-            <input type="hidden" name="id" value={item.id} />
-            <button
-              type="submit"
-              aria-label="Supprimer cet article"
-              className="rounded-lg border border-tomate/40 px-2 py-1 text-xs text-tomate"
-            >
-              ✕
-            </button>
-          </form>
-        </div>
-      </li>
-    );
+  // Au sein d'une même liste nommée, plusieurs imports successifs le même
+  // jour (ex. deux recettes collées sous le même nom par défaut) partagent
+  // un nom mais pas un horodatage : les articles d'un même ajout partagent
+  // exactement le même `createdAt` (un seul appel serveur, un seul
+  // horodatage). On les sous-groupe donc par horodatage, avec un sous-titre
+  // numéroté à partir de 1 dès qu'il y a plus d'un ajout — invisible s'il
+  // n'y en a qu'un, pour ne pas surcharger l'affichage.
+  function sousGroupesParAjout(itemsDuGroupe: ArticleCourse[]): [string | null, ArticleCourse[]][] {
+    const parHorodatage = Array.from(
+      itemsDuGroupe.reduce((groupes, item) => {
+        const cle = item.createdAt ?? "";
+        const liste = groupes.get(cle) ?? [];
+        liste.push(item);
+        groupes.set(cle, liste);
+        return groupes;
+      }, new Map<string, ArticleCourse[]>()),
+    ).sort(([a], [b]) => a.localeCompare(b));
+
+    if (parHorodatage.length <= 1) return [[null, itemsDuGroupe]];
+    return parHorodatage.map(([, itemsAjout], i) => [`Ajout ${i + 1}`, itemsAjout]);
   }
 
   return (
@@ -221,43 +216,77 @@ export function CoursesDashboard({
 
             {itemsSansNom.length > 0 && (
               <ul className="mt-2 flex flex-col divide-y divide-ardoise/10">
-                {itemsSansNom.map((item) => ligneAttente(item))}
+                {itemsSansNom.map((item) => (
+                  <LigneAttenteArticle
+                    key={item.id}
+                    item={item}
+                    sessionActive={nomSessionActive}
+                    basculerStatutAction={actions.basculerStatutArticle}
+                    supprimerAction={actions.supprimerArticle}
+                    modifierAction={actions.modifierArticle}
+                  />
+                ))}
               </ul>
             )}
 
-            {groupesNommes.length > 0 && (
+            {groupesNommes.length > 0 && !listesReveleesUneFois && (
               <button
                 type="button"
-                onClick={() => setListesVisibles((v) => !v)}
-                className={
-                  listesVisibles
-                    ? "mt-3 text-xs text-ardoise/60 underline"
-                    : "mt-3 w-full rounded-lg bg-ambre px-3 py-2 text-sm font-semibold text-ardoise shadow hover:opacity-90"
-                }
+                onClick={() => setListesReveleesUneFois(true)}
+                className="mt-3 w-full rounded-lg bg-ambre px-3 py-2 text-sm font-semibold text-ardoise shadow hover:opacity-90"
               >
-                {listesVisibles
-                  ? "Masquer mes listes"
-                  : `👀 Voir mes listes (${groupesNommes.length})`}
+                👀 Voir mes listes ({groupesNommes.length})
               </button>
             )}
 
-            {listesVisibles &&
-              groupesNommes.map(([nom, itemsDuGroupe]) => (
-                <div key={nom} className="mt-3">
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="text-xs font-medium text-ambre">📋 {nom}</p>
-                    <form action={actions.supprimerListeNommee}>
-                      <input type="hidden" name="listeNom" value={nom} />
-                      <button type="submit" className="text-xs text-tomate underline">
-                        Supprimer cette liste
-                      </button>
-                    </form>
+            {listesReveleesUneFois &&
+              groupesNommes.map(([nom, itemsDuGroupe]) => {
+                const masquee = listesMasquees.has(nom);
+                return (
+                  <div key={nom} className="mt-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-xs font-medium text-ambre">📋 {nom}</p>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => basculerMasquageListe(nom)}
+                          className="text-xs text-ardoise/60 underline"
+                        >
+                          {masquee ? "👁️ Afficher" : "🙈 Masquer"}
+                        </button>
+                        <form action={actions.supprimerListeNommee}>
+                          <input type="hidden" name="listeNom" value={nom} />
+                          <button type="submit" className="text-xs text-tomate underline">
+                            Supprimer cette liste
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+                    {!masquee &&
+                      sousGroupesParAjout(itemsDuGroupe).map(([sousTitre, itemsAjout], i) => (
+                        <div key={sousTitre ?? i}>
+                          {sousTitre && (
+                            <p className="mt-1.5 text-[11px] font-medium text-ardoise/40">
+                              {sousTitre}
+                            </p>
+                          )}
+                          <ul className="mt-1 flex flex-col divide-y divide-ardoise/10">
+                            {itemsAjout.map((item) => (
+                              <LigneAttenteArticle
+                                key={item.id}
+                                item={item}
+                                sessionActive={nomSessionActive}
+                                basculerStatutAction={actions.basculerStatutArticle}
+                                supprimerAction={actions.supprimerArticle}
+                                modifierAction={actions.modifierArticle}
+                              />
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
                   </div>
-                  <ul className="mt-1 flex flex-col divide-y divide-ardoise/10">
-                    {itemsDuGroupe.map((item) => ligneAttente(item))}
-                  </ul>
-                </div>
-              ))}
+                );
+              })}
           </div>
         </section>
       )}
@@ -335,70 +364,14 @@ export function CoursesDashboard({
             </p>
           )}
           {itemsAffiches.map((item) => (
-            <li
+            <CarteArticle
               key={item.id}
-              className="flex flex-col gap-2 rounded-lg bg-white p-3"
-            >
-              <div className="min-w-0">
-                <p className="break-words text-ardoise">
-                  {item.quantity > 1 ? `${item.quantity} × ` : ""}
-                  {item.label}
-                </p>
-                <p className="text-xs text-ardoise/50">{item.detail}</p>
-                <p className="font-mono text-sm text-ardoise/60">
-                  {(item.price * item.quantity).toFixed(2)} €
-                  {item.prixSource && item.prixSource !== "manuel" && (
-                    <span className="ml-2 rounded-full bg-basilic/10 px-2 py-0.5 font-sans text-[11px] font-medium text-basilic">
-                      {LABEL_SOURCE_PRIX[item.prixSource]}
-                    </span>
-                  )}
-                  {item.listeNom && (
-                    <span className="ml-2 rounded-full bg-ambre/10 px-2 py-0.5 font-sans text-[11px] font-medium text-ambre">
-                      📋 {item.listeNom}
-                    </span>
-                  )}
-                  {item.sessionCourses && (
-                    <span className="ml-2 rounded-full bg-kaki/10 px-2 py-0.5 font-sans text-[11px] font-medium text-kaki">
-                      🛍️ {item.sessionCourses}
-                    </span>
-                  )}
-                </p>
-              </div>
-              {/* Boutons toujours sur leur propre ligne, jamais à côté du
-                  label : dans la grille à 3 colonnes (277px de large par
-                  carte), un label + bouton "Remettre en attente" côte à
-                  côte pouvait dépasser la largeur de la carte et
-                  recouvrir silencieusement les boutons de la carte
-                  voisine — un clic sur "Supprimer" n'atteignait alors
-                  jamais le bon bouton (reproduit et confirmé avant ce
-                  correctif). */}
-              <div className="flex flex-wrap gap-1">
-                <form action={actions.basculerStatutArticle}>
-                  <input type="hidden" name="id" value={item.id} />
-                  <input
-                    type="hidden"
-                    name="status"
-                    value={item.status === "achete" ? "a_acheter" : "achete"}
-                  />
-                  <input type="hidden" name="sessionCourses" value={nomSessionActive} />
-                  <button
-                    type="submit"
-                    className="rounded-lg border border-basilic/40 px-2 py-1 text-xs text-basilic"
-                  >
-                    {item.status === "achete" ? "Remettre en attente" : "Marquer acheté"}
-                  </button>
-                </form>
-                <form action={actions.supprimerArticle}>
-                  <input type="hidden" name="id" value={item.id} />
-                  <button
-                    type="submit"
-                    className="rounded-lg border border-tomate/40 px-2 py-1 text-xs text-tomate"
-                  >
-                    Supprimer
-                  </button>
-                </form>
-              </div>
-            </li>
+              item={item}
+              sessionActive={nomSessionActive}
+              basculerStatutAction={actions.basculerStatutArticle}
+              supprimerAction={actions.supprimerArticle}
+              modifierAction={actions.modifierArticle}
+            />
           ))}
         </ul>
       </section>

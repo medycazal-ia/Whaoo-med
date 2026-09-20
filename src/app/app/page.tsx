@@ -11,6 +11,7 @@ import {
   basculerStatutArticle,
   contribuerPrixDepuisTicket,
   definirBudgetMensuel,
+  modifierArticle,
   recupererIndexCommunautaire,
   supprimerArticle,
   supprimerListeNommee,
@@ -54,7 +55,7 @@ export default async function AppHomePage({
   const [{ data: itemsAAcheter }, { data: itemsAchetesCeMois }] = await Promise.all([
     supabase
       .from("items")
-      .select("id, label, detail, price, quantity, status, prix_source, liste_nom, session_courses")
+      .select("id, label, detail, price, quantity, status, prix_source, liste_nom, session_courses, created_at")
       .eq("user_id", user.id)
       .eq("status", "a_acheter")
       .order("created_at", { ascending: false }),
@@ -75,6 +76,7 @@ export default async function AppHomePage({
       prixSource: item.prix_source,
       listeNom: item.liste_nom,
       sessionCourses: item.session_courses,
+      createdAt: item.created_at,
     }),
   );
   const indexCommunautaire = await recupererIndexCommunautaire();
@@ -177,6 +179,7 @@ export default async function AppHomePage({
             contribuerPrixTicket: contribuerPrixDepuisTicket,
             ajouterArticlesAcheteesTicket: ajouterArticlesAchetesDepuisTicket,
             ajouterArticleAvecRetour,
+            modifierArticle,
           }}
           pdfHref="/app/export-pdf"
           listePdfHref="/app/export-liste-pdf"

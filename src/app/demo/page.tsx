@@ -6,6 +6,7 @@ import {
   ajouterArticlesEnLotDemo,
   basculerStatutArticleDemo,
   definirBudgetDemo,
+  modifierArticleDemo,
   reinitialiserDemo,
   supprimerArticleDemo,
   supprimerListeNommeeDemo,
@@ -82,6 +83,7 @@ export default async function DemoPage({
           definirBudget: definirBudgetDemo,
           ajouterArticlesEnLot: ajouterArticlesEnLotDemo,
           ajouterArticleAvecRetour: ajouterArticleAvecRetourDemo,
+          modifierArticle: modifierArticleDemo,
         }}
         footer={
           <section className="mx-auto w-full max-w-lg md:max-w-2xl lg:max-w-4xl px-4 sm:px-6 pb-10">

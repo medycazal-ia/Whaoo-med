@@ -9,6 +9,7 @@ import {
   type DemoState,
 } from "@/lib/demo/state";
 import { estimerPrix } from "@/lib/prix-estimes";
+import { nomListeParDefaut } from "@/lib/courses/listes";
 
 function lireSessionCoursesDemo(formData: FormData): string | null {
   const valeur = String(formData.get("sessionCourses") ?? "").trim();
@@ -89,6 +90,12 @@ export async function ajouterArticlesEnLotDemo(
   const cookieStore = await cookies();
   const state = lireEtatDemo(cookieStore);
 
+  // Toujours nommée (voir ajouterArticlesEnLot dans lib/courses/actions.ts)
+  // et un horodatage commun à tout l'appel, pour permettre de sous-grouper
+  // par ajout si la même liste reçoit plusieurs imports le même jour.
+  const nom = listeNom?.trim() || nomListeParDefaut();
+  const createdAt = new Date().toISOString();
+
   for (const item of items) {
     const estimation = estimerPrix(item.label);
     state.items.unshift({
@@ -99,9 +106,29 @@ export async function ajouterArticlesEnLotDemo(
       prixSource: estimation?.source ?? null,
       quantity: item.quantity,
       status: "a_acheter",
-      listeNom,
+      listeNom: nom,
+      createdAt,
     });
   }
+
+  await ecrireEtatDemo(state);
+  revalidatePath("/demo");
+}
+
+export async function modifierArticleDemo(formData: FormData): Promise<void> {
+  const cookieStore = await cookies();
+  const state = lireEtatDemo(cookieStore);
+  const id = String(formData.get("id") ?? "");
+  const label = String(formData.get("label") ?? "").trim();
+  if (!id || !label) return;
+
+  const detail = String(formData.get("detail") ?? "").trim();
+  const price = Number(formData.get("price") ?? 0) || 0;
+  const quantity = Math.max(1, Number(formData.get("quantity") ?? 1) || 1);
+
+  state.items = state.items.map((item) =>
+    item.id === id ? { ...item, label, detail: detail || null, price, quantity } : item,
+  );
 
   await ecrireEtatDemo(state);
   revalidatePath("/demo");

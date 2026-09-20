@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { premierJourDuMois } from "@/lib/courses/rythme";
+import { nomListeParDefaut } from "@/lib/courses/listes";
 import { estimerPrix, normaliserLabel, type IndexCommunautaire, type SourcePrix } from "@/lib/prix-estimes";
 
 function lireSourcePrix(formData: FormData): SourcePrix {
@@ -175,10 +176,41 @@ export async function ajouterArticlesEnLot(
         quantity: item.quantity,
         status: "a_acheter" as const,
         achat_mois: null,
-        liste_nom: listeNom,
+        // Toujours nommée : si l'utilisateur ne donne pas de nom, whaoo en
+        // propose un daté du jour plutôt que de laisser l'import se
+        // perdre parmi les articles sans nom.
+        liste_nom: listeNom?.trim() || nomListeParDefaut(),
       };
     }),
   );
+
+  revalidatePath("/app");
+}
+
+// Corrige le nom, le détail, la quantité ou le prix d'un article déjà
+// ajouté — jamais son statut, sa date d'achat ni sa liste/session
+// (gérés par leurs propres actions dédiées).
+export async function modifierArticle(formData: FormData): Promise<void> {
+  const { supabase, user } = await requireUser();
+  const id = String(formData.get("id") ?? "");
+  const label = String(formData.get("label") ?? "").trim();
+  const detail = String(formData.get("detail") ?? "").trim();
+  const price = Number(formData.get("price") ?? 0) || 0;
+  const quantity = Math.max(1, Number(formData.get("quantity") ?? 1) || 1);
+
+  if (!id || !label) return;
+
+  await supabase
+    .from("items")
+    .update({
+      label,
+      detail: detail || null,
+      price,
+      quantity,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", id)
+    .eq("user_id", user.id);
 
   revalidatePath("/app");
 }

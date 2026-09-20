@@ -19,6 +19,14 @@ export function ScannerTicket({
   const [texteBrut, setTexteBrut] = useState<string | null>(null);
   const [afficherTexteBrut, setAfficherTexteBrut] = useState(false);
   const [texteCopie, setTexteCopie] = useState(false);
+  // Ouvrir l'appareil photo directement (au lieu du sélecteur de fichier
+  // standard) est plus rapide, mais c'est justement ce qui provoquait le
+  // plantage "l'appli se ferme dès la photo prise" une fois installée en
+  // PWA sur Android (voir historique) — donc seulement en navigateur
+  // normal, jamais en PWA installée.
+  const [captureDirecte] = useState(
+    () => typeof window !== "undefined" && !window.matchMedia("(display-mode: standalone)").matches,
+  );
 
   function reinitialiser() {
     setOuvert(false);
@@ -113,6 +121,7 @@ export function ScannerTicket({
             <input
               type="file"
               accept="image/*"
+              {...(captureDirecte ? { capture: "environment" as const } : {})}
               className="hidden"
               onChange={(e) => {
                 const fichier = e.target.files?.[0];

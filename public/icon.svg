@@ -1,4 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
-  <rect width="64" height="64" rx="14" fill="#2B3A32"/>
-  <text x="32" y="42" font-size="32" text-anchor="middle" font-family="sans-serif">🛒</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <rect x="0" y="0" width="100" height="100" rx="22" fill="#1e3a34"/>
+  <polyline points="18,22 26,22 34,34" fill="none" stroke="#1fa97c" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <polygon points="34,34 78,34 68,64 42,64" fill="#1fa97c"/>
+  <line x1="40" y1="44" x2="74" y2="44" stroke="#1e3a34" stroke-width="3"/>
+  <line x1="42" y1="54" x2="70" y2="54" stroke="#1e3a34" stroke-width="3"/>
+  <circle cx="46" cy="76" r="6" fill="#e9f3e1"/>
+  <circle cx="64" cy="76" r="6" fill="#e9f3e1"/>
+  <path d="M82,14 L86,22 L94,24 L86,26 L82,34 L78,26 L70,24 L78,22 Z" fill="#f0a93a"/>
 </svg>

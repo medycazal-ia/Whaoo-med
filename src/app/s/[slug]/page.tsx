@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Image from "next/image";
 import { VideoPartage } from "@/components/video-partage";
 
 const SCENARIOS: Record<string, { titre: string; video: string; poster: string }> = {
@@ -39,8 +40,9 @@ export default async function PartagePage({
 
   return (
     <main className="flex min-h-screen flex-col items-center gap-6 fond-marche px-4 py-8">
-      <h1 className="text-center font-heading text-2xl font-semibold text-ardoise">
-        whaoo 🛒
+      <h1 className="flex items-center gap-2 text-center font-heading text-2xl font-semibold text-ardoise">
+        <Image src="/icon.svg" alt="" width={32} height={32} className="rounded-lg" />
+        whaoo
       </h1>
       <VideoPartage videoSrc={scenario.video} posterSrc={scenario.poster} titre={scenario.titre} />
     </main>

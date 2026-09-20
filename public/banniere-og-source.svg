@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+<defs>
+  <style>
+    @font-face { font-family: 'Space Grotesk'; src: url('file:///tmp/claude-0/-home-user-Whaoo-med/4802447b-d32d-5a62-82f0-f09ec055d7a6/scratchpad/fonts/SpaceGrotesk-Bold.ttf'); font-weight: 700; }
+    @font-face { font-family: 'Inter'; src: url('file:///tmp/claude-0/-home-user-Whaoo-med/4802447b-d32d-5a62-82f0-f09ec055d7a6/scratchpad/fonts/Inter-Regular.ttf'); font-weight: 400; }
+  </style>
+</defs>
+<rect x="0" y="0" width="1200" height="630" fill="#1e3a34"/>
+<circle cx="1120" cy="60" r="260" fill="#1fa97c" opacity="0.08"/>
+<circle cx="1180" cy="560" r="160" fill="#f0a93a" opacity="0.06"/>
+
+<g transform="translate(90 165)">
+  <rect x="0" y="0" width="300" height="300" rx="66" fill="#16302a"/>
+  <g transform="translate(54 54) scale(3)">
+    <polyline points="18,22 26,22 34,34" fill="none" stroke="#1fa97c" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    <polygon points="34,34 78,34 68,64 42,64" fill="#1fa97c"/>
+    <line x1="40" y1="44" x2="74" y2="44" stroke="#16302a" stroke-width="3"/>
+    <line x1="42" y1="54" x2="70" y2="54" stroke="#16302a" stroke-width="3"/>
+    <circle cx="46" cy="76" r="6" fill="#e9f3e1"/>
+    <circle cx="64" cy="76" r="6" fill="#e9f3e1"/>
+    <path d="M82,14 L86,22 L94,24 L86,26 L82,34 L78,26 L70,24 L78,22 Z" fill="#f0a93a"/>
+  </g>
+</g>
+
+<text x="430" y="300" font-family="Space Grotesk" font-weight="700" font-size="128" fill="#e9f3e1">whaoo</text>
+<text x="432" y="368" font-family="Inter" font-weight="400" font-size="33" fill="#b7c9c1">Tes courses, sans les mauvaises</text>
+<text x="432" y="410" font-family="Inter" font-weight="400" font-size="33" fill="#b7c9c1">surprises en caisse.</text>
+</svg>

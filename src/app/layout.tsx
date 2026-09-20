@@ -20,10 +20,14 @@ const inter = Inter({
   subsets: ["latin"],
 });
 
+const TITRE = "whaoo — tes courses, sans les mauvaises surprises en caisse";
+const DESCRIPTION =
+  "Note tes courses à la voix, suis ton budget du mois en temps réel et laisse ta cagnotte se remplir toute seule.";
+
 export const metadata: Metadata = {
-  title: "whaoo — tes courses, sans les mauvaises surprises en caisse",
-  description:
-    "Note tes courses à la voix, suis ton budget du mois en temps réel et laisse ta cagnotte se remplir toute seule.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://whaoo.site"),
+  title: TITRE,
+  description: DESCRIPTION,
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -32,15 +36,30 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
       { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
       { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
     ],
     apple: "/apple-touch-icon.png",
   },
+  openGraph: {
+    title: TITRE,
+    description: DESCRIPTION,
+    siteName: "whaoo",
+    locale: "fr_FR",
+    type: "website",
+    images: [{ url: "/banniere-og.png", width: 1200, height: 630, alt: "whaoo" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITRE,
+    description: DESCRIPTION,
+    images: ["/banniere-og.png"],
+  },
 };
 
 export const viewport = {
-  themeColor: "#4A4229",
+  themeColor: "#1e3a34",
   viewportFit: "cover",
 };
 

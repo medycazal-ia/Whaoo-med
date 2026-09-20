@@ -8,7 +8,10 @@ export function PitchPage({ lang, contenu }: { lang: LangPitch; contenu: Contenu
   return (
     <main className="min-h-screen fond-marche text-ardoise">
       <header className="sticky top-0 z-10 flex items-center justify-between border-b border-ardoise/10 bg-craie/95 px-4 py-3 backdrop-blur sm:px-8">
-        <span className="font-heading text-lg font-semibold">🛒 {contenu.nomBouton}</span>
+        <span className="flex items-center gap-2 font-heading text-lg font-semibold">
+          <Image src="/icon.svg" alt="" width={26} height={26} className="rounded-lg" />
+          {contenu.nomBouton}
+        </span>
         <nav className="flex gap-1 text-sm">
           {LANGUES_PITCH.map((l) => (
             <Link

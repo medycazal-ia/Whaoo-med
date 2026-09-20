@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { BoutonInstaller } from "@/components/bouton-installer";
 import { VideoExplicative } from "@/components/video-explicative";
@@ -59,8 +60,9 @@ export default async function Home({
   return (
     <main className="flex flex-1 flex-col fond-marche">
       <header className="flex items-center justify-between px-4 sm:px-6 py-4">
-        <span className="font-heading text-lg font-semibold text-ardoise">
-          🛒 whaoo
+        <span className="flex items-center gap-2 font-heading text-lg font-semibold text-ardoise">
+          <Image src="/icon.svg" alt="" width={28} height={28} className="rounded-lg" />
+          whaoo
         </span>
         <Link
           href="/connexion"

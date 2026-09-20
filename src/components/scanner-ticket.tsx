@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { parserTicket, type LigneTicket } from "@/lib/ticket/parse-ticket";
 import { redimensionnerImage } from "@/lib/ticket/redimensionner-image";
+import { analyserTicketMindee } from "@/lib/ticket/mindee";
 
 type LigneEditable = LigneTicket & { inclure: boolean };
 
@@ -33,6 +34,20 @@ export function ScannerTicket({
     setProgression(0);
     setTexteBrut(null);
     try {
+      // On tente d'abord Mindee (service spécialisé tickets de caisse,
+      // bien plus fiable) quand il est configuré côté serveur. S'il n'est
+      // pas encore configuré, échoue, ou ne trouve aucun article, on
+      // retombe sur l'OCR local Tesseract plutôt que d'échouer sec.
+      const formDataMindee = new FormData();
+      formDataMindee.append("ticket", fichier);
+      const resultatMindee = await analyserTicketMindee(formDataMindee);
+
+      if (resultatMindee.ok) {
+        setLignes(resultatMindee.lignes.map((ligne) => ({ ...ligne, inclure: true })));
+        setStatut("pret");
+        return;
+      }
+
       const imageReduite = await redimensionnerImage(fichier);
       const Tesseract = (await import("tesseract.js")).default;
       const worker = await Tesseract.createWorker("fra", undefined, {
@@ -75,9 +90,10 @@ export function ScannerTicket({
     <div className="flex flex-col gap-2 rounded-xl border border-ardoise/10 bg-white p-4">
       <p className="text-sm text-ardoise/70">
         Prends une photo de ton ticket de caisse : whaoo lit les prix et les
-        ajoute à l&apos;estimation communautaire (anonyme). L&apos;analyse se
-        fait entièrement dans ton navigateur, la photo n&apos;est envoyée
-        nulle part.
+        ajoute à l&apos;estimation communautaire (anonyme). Selon la
+        disponibilité, l&apos;analyse se fait via un service sécurisé
+        spécialisé ou directement dans ton navigateur ; dans les deux cas,
+        aucune donnée personnelle n&apos;est associée à ta contribution.
       </p>
       <p className="text-xs text-ardoise/50">
         💡 Pour une meilleure lecture : à plat, bien à plat sous une bonne

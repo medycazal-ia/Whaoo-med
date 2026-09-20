@@ -19,6 +19,11 @@ export function ScannerTicket({
   const [texteBrut, setTexteBrut] = useState<string | null>(null);
   const [afficherTexteBrut, setAfficherTexteBrut] = useState(false);
   const [texteCopie, setTexteCopie] = useState(false);
+  // Pourquoi Mindee n'a pas été utilisé cette fois (clé absente, erreur
+  // d'appel, ou aucun article trouvé) — affiché en debug, pour ne plus
+  // avoir à deviner à l'aveugle si Mindee échoue silencieusement alors
+  // que la clé est bien configurée.
+  const [diagnosticMindee, setDiagnosticMindee] = useState<string | null>(null);
   // Ouvrir l'appareil photo directement (au lieu du sélecteur de fichier
   // standard) est plus rapide, mais c'est justement ce qui provoquait le
   // plantage "l'appli se ferme dès la photo prise" une fois installée en
@@ -35,12 +40,14 @@ export function ScannerTicket({
     setLignes([]);
     setTexteBrut(null);
     setAfficherTexteBrut(false);
+    setDiagnosticMindee(null);
   }
 
   async function analyserImage(fichier: File) {
     setStatut("analyse");
     setProgression(0);
     setTexteBrut(null);
+    setDiagnosticMindee(null);
     try {
       // On tente d'abord Mindee (service spécialisé tickets de caisse,
       // bien plus fiable) quand il est configuré côté serveur. S'il n'est
@@ -61,6 +68,10 @@ export function ScannerTicket({
         setStatut("pret");
         return;
       }
+
+      setDiagnosticMindee(
+        `${resultatMindee.raison}${resultatMindee.details ? ` — ${resultatMindee.details}` : ""}`,
+      );
 
       const imageReduite = await redimensionnerImage(fichier);
       const Tesseract = (await import("tesseract.js")).default;
@@ -151,6 +162,11 @@ export function ScannerTicket({
             La lecture a échoué — réessaie avec une photo plus nette et bien
             éclairée.
           </p>
+          {diagnosticMindee && (
+            <p className="text-xs text-ardoise/40">
+              🔧 Mindee non utilisé cette fois : {diagnosticMindee}
+            </p>
+          )}
           <button
             type="button"
             onClick={reinitialiser}
@@ -212,6 +228,11 @@ export function ScannerTicket({
                 ))}
               </ul>
             </>
+          )}
+          {diagnosticMindee && (
+            <p className="text-xs text-ardoise/40">
+              🔧 Mindee non utilisé cette fois : {diagnosticMindee}
+            </p>
           )}
           {texteBrut && (
             <div>

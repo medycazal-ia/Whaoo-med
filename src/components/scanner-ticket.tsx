@@ -113,7 +113,6 @@ export function ScannerTicket({
             <input
               type="file"
               accept="image/*"
-              capture="environment"
               className="hidden"
               onChange={(e) => {
                 const fichier = e.target.files?.[0];

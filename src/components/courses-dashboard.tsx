@@ -104,8 +104,11 @@ export function CoursesDashboard({
 
   function ligneAttente(item: ArticleCourse) {
     return (
-      <li key={item.id} className="flex items-center justify-between gap-2 py-2 text-sm text-ardoise">
-        <span>
+      <li
+        key={item.id}
+        className="flex flex-wrap items-center justify-between gap-2 py-2 text-sm text-ardoise"
+      >
+        <span className="min-w-0 break-words">
           {item.label}
           {item.detail ? ` (${item.detail})` : ""}
         </span>
@@ -303,10 +306,10 @@ export function CoursesDashboard({
           {itemsAffiches.map((item) => (
             <li
               key={item.id}
-              className="flex items-center justify-between gap-2 rounded-lg bg-white p-3"
+              className="flex flex-col gap-2 rounded-lg bg-white p-3"
             >
-              <div>
-                <p className="text-ardoise">
+              <div className="min-w-0">
+                <p className="break-words text-ardoise">
                   {item.quantity > 1 ? `${item.quantity} × ` : ""}
                   {item.label}
                 </p>
@@ -325,7 +328,15 @@ export function CoursesDashboard({
                   )}
                 </p>
               </div>
-              <div className="flex gap-1">
+              {/* Boutons toujours sur leur propre ligne, jamais à côté du
+                  label : dans la grille à 3 colonnes (277px de large par
+                  carte), un label + bouton "Remettre en attente" côte à
+                  côte pouvait dépasser la largeur de la carte et
+                  recouvrir silencieusement les boutons de la carte
+                  voisine — un clic sur "Supprimer" n'atteignait alors
+                  jamais le bon bouton (reproduit et confirmé avant ce
+                  correctif). */}
+              <div className="flex flex-wrap gap-1">
                 <form action={actions.basculerStatutArticle}>
                   <input type="hidden" name="id" value={item.id} />
                   <input

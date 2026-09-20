@@ -26,8 +26,15 @@ export function BudgetFlottant({
     function positionParDefaut() {
       setPosition((actuelle) => {
         if (actuelle) return actuelle;
+        // À gauche par défaut, pas à droite : les boutons d'action de
+        // chaque article ("Supprimer", "Marquer acheté"…) sont alignés à
+        // droite de l'écran (flex justify-between) — un widget flottant
+        // par-dessus eux à droite intercepte silencieusement les taps
+        // destinés à ces boutons (repéré en testant la suppression d'un
+        // article "déjà acheté" : le total ne redescendait jamais, le tap
+        // sur "Supprimer" n'atteignait jamais le bouton).
         return {
-          x: Math.max(8, window.innerWidth - LARGEUR - 16),
+          x: 16,
           y: Math.max(8, window.innerHeight - HAUTEUR - 96),
         };
       });

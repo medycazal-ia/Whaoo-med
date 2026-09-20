@@ -87,6 +87,24 @@ export function CoursesDashboard({
   // (plutôt que tout ou rien) — son nom est ajouté ici tant qu'elle est
   // repliée.
   const [listesMasquees, setListesMasquees] = useState<Set<string>>(new Set());
+  // Un bouton masquer sur la section entière "🔔 À ne pas oublier" (utile
+  // quand elle devient longue et pollue l'écran), et un autre spécifique
+  // aux articles sans liste, indépendant des listes nommées ci-dessus.
+  const [rappelsMasques, setRappelsMasques] = useState(false);
+  const [sansNomMasque, setSansNomMasque] = useState(false);
+  // Pareil pour la grille "à acheter" / "acheté" affichée plus bas — un
+  // état par vue (et non un simple booléen), pour que masquer l'une ne
+  // masque pas l'autre en changeant d'onglet.
+  const [grillesMasquees, setGrillesMasquees] = useState<Set<"achete" | "a_acheter">>(new Set());
+  const grilleMasquee = grillesMasquees.has(vueActive);
+  function basculerMasquageGrille() {
+    setGrillesMasquees((precedent) => {
+      const suivant = new Set(precedent);
+      if (suivant.has(vueActive)) suivant.delete(vueActive);
+      else suivant.add(vueActive);
+      return suivant;
+    });
+  }
   const [nomSessionActive, setNomSessionActive] = useState(
     sessionActive ?? nomSessionParDefaut(),
   );
@@ -210,83 +228,114 @@ export function CoursesDashboard({
       {itemsEnAttente.length > 0 && (
         <section className="mx-auto w-full max-w-lg md:max-w-2xl lg:max-w-4xl px-4 sm:px-6 pt-6">
           <div className="rounded-xl border border-ambre bg-ambre/15 p-4">
-            <p className="font-heading text-sm font-semibold text-ardoise">
-              🔔 À ne pas oublier
-            </p>
-
-            {itemsSansNom.length > 0 && (
-              <ul className="mt-2 flex flex-col divide-y divide-ardoise/10">
-                {itemsSansNom.map((item) => (
-                  <LigneAttenteArticle
-                    key={item.id}
-                    item={item}
-                    sessionActive={nomSessionActive}
-                    basculerStatutAction={actions.basculerStatutArticle}
-                    supprimerAction={actions.supprimerArticle}
-                    modifierAction={actions.modifierArticle}
-                  />
-                ))}
-              </ul>
-            )}
-
-            {groupesNommes.length > 0 && !listesReveleesUneFois && (
+            <div className="flex items-center justify-between gap-2">
+              <p className="font-heading text-sm font-semibold text-ardoise">
+                🔔 À ne pas oublier ({itemsEnAttente.length})
+              </p>
               <button
                 type="button"
-                onClick={() => setListesReveleesUneFois(true)}
-                className="mt-3 w-full rounded-lg bg-ambre px-3 py-2 text-sm font-semibold text-ardoise shadow hover:opacity-90"
+                onClick={() => setRappelsMasques((v) => !v)}
+                className="shrink-0 text-xs text-ardoise/60 underline"
               >
-                👀 Voir mes listes ({groupesNommes.length})
+                {rappelsMasques ? "👁️ Afficher" : "🙈 Masquer"}
               </button>
-            )}
+            </div>
 
-            {listesReveleesUneFois &&
-              groupesNommes.map(([nom, itemsDuGroupe]) => {
-                const masquee = listesMasquees.has(nom);
-                return (
-                  <div key={nom} className="mt-3">
+            {!rappelsMasques && (
+              <>
+                {itemsSansNom.length > 0 && (
+                  <div className="mt-2">
                     <div className="flex items-center justify-between gap-2">
-                      <p className="text-xs font-medium text-ambre">📋 {nom}</p>
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => basculerMasquageListe(nom)}
-                          className="text-xs text-ardoise/60 underline"
-                        >
-                          {masquee ? "👁️ Afficher" : "🙈 Masquer"}
-                        </button>
-                        <form action={actions.supprimerListeNommee}>
-                          <input type="hidden" name="listeNom" value={nom} />
-                          <button type="submit" className="text-xs text-tomate underline">
-                            Supprimer cette liste
-                          </button>
-                        </form>
-                      </div>
+                      <p className="text-xs font-medium text-ardoise/50">
+                        Articles seuls ({itemsSansNom.length})
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setSansNomMasque((v) => !v)}
+                        className="text-xs text-ardoise/60 underline"
+                      >
+                        {sansNomMasque ? "👁️ Afficher" : "🙈 Masquer"}
+                      </button>
                     </div>
-                    {!masquee &&
-                      sousGroupesParAjout(itemsDuGroupe).map(([sousTitre, itemsAjout], i) => (
-                        <div key={sousTitre ?? i}>
-                          {sousTitre && (
-                            <p className="mt-1.5 text-[11px] font-medium text-ardoise/40">
-                              {sousTitre}
-                            </p>
-                          )}
-                          <ul className="mt-1 flex flex-col divide-y divide-ardoise/10">
-                            {itemsAjout.map((item) => (
-                              <LigneAttenteArticle
-                                key={item.id}
-                                item={item}
-                                sessionActive={nomSessionActive}
-                                basculerStatutAction={actions.basculerStatutArticle}
-                                supprimerAction={actions.supprimerArticle}
-                                modifierAction={actions.modifierArticle}
-                              />
-                            ))}
-                          </ul>
-                        </div>
-                      ))}
+                    {!sansNomMasque && (
+                      <ul className="mt-1 flex flex-col divide-y divide-ardoise/10">
+                        {itemsSansNom.map((item) => (
+                          <LigneAttenteArticle
+                            key={item.id}
+                            item={item}
+                            sessionActive={nomSessionActive}
+                            basculerStatutAction={actions.basculerStatutArticle}
+                            supprimerAction={actions.supprimerArticle}
+                            modifierAction={actions.modifierArticle}
+                          />
+                        ))}
+                      </ul>
+                    )}
                   </div>
-                );
-              })}
+                )}
+
+                {groupesNommes.length > 0 && !listesReveleesUneFois && (
+                  <button
+                    type="button"
+                    onClick={() => setListesReveleesUneFois(true)}
+                    className="mt-3 w-full rounded-lg bg-ambre px-3 py-2 text-sm font-semibold text-ardoise shadow hover:opacity-90"
+                  >
+                    👀 Voir mes listes ({groupesNommes.length})
+                  </button>
+                )}
+
+                {listesReveleesUneFois &&
+                  groupesNommes.map(([nom, itemsDuGroupe]) => {
+                    const masquee = listesMasquees.has(nom);
+                    return (
+                      <div key={nom} className="mt-3">
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="text-xs font-medium text-ambre">
+                            📋 {nom} ({itemsDuGroupe.length})
+                          </p>
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => basculerMasquageListe(nom)}
+                              className="text-xs text-ardoise/60 underline"
+                            >
+                              {masquee ? "👁️ Afficher" : "🙈 Masquer"}
+                            </button>
+                            <form action={actions.supprimerListeNommee}>
+                              <input type="hidden" name="listeNom" value={nom} />
+                              <button type="submit" className="text-xs text-tomate underline">
+                                Supprimer cette liste
+                              </button>
+                            </form>
+                          </div>
+                        </div>
+                        {!masquee &&
+                          sousGroupesParAjout(itemsDuGroupe).map(([sousTitre, itemsAjout], i) => (
+                            <div key={sousTitre ?? i}>
+                              {sousTitre && (
+                                <p className="mt-1.5 text-[11px] font-medium text-ardoise/40">
+                                  {sousTitre}
+                                </p>
+                              )}
+                              <ul className="mt-1 flex flex-col divide-y divide-ardoise/10">
+                                {itemsAjout.map((item) => (
+                                  <LigneAttenteArticle
+                                    key={item.id}
+                                    item={item}
+                                    sessionActive={nomSessionActive}
+                                    basculerStatutAction={actions.basculerStatutArticle}
+                                    supprimerAction={actions.supprimerArticle}
+                                    modifierAction={actions.modifierArticle}
+                                  />
+                                ))}
+                              </ul>
+                            </div>
+                          ))}
+                      </div>
+                    );
+                  })}
+              </>
+            )}
           </div>
         </section>
       )}
@@ -357,23 +406,45 @@ export function CoursesDashboard({
           </Link>
         </div>
 
-        <ul className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-3">
-          {itemsAffiches.length === 0 && (
-            <p className="col-span-full rounded-lg bg-white p-4 text-center text-sm text-ardoise/60">
-              Rien ici pour l&apos;instant.
+        {itemsAffiches.length > 0 && (
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs font-medium text-ardoise/50">
+              {vueActive === "a_acheter" ? "À acheter" : "Acheté"} ({itemsAffiches.length})
             </p>
-          )}
-          {itemsAffiches.map((item) => (
-            <CarteArticle
-              key={item.id}
-              item={item}
-              sessionActive={nomSessionActive}
-              basculerStatutAction={actions.basculerStatutArticle}
-              supprimerAction={actions.supprimerArticle}
-              modifierAction={actions.modifierArticle}
-            />
-          ))}
-        </ul>
+            <button
+              type="button"
+              onClick={basculerMasquageGrille}
+              className="text-xs text-ardoise/60 underline"
+            >
+              {grilleMasquee ? "👁️ Afficher" : "🙈 Masquer"}
+            </button>
+          </div>
+        )}
+
+        {grilleMasquee ? (
+          <p className="rounded-lg bg-white p-4 text-center text-sm text-ardoise/60">
+            {itemsAffiches.length} article{itemsAffiches.length > 1 ? "s" : ""} masqué
+            {itemsAffiches.length > 1 ? "s" : ""}.
+          </p>
+        ) : (
+          <ul className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-3">
+            {itemsAffiches.length === 0 && (
+              <p className="col-span-full rounded-lg bg-white p-4 text-center text-sm text-ardoise/60">
+                Rien ici pour l&apos;instant.
+              </p>
+            )}
+            {itemsAffiches.map((item) => (
+              <CarteArticle
+                key={item.id}
+                item={item}
+                sessionActive={nomSessionActive}
+                basculerStatutAction={actions.basculerStatutArticle}
+                supprimerAction={actions.supprimerArticle}
+                modifierAction={actions.modifierArticle}
+              />
+            ))}
+          </ul>
+        )}
       </section>
 
       {footer}

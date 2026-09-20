@@ -9,8 +9,10 @@ type LigneEditable = LigneTicket & { inclure: boolean };
 
 export function ScannerTicket({
   contribuerAction,
+  ajouterAuBudgetAction,
 }: {
   contribuerAction: (lignes: { label: string; price: number }[]) => Promise<void>;
+  ajouterAuBudgetAction?: (lignes: { label: string; price: number }[]) => Promise<void>;
 }) {
   const [ouvert, setOuvert] = useState(false);
   const [statut, setStatut] = useState<"idle" | "analyse" | "pret" | "erreur" | "envoye">("idle");
@@ -19,6 +21,11 @@ export function ScannerTicket({
   const [texteBrut, setTexteBrut] = useState<string | null>(null);
   const [afficherTexteBrut, setAfficherTexteBrut] = useState(false);
   const [texteCopie, setTexteCopie] = useState(false);
+  // Un ticket de caisse représente un achat déjà effectué : coché par
+  // défaut pour que les articles rejoignent directement le budget du mois
+  // en "déjà acheté", en plus de la contribution à l'estimation
+  // communautaire (les deux ne s'excluent pas).
+  const [ajouterAuBudget, setAjouterAuBudget] = useState(true);
   // Pourquoi Claude n'a pas été utilisé cette fois (clé absente, erreur
   // d'appel, ou aucun article trouvé) — affiché en debug, pour ne plus
   // avoir à deviner à l'aveugle si l'appel échoue silencieusement alors
@@ -96,6 +103,9 @@ export function ScannerTicket({
     const aEnvoyer = lignes.filter((l) => l.inclure).map(({ label, price }) => ({ label, price }));
     if (aEnvoyer.length === 0) return;
     await contribuerAction(aEnvoyer);
+    if (ajouterAuBudget && ajouterAuBudgetAction) {
+      await ajouterAuBudgetAction(aEnvoyer);
+    }
     setStatut("envoye");
   }
 
@@ -227,6 +237,17 @@ export function ScannerTicket({
                   </li>
                 ))}
               </ul>
+              {ajouterAuBudgetAction && (
+                <label className="flex items-center gap-2 text-sm text-ardoise">
+                  <input
+                    type="checkbox"
+                    checked={ajouterAuBudget}
+                    onChange={(e) => setAjouterAuBudget(e.target.checked)}
+                  />
+                  Ajouter aussi ces articles à mon budget du mois (déjà
+                  achetés)
+                </label>
+              )}
             </>
           )}
           {diagnosticIA && (
@@ -273,7 +294,9 @@ export function ScannerTicket({
                 onClick={envoyer}
                 className="rounded-lg bg-basilic px-4 py-2 text-sm font-medium text-craie"
               >
-                Contribuer {lignes.filter((l) => l.inclure).length} prix
+                {ajouterAuBudget && ajouterAuBudgetAction
+                  ? `Ajouter ${lignes.filter((l) => l.inclure).length} article${lignes.filter((l) => l.inclure).length > 1 ? "s" : ""}`
+                  : `Contribuer ${lignes.filter((l) => l.inclure).length} prix`}
               </button>
             )}
             <button
@@ -290,7 +313,9 @@ export function ScannerTicket({
       {statut === "envoye" && (
         <>
           <p className="text-sm text-basilic">
-            Merci ! Tes prix ont été ajoutés à l&apos;estimation communautaire.
+            {ajouterAuBudget && ajouterAuBudgetAction
+              ? "Merci ! Tes articles ont été ajoutés à ton budget (déjà achetés) et à l'estimation communautaire."
+              : "Merci ! Tes prix ont été ajoutés à l'estimation communautaire."}
           </p>
           <button
             type="button"

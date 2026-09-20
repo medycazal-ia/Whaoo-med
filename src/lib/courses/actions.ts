@@ -158,6 +158,34 @@ export async function contribuerPrixDepuisTicket(
   revalidatePath("/app");
 }
 
+// Ajoute directement les articles d'un ticket scanné au budget du mois de
+// l'utilisateur, déjà marqués "achetés" — un ticket de caisse représente
+// un achat déjà effectué, pas quelque chose à ajouter à une liste "à
+// acheter". Proposé comme option distincte de la contribution à
+// l'estimation communautaire (contribuerPrixDepuisTicket), l'utilisateur
+// peut choisir l'une, l'autre, ou les deux.
+export async function ajouterArticlesAchetesDepuisTicket(
+  lignes: LigneTicketAContribuer[],
+): Promise<void> {
+  const { supabase, user } = await requireUser();
+  if (lignes.length === 0) return;
+
+  await supabase.from("items").insert(
+    lignes.map((ligne) => ({
+      user_id: user.id,
+      label: ligne.label,
+      detail: null,
+      price: ligne.price,
+      quantity: 1,
+      status: "achete" as const,
+      achat_mois: moisEnDateISO(),
+      prix_source: "manuel" as const,
+    })),
+  );
+
+  revalidatePath("/app");
+}
+
 export async function basculerStatutArticle(formData: FormData): Promise<void> {
   const { supabase, user } = await requireUser();
   const id = String(formData.get("id") ?? "");

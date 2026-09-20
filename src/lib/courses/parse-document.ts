@@ -36,6 +36,28 @@ function normaliser(texte: string): string {
     .trim();
 }
 
+// Séparateur d'alternatives/ingrédients multiples sur une même ligne, que
+// ce soit dans une parenthèse ("bœuf haché, tomates, oignons") ou en clair
+// dans un menu ("potage ou carotte, ou miel/fromage/yaourt" doit donner 5
+// articles distincts : potage, carotte, miel, fromage, yaourt).
+const SEPARATEUR_MULTI = /,|;|\/|\s+ou\s+|\s+et\s+|\s+\+\s+/i;
+
+// Formules génériques qui indiquent un choix libre plutôt qu'un article
+// précis (ex. "Autres alternatives", "Au choix") — jamais un vrai
+// ingrédient, à ne jamais transformer en ligne d'article.
+const PHRASES_GENERIQUES = [
+  /^autres?\s+(alternatives?|solutions?|options?|choix|possibilit[ée]s?)$/,
+  /^(alternatives?|solutions?|options?)$/,
+  /^au\s+choix$/,
+  /^selon\s+(le\s+)?go[uû]t$/,
+  /^\(?au\s+choix\)?$/,
+];
+
+function estPhraseGenerique(texte: string): boolean {
+  const nettoyee = normaliser(texte).replace(/[.:!]+$/, "");
+  return PHRASES_GENERIQUES.some((motif) => motif.test(nettoyee));
+}
+
 function estEntete(ligne: string): boolean {
   const nettoyee = normaliser(ligne).replace(/[:\s]+$/, "");
   if (ENTETES_A_IGNORER.has(nettoyee)) return true;
@@ -84,14 +106,14 @@ export function parserDocumentAliments(texte: string): ResultatParseDocument {
     if (estEntete(ligneBrute)) continue;
 
     const ligne = nettoyerLigne(ligneBrute);
-    if (!ligne) continue;
+    if (!ligne || estPhraseGenerique(ligne)) continue;
 
     const matchParenthese = ligne.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
     if (matchParenthese) {
       const ingredients = matchParenthese[2]
-        .split(/,|;|\/|\s+et\s+|\s+\+\s+/i)
+        .split(SEPARATEUR_MULTI)
         .map((s) => s.trim())
-        .filter(Boolean);
+        .filter((s) => s && !estPhraseGenerique(s));
 
       if (ingredients.length >= 2) {
         if (!nomSuggere) nomSuggere = matchParenthese[1].trim();
@@ -102,7 +124,19 @@ export function parserDocumentAliments(texte: string): ResultatParseDocument {
       }
     }
 
-    items.push(parserLigne(ligne));
+    // Une ligne "hors parenthèse" peut aussi présenter plusieurs
+    // alternatives ("potage ou carotte, ou miel/fromage/yaourt") : chaque
+    // alternative devient un article distinct plutôt qu'une seule ligne
+    // avec toute la phrase comme nom (les lignes à un seul article, sans
+    // séparateur, ne sont pas affectées).
+    const morceaux = ligne
+      .split(SEPARATEUR_MULTI)
+      .map((s) => s.trim())
+      .filter((s) => s && !estPhraseGenerique(s));
+
+    for (const morceau of morceaux) {
+      items.push(parserLigne(morceau));
+    }
   }
 
   return { items, nomSuggere };

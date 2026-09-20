@@ -33,6 +33,7 @@ type CoursesActions = {
   definirBudget: (formData: FormData) => Promise<void>;
   ajouterArticlesEnLot: (items: IngredientParse[], listeNom: string | null) => Promise<void>;
   contribuerPrixTicket?: (lignes: { label: string; price: number }[]) => Promise<void>;
+  ajouterArticlesAcheteesTicket?: (lignes: { label: string; price: number }[]) => Promise<void>;
 };
 
 // Pastilles pensées pour la carte budget au fond sombre (dégradé
@@ -253,7 +254,10 @@ export function CoursesDashboard({
         />
 
         {actions.contribuerPrixTicket && (
-          <ScannerTicket contribuerAction={actions.contribuerPrixTicket} />
+          <ScannerTicket
+            contribuerAction={actions.contribuerPrixTicket}
+            ajouterAuBudgetAction={actions.ajouterArticlesAcheteesTicket}
+          />
         )}
 
         <PromotionsLocales />

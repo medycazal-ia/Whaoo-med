@@ -106,16 +106,16 @@ function appliquerNettete(
   return resultat;
 }
 
-// Plafond de taille avant envoi à un service distant (Mindee) : uniquement
+// Plafond de taille avant envoi à un service distant (Claude) : uniquement
 // pour éviter le même plantage mémoire mobile que le traitement Tesseract
 // ci-dessous — une photo de smartphone récent (10+ Mpx, parfois 8-15 Mo)
 // peut faire planter l'appli rien qu'en la préparant pour l'envoi. Pas de
-// niveaux de gris ni de netteté ici : Mindee fait sa propre analyse sur une
-// photo couleur, pas besoin (et pas souhaitable) de la lui pré-traiter.
-// Volontairement plus généreux que le plafond de l'OCR local (Tesseract,
-// qui tourne dans le navigateur) : Mindee est un service cloud sans
-// contrainte mémoire côté client, réduire l'image plus que nécessaire ne
-// ferait que dégrader la lecture pour rien.
+// niveaux de gris ni de netteté ici : le service distant fait sa propre
+// analyse sur une photo couleur, pas besoin (et pas souhaitable) de la
+// lui pré-traiter. Volontairement plus généreux que le plafond de l'OCR
+// local (Tesseract, qui tourne dans le navigateur) : un service cloud n'a
+// pas de contrainte mémoire côté client, réduire l'image plus que
+// nécessaire ne ferait que dégrader la lecture pour rien.
 const DIMENSION_MAX_ENVOI = 4000;
 
 export async function redimensionnerPourEnvoi(fichier: File): Promise<Blob> {

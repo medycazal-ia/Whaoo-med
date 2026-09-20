@@ -1,15 +1,12 @@
 "use server";
 
-// Lecture de ticket de caisse via l'API vision de Claude (Anthropic) —
-// alternative à Mindee, dont le débogage s'est avéré long et opaque
-// (service tiers non testable depuis l'environnement de développement).
-// Un modèle de vision généraliste comme Claude lit en général très bien
-// du texte flou/mal cadré, et le prompt est directement ajustable ici si
+// Lecture de ticket de caisse via l'API vision de Claude (Anthropic). Un
+// modèle de vision généraliste comme Claude lit en général très bien du
+// texte flou/mal cadré, et le prompt est directement ajustable ici si
 // besoin, sans dépendre d'un tableau de bord externe. Nécessite
 // ANTHROPIC_TICKET_API_KEY ; tant qu'elle n'est pas configurée,
 // analyserTicketClaude renvoie { ok: false, raison: "pas_de_cle" } et
-// l'appelant retombe sur Mindee puis, en dernier recours, sur l'OCR local
-// (Tesseract).
+// l'appelant retombe sur l'OCR local (Tesseract).
 const ENDPOINT = "https://api.anthropic.com/v1/messages";
 const MODELE = "claude-haiku-4-5-20251001";
 

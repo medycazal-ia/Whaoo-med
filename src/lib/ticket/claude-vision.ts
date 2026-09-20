@@ -49,6 +49,11 @@ export async function analyserTicketClaude(formData: FormData): Promise<Resultat
   const base64 = Buffer.from(buffer).toString("base64");
   const mediaType = fichier.type || "image/jpeg";
 
+  // Une clé API organisation (par opposition à une clé rattachée à un
+  // workspace précis) exige cet en-tête supplémentaire, sans quoi
+  // l'API répond 400 "not scoped to a workspace" — observé en test réel.
+  const workspaceId = process.env.ANTHROPIC_TICKET_WORKSPACE_ID;
+
   let reponse: Response;
   try {
     reponse = await fetch(ENDPOINT, {
@@ -57,6 +62,7 @@ export async function analyserTicketClaude(formData: FormData): Promise<Resultat
         "x-api-key": cle,
         "anthropic-version": "2023-06-01",
         "content-type": "application/json",
+        ...(workspaceId ? { "anthropic-workspace-id": workspaceId } : {}),
       },
       body: JSON.stringify({
         model: MODELE,

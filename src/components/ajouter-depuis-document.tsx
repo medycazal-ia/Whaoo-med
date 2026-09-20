@@ -2,9 +2,10 @@
 
 import { useState, type ChangeEvent } from "react";
 import { parserDocumentAliments } from "@/lib/courses/parse-document";
-import { analyserDocumentClaude } from "@/lib/courses/parse-document-ia";
+import { analyserDocumentClaude, analyserDocumentPhotoClaude } from "@/lib/courses/parse-document-ia";
 import type { IngredientParse } from "@/lib/courses/parse-recette";
 import { estimerPrix, type IndexCommunautaire } from "@/lib/prix-estimes";
+import { redimensionnerPourEnvoi } from "@/lib/ticket/redimensionner-image";
 
 export function AjouterDepuisDocument({
   ajouterEnLotAction,
@@ -21,6 +22,13 @@ export function AjouterDepuisDocument({
   const [enCours, setEnCours] = useState(false);
   const [chargementFichier, setChargementFichier] = useState(false);
   const [erreurFichier, setErreurFichier] = useState<string | null>(null);
+  const [analysePhotoEnCours, setAnalysePhotoEnCours] = useState(false);
+  // Même précaution que pour le scan de ticket : la capture caméra
+  // directe peut faire tuer le processus d'une PWA installée sur Android
+  // (voir scanner-ticket.tsx) — seulement en navigateur normal.
+  const [captureDirecte] = useState(
+    () => typeof window !== "undefined" && !window.matchMedia("(display-mode: standalone)").matches,
+  );
 
   function fermer() {
     setOuvert(false);
@@ -87,6 +95,39 @@ export function AjouterDepuisDocument({
     }
   }
 
+  async function gererPhoto(e: ChangeEvent<HTMLInputElement>) {
+    const fichier = e.target.files?.[0];
+    e.target.value = "";
+    if (!fichier) return;
+
+    setErreurFichier(null);
+    setAnalysePhotoEnCours(true);
+    try {
+      const imagePourEnvoi = await redimensionnerPourEnvoi(fichier);
+      const formData = new FormData();
+      formData.append("document", imagePourEnvoi, "document.jpg");
+      const resultat = await analyserDocumentPhotoClaude(formData);
+
+      if (!resultat.ok) {
+        setErreurFichier(
+          resultat.raison === "aucun_article"
+            ? "Aucun article reconnu sur cette photo — essaie un cadrage plus net."
+            : "La lecture de la photo n'est pas disponible pour le moment — essaie de coller le texte directement.",
+        );
+        return;
+      }
+
+      setTexte("");
+      setApercu(resultat.items);
+      setCochees(resultat.items.map(() => true));
+      if (resultat.nomSuggere && !nomListe.trim()) setNomListe(resultat.nomSuggere);
+    } catch {
+      setErreurFichier("Impossible de lire cette photo — réessaie ou colle le texte directement.");
+    } finally {
+      setAnalysePhotoEnCours(false);
+    }
+  }
+
   if (!ouvert) {
     return (
       <button
@@ -105,8 +146,9 @@ export function AjouterDepuisDocument({
     <div className="flex flex-col gap-2 rounded-xl border border-ardoise/10 bg-white p-4">
       <p className="text-sm text-ardoise/70">
         Colle le texte d&apos;une recette, d&apos;un régime ou d&apos;une liste
-        de repas, ou importe un fichier (.txt, .pdf) — whaoo repère les
-        articles et propose un prix pour chacun.
+        de courses, importe un fichier (.txt, .pdf) ou une photo (liste
+        manuscrite, capture d&apos;écran...) — whaoo repère les articles,
+        alimentaires ou non, et propose un prix pour chacun.
       </p>
 
       <label className="flex flex-col gap-1 text-sm text-ardoise/80">
@@ -130,16 +172,29 @@ export function AjouterDepuisDocument({
         className="rounded-lg border border-ardoise/20 px-3 py-2 text-ardoise"
       />
 
-      <label className="w-fit cursor-pointer text-sm text-ardoise/60 underline">
-        {chargementFichier ? "Lecture du fichier…" : "📎 Importer un fichier (.txt, .pdf)"}
-        <input
-          type="file"
-          accept=".txt,.pdf,text/plain,application/pdf"
-          onChange={gererFichier}
-          disabled={chargementFichier}
-          className="hidden"
-        />
-      </label>
+      <div className="flex flex-wrap gap-3">
+        <label className="w-fit cursor-pointer text-sm text-ardoise/60 underline">
+          {chargementFichier ? "Lecture du fichier…" : "📎 Importer un fichier (.txt, .pdf)"}
+          <input
+            type="file"
+            accept=".txt,.pdf,text/plain,application/pdf"
+            onChange={gererFichier}
+            disabled={chargementFichier}
+            className="hidden"
+          />
+        </label>
+        <label className="w-fit cursor-pointer text-sm text-ardoise/60 underline">
+          {analysePhotoEnCours ? "Lecture de la photo…" : "📷 Prendre/importer une photo"}
+          <input
+            type="file"
+            accept="image/*"
+            {...(captureDirecte ? { capture: "environment" as const } : {})}
+            onChange={gererPhoto}
+            disabled={analysePhotoEnCours}
+            className="hidden"
+          />
+        </label>
+      </div>
       {erreurFichier && <p className="text-xs text-tomate">{erreurFichier}</p>}
 
       {apercu === null ? (

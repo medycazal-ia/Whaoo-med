@@ -18,11 +18,11 @@ export type ResultatDocumentClaude =
   | { ok: true; items: IngredientClaude[]; nomSuggere: string | null }
   | { ok: false; raison: "pas_de_cle" | "erreur_api" | "aucun_article"; details?: string };
 
-const PROMPT_SYSTEME = `Tu lis un document collé par un utilisateur d'une application de liste de courses (recette, menu de la semaine, régime alimentaire, liste de repas...). Ton but : en extraire UNIQUEMENT les ingrédients/produits à acheter, jamais autre chose.
+const PROMPT_SYSTEME = `Tu lis un document collé par un utilisateur d'une application de liste de courses. Le document peut être n'importe quoi qui mentionne des articles à acheter : une recette, un menu de la semaine, un régime alimentaire, mais aussi une liste de courses classique, une liste de fournitures, un mot laissé par quelqu'un ("prends du pain et des piles en rentrant"), ou tout autre texte listant des choses à acheter — alimentaire ou non (produits ménagers, hygiène, papeterie, bricolage, etc.). Ton but : en extraire UNIQUEMENT les articles à acheter, jamais autre chose.
 
 Règles :
-1. Si une partie du texte présente plusieurs choix pour une même ligne ou un même repas — quelle que soit la façon dont c'est écrit : "ou", "soit... soit", "au choix entre", une liste séparée par virgules ou barres obliques, etc. — crée UN ARTICLE DISTINCT PAR ALTERNATIVE. Exemple : "potage ou carotte, ou miel/fromage/yaourt" donne 5 articles (potage, carotte, miel, fromage, yaourt).
-2. N'invente jamais un article à partir de texte qui n'en nomme pas un précisément : titres de jour ("Dimanche"), noms de repas ("Midi", "Soir", "Collation"), instructions de préparation ("faire cuire 10 minutes", "mélanger", "servir chaud"), remarques génériques ("au choix", "selon le goût", "autres alternatives", "à volonté", "en accompagnement"), notes nutritionnelles ou commentaires. Ignore-les silencieusement.
+1. Si une partie du texte présente plusieurs choix pour une même ligne — quelle que soit la façon dont c'est écrit : "ou", "soit... soit", "au choix entre", une liste séparée par virgules ou barres obliques, etc. — crée UN ARTICLE DISTINCT PAR ALTERNATIVE. Exemple : "potage ou carotte, ou miel/fromage/yaourt" donne 5 articles (potage, carotte, miel, fromage, yaourt).
+2. N'invente jamais un article à partir de texte qui n'en nomme pas un précisément : titres de jour ("Dimanche"), noms de repas ("Midi", "Soir", "Collation"), instructions de préparation ("faire cuire 10 minutes", "mélanger", "servir chaud"), remarques génériques ("au choix", "selon le goût", "autres alternatives", "à volonté", "en accompagnement"), notes ou commentaires qui ne nomment pas un produit précis. Ignore-les silencieusement.
 3. Reconnais le format "Nom du plat (ingrédient 1, ingrédient 2, ...)" : suggère le nom du plat comme nom de liste, et donne un article par ingrédient de la parenthèse.
 4. Pour chaque article, sépare la quantité numérique du nom quand elle est donnée (ex. "3 œufs" → label "œufs", quantity 3). Sans quantité précisée, quantity vaut 1. "detail" sert à une unité/précision non numérique (ex. "200g", "1 sachet") — sinon null.
 
@@ -44,14 +44,14 @@ function extraireJson(texte: string): unknown {
   return JSON.parse(objet);
 }
 
-export async function analyserDocumentClaude(texteDocument: string): Promise<ResultatDocumentClaude> {
+type ContenuMessage =
+  | string
+  | ({ type: "image"; source: { type: "base64"; media_type: string; data: string } } | { type: "text"; text: string })[];
+
+async function appellerClaudeDocument(contenu: ContenuMessage): Promise<ResultatDocumentClaude> {
   const cle = process.env.ANTHROPIC_TICKET_API_KEY;
   if (!cle) {
     return { ok: false, raison: "pas_de_cle" };
-  }
-
-  if (!texteDocument.trim()) {
-    return { ok: false, raison: "aucun_article" };
   }
 
   const workspaceId = process.env.ANTHROPIC_TICKET_WORKSPACE_ID;
@@ -70,7 +70,7 @@ export async function analyserDocumentClaude(texteDocument: string): Promise<Res
         model: MODELE,
         max_tokens: 4096,
         system: PROMPT_SYSTEME,
-        messages: [{ role: "user", content: texteDocument.slice(0, 20000) }],
+        messages: [{ role: "user", content: contenu }],
       }),
     });
   } catch (erreur) {
@@ -132,4 +132,30 @@ export async function analyserDocumentClaude(texteDocument: string): Promise<Res
   const nomSuggere = typeof brutType.nomSuggere === "string" && brutType.nomSuggere.trim() ? brutType.nomSuggere.trim() : null;
 
   return { ok: true, items, nomSuggere };
+}
+
+export async function analyserDocumentClaude(texteDocument: string): Promise<ResultatDocumentClaude> {
+  if (!texteDocument.trim()) {
+    return { ok: false, raison: "aucun_article" };
+  }
+  return appellerClaudeDocument(texteDocument.slice(0, 20000));
+}
+
+// Lecture d'une photo (liste de courses manuscrite, capture d'écran de
+// SMS/notes, page d'un carnet, etc.) — même moteur que la lecture de
+// texte, avec une image en entrée au lieu d'un texte collé.
+export async function analyserDocumentPhotoClaude(formData: FormData): Promise<ResultatDocumentClaude> {
+  const fichier = formData.get("document");
+  if (!(fichier instanceof File)) {
+    return { ok: false, raison: "erreur_api", details: "Aucune image reçue" };
+  }
+
+  const buffer = await fichier.arrayBuffer();
+  const base64 = Buffer.from(buffer).toString("base64");
+  const mediaType = fichier.type || "image/jpeg";
+
+  return appellerClaudeDocument([
+    { type: "image", source: { type: "base64", media_type: mediaType, data: base64 } },
+    { type: "text", text: "Voici la photo à analyser." },
+  ]);
 }

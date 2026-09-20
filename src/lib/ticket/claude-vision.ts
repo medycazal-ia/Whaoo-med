@@ -18,6 +18,8 @@ export type ResultatClaude =
 
 const PROMPT = `Tu regardes la photo d'un ticket de caisse français. Extrais chaque article acheté avec son prix final (en euros), en ignorant les lignes de total, sous-total, TVA, mode de paiement, monnaie rendue, coordonnées du magasin et messages de fin de ticket.
 
+Pour le nom de l'article ("label"), transcris EXACTEMENT les lettres imprimées sur le ticket, caractère par caractère — ne remplace jamais un mot imprimé par un autre mot plausible ou plus courant qui lui ressemble (par exemple, si le ticket imprime "GIGOT", n'écris jamais "PAIN" même si "pain" semble plus fréquent dans un supermarché). En cas de lettre vraiment illisible, garde le reste du mot tel quel et mets un "?" à la place de la lettre incertaine, plutôt que de deviner un mot entier différent.
+
 Réponds UNIQUEMENT avec un tableau JSON, sans aucun texte ni explication autour, exactement dans ce format :
 [{"label": "nom de l'article", "price": 4.3}, {"label": "autre article", "price": 2.16}]
 

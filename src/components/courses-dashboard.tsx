@@ -34,6 +34,7 @@ type CoursesActions = {
   ajouterArticlesEnLot: (items: IngredientParse[], listeNom: string | null) => Promise<void>;
   contribuerPrixTicket?: (lignes: { label: string; price: number }[]) => Promise<void>;
   ajouterArticlesAcheteesTicket?: (lignes: { label: string; price: number }[]) => Promise<void>;
+  ajouterArticleAvecRetour?: (formData: FormData) => Promise<string | null>;
 };
 
 // Pastilles pensées pour la carte budget au fond sombre (dégradé
@@ -174,6 +175,8 @@ export function CoursesDashboard({
       <section className="mx-auto flex w-full max-w-lg md:max-w-2xl lg:max-w-4xl flex-col gap-4 px-4 sm:px-6 pt-6">
         <SaisieVocale
           ajouterArticleAction={actions.ajouterArticle}
+          ajouterArticleAvecRetourAction={actions.ajouterArticleAvecRetour}
+          supprimerArticleAction={actions.supprimerArticle}
           definirBudgetAction={actions.definirBudget}
           indexCommunautaire={indexCommunautaire}
           proposerPartage={proposerPartagePrix}

@@ -42,6 +42,28 @@ export async function ajouterArticleDemo(formData: FormData): Promise<void> {
   revalidatePath("/demo");
 }
 
+// Variante démo qui renvoie l'id créé — voir ajouterArticleAvecRetour
+// dans lib/courses/actions.ts (dictée vocale en écoute continue).
+export async function ajouterArticleAvecRetourDemo(formData: FormData): Promise<string | null> {
+  const cookieStore = await cookies();
+  const state = lireEtatDemo(cookieStore);
+
+  const label = String(formData.get("label") ?? "").trim();
+  if (!label) return null;
+
+  const detail = String(formData.get("detail") ?? "").trim();
+  const price = Number(formData.get("price") ?? 0) || 0;
+  const quantity = Math.max(1, Number(formData.get("quantity") ?? 1) || 1);
+  const status = formData.get("status") === "achete" ? "achete" : "a_acheter";
+  const id = crypto.randomUUID();
+
+  state.items.unshift({ id, label, detail: detail || null, price, quantity, status });
+
+  await ecrireEtatDemo(state);
+  revalidatePath("/demo");
+  return id;
+}
+
 export type IngredientALotter = { label: string; detail: string | null; quantity: number };
 
 export async function ajouterArticlesEnLotDemo(

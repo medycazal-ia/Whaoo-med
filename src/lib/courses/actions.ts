@@ -87,6 +87,43 @@ export async function ajouterArticle(formData: FormData): Promise<void> {
   revalidatePath("/app");
 }
 
+// Variante qui renvoie l'id de la ligne créée — utilisée par la dictée
+// vocale en écoute continue (voir saisie-vocale.tsx), qui ajoute
+// automatiquement chaque article reconnu et doit pouvoir le supprimer de
+// nouveau si l'utilisateur annule juste après (la reconnaissance vocale
+// n'étant jamais fiable à 100 %). ajouterArticle() ci-dessus reste
+// utilisée telle quelle par les <form action=...> classiques.
+export async function ajouterArticleAvecRetour(formData: FormData): Promise<string | null> {
+  const { supabase, user } = await requireUser();
+
+  const label = String(formData.get("label") ?? "").trim();
+  const detail = String(formData.get("detail") ?? "").trim();
+  const price = Number(formData.get("price") ?? 0) || 0;
+  const quantity = Math.max(1, Number(formData.get("quantity") ?? 1) || 1);
+  const status = formData.get("status") === "achete" ? "achete" : "a_acheter";
+  const prixSource = lireSourcePrix(formData);
+
+  if (!label) return null;
+
+  const { data } = await supabase
+    .from("items")
+    .insert({
+      user_id: user.id,
+      label,
+      detail: detail || null,
+      price,
+      quantity,
+      status,
+      achat_mois: status === "achete" ? moisEnDateISO() : null,
+      prix_source: prixSource,
+    })
+    .select("id")
+    .single();
+
+  revalidatePath("/app");
+  return data?.id ?? null;
+}
+
 export async function recupererIndexCommunautaire(): Promise<IndexCommunautaire> {
   const { supabase } = await requireUser();
   const { data } = await supabase.rpc("prix_communautaires_stats");

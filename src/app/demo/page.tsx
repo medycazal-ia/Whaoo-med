@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
 import {
+  ajouterArticleAvecRetourDemo,
   ajouterArticleDemo,
   ajouterArticlesEnLotDemo,
   basculerStatutArticleDemo,
@@ -80,6 +81,7 @@ export default async function DemoPage({
           supprimerListeNommee: supprimerListeNommeeDemo,
           definirBudget: definirBudgetDemo,
           ajouterArticlesEnLot: ajouterArticlesEnLotDemo,
+          ajouterArticleAvecRetour: ajouterArticleAvecRetourDemo,
         }}
         footer={
           <section className="mx-auto w-full max-w-lg md:max-w-2xl lg:max-w-4xl px-4 sm:px-6 pb-10">

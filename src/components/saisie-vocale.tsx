@@ -23,6 +23,14 @@ function semblePlusieursArticles(phrase: string): boolean {
   return /\bet\b|,/i.test(phrase) && phrase.trim().split(/\s+/).length > 4;
 }
 
+// Après ce nombre d'échecs consécutifs à relancer l'écoute continue
+// (voir onEnd ci-dessous), on abandonne proprement plutôt que de boucler
+// indéfiniment — l'écoute continue des navigateurs mobiles est connue
+// pour être capricieuse (coupures silencieuses, notamment écran
+// verrouillé).
+const MAX_TENTATIVES_REDEMARRAGE = 5;
+const DUREE_TOAST_MS = 5000;
+
 const MIME_TYPES_CANDIDATS = ["audio/webm", "audio/mp4", "audio/ogg"];
 const DUREE_MAX_ENREGISTREMENT_MS = 15000;
 
@@ -35,20 +43,35 @@ function choisirMimeType(): string {
   return "";
 }
 
+type ArticleAuto = { label: string; price: number; quantity: number };
+type ArticleAjoute = ArticleAuto & { id: string | null };
+
 export function SaisieVocale({
   ajouterArticleAction,
+  ajouterArticleAvecRetourAction,
+  supprimerArticleAction,
   definirBudgetAction,
   indexCommunautaire,
   proposerPartage = false,
   onAide,
 }: {
   ajouterArticleAction: (formData: FormData) => Promise<void>;
+  ajouterArticleAvecRetourAction?: (formData: FormData) => Promise<string | null>;
+  supprimerArticleAction?: (formData: FormData) => Promise<void>;
   definirBudgetAction: (formData: FormData) => Promise<void>;
   indexCommunautaire?: IndexCommunautaire;
   proposerPartage?: boolean;
   onAide?: () => void;
 }) {
+  // Écoute continue ("Parlez-moi") : le micro reste ouvert et chaque
+  // article reconnu est ajouté automatiquement, sans étape de
+  // confirmation manuelle — voir traiterTranscriptionAuto. `ecoute` est
+  // l'état affiché, `ecouteRef` la valeur vraie utilisée dans les
+  // callbacks du navigateur (qui capturent sinon une valeur figée).
   const [ecoute, setEcoute] = useState(false);
+  const ecouteRef = useRef(false);
+  const tentativesEchecRef = useRef(0);
+
   const [brouillon, setBrouillon] = useState<{
     label: string;
     price: number;
@@ -65,6 +88,13 @@ export function SaisieVocale({
     { label: string; price: number; quantity: number; inclure: boolean }[] | null
   >(null);
   const [analyseVocaleIA, setAnalyseVocaleIA] = useState(false);
+  // Confirmation d'ajout automatique en écoute continue — un court
+  // bandeau (pas un blocage) avec une annulation possible pendant
+  // quelques secondes, la reconnaissance vocale n'étant jamais fiable à
+  // 100 %.
+  const [toast, setToast] = useState<{ items: ArticleAjoute[] } | null>(null);
+  const toastTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const [budgetDicte, setBudgetDicte] = useState<number | null>(null);
   const [sourcePrix, setSourcePrix] = useState<SourcePrix | null>(null);
   const [nonSupporte, setNonSupporte] = useState(false);
@@ -126,24 +156,173 @@ export function SaisieVocale({
     setBrouillon({ ...article, status: "a_acheter" });
   }
 
-  function demarrerEcoute() {
+  // Ajout automatique (mode "Parlez-moi") : sans variante d'action
+  // renvoyant un id, impossible de proposer une annulation fiable — on
+  // retombe alors sur la confirmation manuelle classique plutôt que
+  // d'ajouter à l'aveugle.
+  async function ajouterEtAfficherToast(articles: ArticleAuto[]) {
+    if (!ajouterArticleAvecRetourAction) {
+      if (articles.length === 1) {
+        setBrouillon({ ...articles[0], status: "a_acheter" });
+      } else {
+        setBrouillonsMultiples(articles.map((a) => ({ ...a, inclure: true })));
+      }
+      return;
+    }
+
+    const ajoutes: ArticleAjoute[] = [];
+    for (const article of articles) {
+      const formData = new FormData();
+      formData.set("label", article.label);
+      formData.set("price", String(article.price));
+      formData.set("quantity", String(article.quantity));
+      formData.set("status", "a_acheter");
+      formData.set("prixSource", "manuel");
+      const id = await ajouterArticleAvecRetourAction(formData);
+      ajoutes.push({ ...article, id });
+    }
+
+    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    setToast({ items: ajoutes });
+    toastTimeoutRef.current = setTimeout(() => setToast(null), DUREE_TOAST_MS);
+  }
+
+  async function annulerToast() {
+    if (!toast) return;
+    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    if (supprimerArticleAction) {
+      for (const item of toast.items) {
+        if (!item.id) continue;
+        const formData = new FormData();
+        formData.set("id", item.id);
+        await supprimerArticleAction(formData);
+      }
+    }
+    setToast(null);
+  }
+
+  async function traiterTranscriptionAuto(transcript: string) {
+    if (/\baide\b/i.test(transcript)) {
+      onAide?.();
+      return;
+    }
+
+    const commande = parserPhraseVocale(transcript);
+    if (commande.type === "budget") {
+      // Un changement de budget reste sensible (un montant mal entendu
+      // peut être très différent) : on coupe l'écoute continue et on
+      // demande une confirmation manuelle plutôt que de l'appliquer tout
+      // seul.
+      arreterEcouteContinue();
+      setBudgetDicte(commande.montant);
+      return;
+    }
+
+    if (semblePlusieursArticles(transcript)) {
+      setAnalyseVocaleIA(true);
+      try {
+        const resultatIA = await analyserPhraseVocaleClaude(transcript);
+        if (resultatIA.ok) {
+          const articles = resultatIA.articles.map((a) => {
+            const article = { ...a };
+            if (article.price === 0) {
+              const estimation = estimerPrix(article.label, indexCommunautaire);
+              if (estimation !== null) article.price = estimation.prix;
+            }
+            return article;
+          });
+          await ajouterEtAfficherToast(articles);
+          return;
+        }
+      } finally {
+        setAnalyseVocaleIA(false);
+      }
+    }
+
+    const article = commande.article;
+    if (article.price === 0) {
+      const estimation = estimerPrix(article.label, indexCommunautaire);
+      if (estimation !== null) article.price = estimation.prix;
+    }
+    await ajouterEtAfficherToast([article]);
+  }
+
+  function arreterEcouteContinue() {
+    ecouteRef.current = false;
+    setEcoute(false);
+    recognitionRef.current?.stop();
+  }
+
+  function demarrerEcouteContinue() {
     const SpeechRecognitionCtor = getSpeechRecognition();
     if (!SpeechRecognitionCtor) {
       setNonSupporte(true);
       return;
     }
 
+    tentativesEchecRef.current = 0;
+    ecouteRef.current = true;
+    setEcoute(true);
+    setErreurAudio(null);
+
     const recognition = new SpeechRecognitionCtor();
     recognition.lang = "fr-FR";
     recognition.interimResults = false;
+    recognition.continuous = true;
+
     recognition.onresult = (event) => {
-      traiterTranscription(event.results[0][0].transcript);
+      tentativesEchecRef.current = 0;
+      const resultats = event.results as unknown as {
+        length: number;
+        [i: number]: { [j: number]: { transcript: string } };
+      };
+      const resultIndex = (event as unknown as { resultIndex?: number }).resultIndex ?? 0;
+      for (let i = resultIndex; i < resultats.length; i++) {
+        const transcript = resultats[i]?.[0]?.transcript;
+        if (transcript) traiterTranscriptionAuto(transcript);
+      }
     };
-    recognition.onerror = () => setEcoute(false);
-    recognition.onend = () => setEcoute(false);
+
+    recognition.onerror = (event) => {
+      if (event.error === "not-allowed" || event.error === "service-not-allowed") {
+        ecouteRef.current = false;
+        setEcoute(false);
+        setErreurAudio(
+          "Micro refusé — vérifie l'autorisation dans les réglages de ton navigateur.",
+        );
+      }
+      // Les autres erreurs (silence prolongé, réseau...) sont gérées par
+      // onend juste après, qui relance l'écoute si elle doit continuer.
+    };
+
+    recognition.onend = () => {
+      if (!ecouteRef.current) return;
+      if (tentativesEchecRef.current >= MAX_TENTATIVES_REDEMARRAGE) {
+        ecouteRef.current = false;
+        setEcoute(false);
+        setErreurAudio(
+          "L'écoute continue s'est arrêtée après plusieurs interruptions — réessaie.",
+        );
+        return;
+      }
+      tentativesEchecRef.current++;
+      try {
+        recognition.start();
+      } catch {
+        setTimeout(() => {
+          if (ecouteRef.current) {
+            try {
+              recognition.start();
+            } catch {
+              ecouteRef.current = false;
+              setEcoute(false);
+            }
+          }
+        }, 400);
+      }
+    };
 
     recognitionRef.current = recognition;
-    setEcoute(true);
     recognition.start();
   }
 
@@ -454,16 +633,42 @@ export function SaisieVocale({
     <div className="flex flex-col items-center gap-1">
       <button
         type="button"
-        onClick={demarrerEcoute}
-        disabled={analyseVocaleIA}
-        className="flex items-center justify-center gap-2 rounded-xl border border-ardoise/20 bg-white px-4 py-3 font-medium text-ardoise hover:bg-ardoise/5 disabled:opacity-50"
+        onClick={ecoute ? arreterEcouteContinue : demarrerEcouteContinue}
+        disabled={analyseVocaleIA && !ecoute}
+        className={`flex items-center justify-center gap-2 rounded-xl border px-4 py-3 font-medium hover:opacity-90 disabled:opacity-50 ${
+          ecoute
+            ? "border-tomate/40 bg-tomate/10 text-tomate"
+            : "border-ardoise/20 bg-white text-ardoise hover:bg-ardoise/5"
+        }`}
       >
-        {analyseVocaleIA ? "Analyse en cours…" : ecoute ? "Je t'écoute…" : "🎙️ Dicter un article"}
+        {ecoute
+          ? "🔴 Je t'écoute… (appuie pour arrêter)"
+          : analyseVocaleIA
+            ? "Analyse en cours…"
+            : "🎙️ Parlez-moi"}
       </button>
       <p className="text-xs text-ardoise/50">
+        Reste à l&apos;écoute en continu et ajoute chaque article dicté
+        automatiquement, jusqu&apos;à ce que tu appuies pour arrêter.
         Fonctionne aussi pour le budget (« budget du mois 250 euros ») et
         pour l&apos;aide (« aide moi »)
       </p>
+
+      {erreurAudio && <p className="text-xs text-tomate">{erreurAudio}</p>}
+
+      {toast && (
+        <div className="flex flex-wrap items-center gap-2 rounded-lg bg-basilic/10 px-3 py-2 text-sm text-basilic">
+          <span>
+            ✓ Ajouté :{" "}
+            {toast.items
+              .map((i) => `${i.quantity > 1 ? `${i.quantity} × ` : ""}${i.label}`)
+              .join(", ")}
+          </span>
+          <button type="button" onClick={annulerToast} className="font-medium underline">
+            Annuler
+          </button>
+        </div>
+      )}
     </div>
   );
 }

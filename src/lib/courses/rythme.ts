@@ -43,7 +43,12 @@ export function calculerRythme(params: {
   if (ratio > SEUIL_ATTENTION) statut = "attention";
   else if (ratio > SEUIL_VIGILANT) statut = "vigilant";
 
-  const cagnotte = Math.max(0, ecart);
+  // Tant qu'aucun achat n'est enregistré ce mois-ci, la cagnotte reste à
+  // 0 € plutôt que d'afficher l'écart théorique par rapport au rythme
+  // idéal (qui donnerait un chiffre élevé rien qu'en n'ayant encore rien
+  // dépensé, avant même le moindre achat réel — pas ce que "cagnotte"
+  // doit représenter).
+  const cagnotte = params.totalDepense > 0 ? Math.max(0, ecart) : 0;
   const palierAtteint = [...PALIERS_CAGNOTTE].reverse().find((palier) => cagnotte >= palier.min);
 
   const conseilCagnotte = palierAtteint

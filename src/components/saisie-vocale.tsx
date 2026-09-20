@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { parserPhraseVocale } from "@/lib/courses/parse-vocal";
+import { analyserPhraseVocaleClaude } from "@/lib/courses/parse-vocal-ia";
 import {
   estimerPrix,
   LABEL_SOURCE_PRIX,
@@ -11,6 +12,16 @@ import {
 import { getSpeechRecognition, type SpeechRecognitionLike } from "@/lib/voice/speech-recognition";
 import { transcrireAudio } from "@/lib/voice/transcription";
 import { BoutonCorrigerPrixVocal } from "@/components/bouton-corriger-prix-vocal";
+
+// Une phrase dictée qui semble énumérer plusieurs articles (connecteurs
+// "et"/virgule + assez de mots pour que ce ne soit pas juste "3 œufs")
+// n'est pas fiable avec le parseur par règles ci-dessous, qui ne
+// reconnaît qu'un seul article par phrase. On ne fait alors appel à
+// Claude que pour CE cas précis — la grande majorité des dictées courtes
+// ("2 yaourts à 1 euro 50") restent instantanées et gratuites.
+function semblePlusieursArticles(phrase: string): boolean {
+  return /\bet\b|,/i.test(phrase) && phrase.trim().split(/\s+/).length > 4;
+}
 
 const MIME_TYPES_CANDIDATS = ["audio/webm", "audio/mp4", "audio/ogg"];
 const DUREE_MAX_ENREGISTREMENT_MS = 15000;
@@ -44,6 +55,16 @@ export function SaisieVocale({
     quantity: number;
     status: "achete" | "a_acheter";
   } | null>(null);
+  // Plusieurs articles détectés dans une seule phrase dictée (via Claude,
+  // en secours des règles simples — voir semblePlusieursArticles) :
+  // confirmation simplifiée en liste, séparée du formulaire riche à un
+  // seul article ci-dessus (prix/quantité/statut détaillés) qui reste le
+  // chemin normal, instantané et gratuit, pour l'immense majorité des
+  // dictées courtes.
+  const [brouillonsMultiples, setBrouillonsMultiples] = useState<
+    { label: string; price: number; quantity: number; inclure: boolean }[] | null
+  >(null);
+  const [analyseVocaleIA, setAnalyseVocaleIA] = useState(false);
   const [budgetDicte, setBudgetDicte] = useState<number | null>(null);
   const [sourcePrix, setSourcePrix] = useState<SourcePrix | null>(null);
   const [nonSupporte, setNonSupporte] = useState(false);
@@ -58,7 +79,7 @@ export function SaisieVocale({
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
 
-  function traiterTranscription(transcript: string) {
+  async function traiterTranscription(transcript: string) {
     if (/\baide\b/i.test(transcript)) {
       onAide?.();
       return;
@@ -66,17 +87,43 @@ export function SaisieVocale({
     const commande = parserPhraseVocale(transcript);
     if (commande.type === "budget") {
       setBudgetDicte(commande.montant);
-    } else {
-      const article = commande.article;
-      if (article.price === 0) {
-        const estimation = estimerPrix(article.label, indexCommunautaire);
-        if (estimation !== null) {
-          article.price = estimation.prix;
-          setSourcePrix(estimation.source);
-        }
-      }
-      setBrouillon({ ...article, status: "a_acheter" });
+      return;
     }
+
+    if (semblePlusieursArticles(transcript)) {
+      setAnalyseVocaleIA(true);
+      try {
+        const resultatIA = await analyserPhraseVocaleClaude(transcript);
+        if (resultatIA.ok) {
+          setBrouillonsMultiples(
+            resultatIA.articles.map((a) => {
+              const article = { ...a };
+              if (article.price === 0) {
+                const estimation = estimerPrix(article.label, indexCommunautaire);
+                if (estimation !== null) article.price = estimation.prix;
+              }
+              return { ...article, inclure: true };
+            }),
+          );
+          return;
+        }
+      } finally {
+        setAnalyseVocaleIA(false);
+      }
+      // La reconnaissance par IA n'est pas configurée ou a échoué : on
+      // retombe sur le résultat des règles simples ci-dessous, comme si
+      // la phrase n'avait jamais semblé contenir plusieurs articles.
+    }
+
+    const article = commande.article;
+    if (article.price === 0) {
+      const estimation = estimerPrix(article.label, indexCommunautaire);
+      if (estimation !== null) {
+        article.price = estimation.prix;
+        setSourcePrix(estimation.source);
+      }
+    }
+    setBrouillon({ ...article, status: "a_acheter" });
   }
 
   function demarrerEcoute() {
@@ -150,6 +197,93 @@ export function SaisieVocale({
 
   function arreterEnregistrementAudio() {
     mediaRecorderRef.current?.stop();
+  }
+
+  if (brouillonsMultiples) {
+    const nbInclus = brouillonsMultiples.filter((b) => b.inclure).length;
+    return (
+      <div className="flex flex-col gap-2 rounded-xl border border-ambre/40 bg-ambre/10 p-4">
+        <p className="text-xs font-medium text-ambre">
+          Plusieurs articles reconnus dans ta phrase — vérifie avant
+          d&apos;ajouter :
+        </p>
+        <ul className="flex flex-col gap-1">
+          {brouillonsMultiples.map((b, i) => (
+            <li key={i} className="flex items-center gap-2 text-sm text-ardoise">
+              <input
+                type="checkbox"
+                checked={b.inclure}
+                onChange={(e) =>
+                  setBrouillonsMultiples((prev) =>
+                    prev!.map((x, j) => (j === i ? { ...x, inclure: e.target.checked } : x)),
+                  )
+                }
+              />
+              <input
+                value={b.label}
+                onChange={(e) =>
+                  setBrouillonsMultiples((prev) =>
+                    prev!.map((x, j) => (j === i ? { ...x, label: e.target.value } : x)),
+                  )
+                }
+                className="flex-1 rounded border border-ardoise/20 bg-white px-2 py-1"
+              />
+              <input
+                type="number"
+                min={1}
+                value={b.quantity}
+                onChange={(e) =>
+                  setBrouillonsMultiples((prev) =>
+                    prev!.map((x, j) => (j === i ? { ...x, quantity: Number(e.target.value) || 1 } : x)),
+                  )
+                }
+                className="w-16 rounded border border-ardoise/20 bg-white px-2 py-1"
+              />
+              <input
+                type="number"
+                step="0.01"
+                value={b.price}
+                onChange={(e) =>
+                  setBrouillonsMultiples((prev) =>
+                    prev!.map((x, j) => (j === i ? { ...x, price: Number(e.target.value) || 0 } : x)),
+                  )
+                }
+                className="w-20 rounded border border-ardoise/20 bg-white px-2 py-1"
+              />
+            </li>
+          ))}
+        </ul>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            disabled={nbInclus === 0}
+            onClick={async () => {
+              const selection = brouillonsMultiples.filter((b) => b.inclure);
+              for (const item of selection) {
+                const formData = new FormData();
+                formData.set("label", item.label);
+                formData.set("price", String(item.price));
+                formData.set("quantity", String(item.quantity));
+                formData.set("status", "a_acheter");
+                formData.set("prixSource", "manuel");
+                await ajouterArticleAction(formData);
+              }
+              setBrouillonsMultiples(null);
+            }}
+            className="flex-1 rounded-lg bg-basilic px-3 py-2 font-medium text-craie disabled:opacity-50"
+          >
+            Ajouter {nbInclus} article{nbInclus > 1 ? "s" : ""}
+          </button>
+          <button
+            type="button"
+            onClick={() => setBrouillonsMultiples(null)}
+            className="rounded-lg border border-ardoise/20 px-3 py-2 text-ardoise"
+          >
+            Annuler
+          </button>
+        </div>
+      </div>
+    );
   }
 
   if (budgetDicte !== null) {
@@ -293,8 +427,8 @@ export function SaisieVocale({
 
         {erreurAudio && <p className="text-tomate">{erreurAudio}</p>}
 
-        {transcriptionEnCours ? (
-          <p>Transcription en cours…</p>
+        {transcriptionEnCours || analyseVocaleIA ? (
+          <p>{analyseVocaleIA ? "Analyse en cours…" : "Transcription en cours…"}</p>
         ) : (
           <button
             type="button"
@@ -321,9 +455,10 @@ export function SaisieVocale({
       <button
         type="button"
         onClick={demarrerEcoute}
-        className="flex items-center justify-center gap-2 rounded-xl border border-ardoise/20 bg-white px-4 py-3 font-medium text-ardoise hover:bg-ardoise/5"
+        disabled={analyseVocaleIA}
+        className="flex items-center justify-center gap-2 rounded-xl border border-ardoise/20 bg-white px-4 py-3 font-medium text-ardoise hover:bg-ardoise/5 disabled:opacity-50"
       >
-        {ecoute ? "Je t'écoute…" : "🎙️ Dicter un article"}
+        {analyseVocaleIA ? "Analyse en cours…" : ecoute ? "Je t'écoute…" : "🎙️ Dicter un article"}
       </button>
       <p className="text-xs text-ardoise/50">
         Fonctionne aussi pour le budget (« budget du mois 250 euros ») et

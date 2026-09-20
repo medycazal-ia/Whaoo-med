@@ -36,26 +36,25 @@ export function calculerRythme(params: {
   const jourCourant = Math.min(aujourdHui.getDate(), totalJours);
 
   const depenseIdeale = (params.budgetAmount * jourCourant) / totalJours;
-  const ecart = depenseIdeale - params.totalDepense;
   const ratio = depenseIdeale > 0 ? params.totalDepense / depenseIdeale : 0;
 
   let statut: StatutRythme = "serein";
   if (ratio > SEUIL_ATTENTION) statut = "attention";
   else if (ratio > SEUIL_VIGILANT) statut = "vigilant";
 
-  // Tant qu'aucun achat n'est enregistré ce mois-ci, la cagnotte reste à
-  // 0 € plutôt que d'afficher l'écart théorique par rapport au rythme
-  // idéal (qui donnerait un chiffre élevé rien qu'en n'ayant encore rien
-  // dépensé, avant même le moindre achat réel — pas ce que "cagnotte"
-  // doit représenter).
-  const cagnotte = params.totalDepense > 0 ? Math.max(0, ecart) : 0;
+  // La cagnotte est le budget du mois amputé de chaque achat au fur et à
+  // mesure — pas un écart théorique par rapport à un rythme idéal.
+  // Exemple donné par Medy : 200 € de budget, premier achat à 59 € →
+  // cagnotte à 141 €, quel que soit le jour du mois où cet achat a lieu.
+  const cagnotteBrute = params.budgetAmount - params.totalDepense;
+  const cagnotte = Math.max(0, cagnotteBrute);
   const palierAtteint = [...PALIERS_CAGNOTTE].reverse().find((palier) => cagnotte >= palier.min);
 
   const conseilCagnotte = palierAtteint
     ? palierAtteint.conseil
-    : ecart < 0
+    : cagnotteBrute < 0
       ? "Budget dépassé ce mois-ci — pas de cagnotte pour l'instant."
-      : "Continue, la cagnotte se remplira si tu restes sous ton rythme.";
+      : "Il te reste de quoi voir venir, continue comme ça.";
 
   return {
     jourCourant,

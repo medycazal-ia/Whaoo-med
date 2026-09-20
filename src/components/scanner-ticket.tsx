@@ -152,7 +152,7 @@ export function ScannerTicket({
 
       {statut === "analyse" && (
         <p className="text-sm text-ardoise/70">
-          Lecture du ticket en cours… {progression}%
+          Lecture du ticket en cours…{progression > 0 ? ` ${progression}%` : ""}
         </p>
       )}
 

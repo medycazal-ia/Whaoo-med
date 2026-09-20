@@ -106,28 +106,27 @@ function appliquerNettete(
   return resultat;
 }
 
-// Plafond de taille avant envoi à un service distant (Claude) : uniquement
-// pour éviter le même plantage mémoire mobile que le traitement Tesseract
-// ci-dessous — une photo de smartphone récent (10+ Mpx, parfois 8-15 Mo)
-// peut faire planter l'appli rien qu'en la préparant pour l'envoi. Pas de
-// niveaux de gris ni de netteté ici : le service distant fait sa propre
-// analyse sur une photo couleur, pas besoin (et pas souhaitable) de la
-// lui pré-traiter. Volontairement plus généreux que le plafond de l'OCR
-// local (Tesseract, qui tourne dans le navigateur) : un service cloud n'a
-// pas de contrainte mémoire côté client, réduire l'image plus que
-// nécessaire ne ferait que dégrader la lecture pour rien.
-const DIMENSION_MAX_ENVOI = 4000;
+// Plafond de taille avant envoi à un service distant (Claude) : au-delà
+// de 1568px sur son plus grand côté, l'API vision de Claude redimensionne
+// l'image en interne avant de l'analyser — envoyer plus grand n'améliore
+// donc pas la lecture, ça ne fait qu'allonger inutilement le temps de
+// transfert (notable sur mobile, remonté comme "ça réfléchit longtemps").
+// Reste très supérieur à ce qu'il faudrait pour éviter le plantage
+// mémoire mobile (voir Tesseract ci-dessous) : pas de niveaux de gris ni
+// de netteté ici, Claude fait sa propre analyse sur une photo couleur.
+const DIMENSION_MAX_ENVOI = 1568;
 
 export async function redimensionnerPourEnvoi(fichier: File): Promise<Blob> {
   const bitmap = await decoderBitmapBorne(fichier, DIMENSION_MAX_ENVOI);
   const plusGrandCote = Math.max(bitmap.width, bitmap.height);
 
-  if (plusGrandCote <= DIMENSION_MAX_ENVOI) {
-    bitmap.close();
-    return fichier;
-  }
-
-  const ratio = DIMENSION_MAX_ENVOI / plusGrandCote;
+  // On ré-encode toujours en JPEG compressé ci-dessous, même quand le
+  // décodage borné a déjà ramené l'image à la bonne taille : renvoyer le
+  // fichier original tel quel dans ce cas (comme le faisait une version
+  // précédente de cette fonction) envoyait en réalité la photo brute non
+  // réduite à Claude à chaque scan — c'est très probablement la cause
+  // principale du temps de chargement remonté comme trop long.
+  const ratio = Math.min(1, DIMENSION_MAX_ENVOI / plusGrandCote);
   const largeur = Math.round(bitmap.width * ratio);
   const hauteur = Math.round(bitmap.height * ratio);
 

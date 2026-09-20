@@ -4,6 +4,7 @@ import { useState } from "react";
 import { parserTicket, type LigneTicket } from "@/lib/ticket/parse-ticket";
 import { redimensionnerImage, redimensionnerPourEnvoi } from "@/lib/ticket/redimensionner-image";
 import { analyserTicketMindee } from "@/lib/ticket/mindee";
+import { analyserTicketClaude } from "@/lib/ticket/claude-vision";
 
 type LigneEditable = LigneTicket & { inclure: boolean };
 
@@ -19,11 +20,11 @@ export function ScannerTicket({
   const [texteBrut, setTexteBrut] = useState<string | null>(null);
   const [afficherTexteBrut, setAfficherTexteBrut] = useState(false);
   const [texteCopie, setTexteCopie] = useState(false);
-  // Pourquoi Mindee n'a pas été utilisé cette fois (clé absente, erreur
-  // d'appel, ou aucun article trouvé) — affiché en debug, pour ne plus
-  // avoir à deviner à l'aveugle si Mindee échoue silencieusement alors
-  // que la clé est bien configurée.
-  const [diagnosticMindee, setDiagnosticMindee] = useState<string | null>(null);
+  // Pourquoi les services distants (Claude, Mindee) n'ont pas été utilisés
+  // cette fois (clé absente, erreur d'appel, ou aucun article trouvé) —
+  // affiché en debug, pour ne plus avoir à deviner à l'aveugle si l'un
+  // d'eux échoue silencieusement alors que sa clé est bien configurée.
+  const [diagnosticIA, setDiagnosticIA] = useState<string | null>(null);
   // Ouvrir l'appareil photo directement (au lieu du sélecteur de fichier
   // standard) est plus rapide, mais c'est justement ce qui provoquait le
   // plantage "l'appli se ferme dès la photo prise" une fois installée en
@@ -40,25 +41,39 @@ export function ScannerTicket({
     setLignes([]);
     setTexteBrut(null);
     setAfficherTexteBrut(false);
-    setDiagnosticMindee(null);
+    setDiagnosticIA(null);
   }
 
   async function analyserImage(fichier: File) {
     setStatut("analyse");
     setProgression(0);
     setTexteBrut(null);
-    setDiagnosticMindee(null);
+    setDiagnosticIA(null);
     try {
-      // On tente d'abord Mindee (service spécialisé tickets de caisse,
-      // bien plus fiable) quand il est configuré côté serveur. S'il n'est
-      // pas encore configuré, échoue, ou ne trouve aucun article, on
-      // retombe sur l'OCR local Tesseract plutôt que d'échouer sec.
-      // La photo brute d'un smartphone récent (10+ Mpx) est réduite avant
-      // l'envoi : sans ça, la préparer pour l'envoi peut à elle seule
-      // épuiser la mémoire du navigateur et fermer l'appli sur mobile —
-      // exactement le même plantage que celui déjà corrigé pour l'OCR
-      // local, qui se reproduit ici si on saute cette étape.
+      // Ordre d'essai : Claude (vision) d'abord, puis Mindee, puis en
+      // dernier recours l'OCR local (Tesseract) si aucun service distant
+      // n'est configuré ou n'a trouvé d'article. La photo brute d'un
+      // smartphone récent (10+ Mpx) est réduite avant l'envoi : sans ça,
+      // la préparer pour l'envoi peut à elle seule épuiser la mémoire du
+      // navigateur et fermer l'appli sur mobile — exactement le même
+      // plantage que celui déjà corrigé pour l'OCR local, qui se
+      // reproduit ici si on saute cette étape.
       const imagePourEnvoi = await redimensionnerPourEnvoi(fichier);
+      const diagnostics: string[] = [];
+
+      const formDataClaude = new FormData();
+      formDataClaude.append("ticket", imagePourEnvoi, "ticket.jpg");
+      const resultatClaude = await analyserTicketClaude(formDataClaude);
+
+      if (resultatClaude.ok) {
+        setLignes(resultatClaude.lignes.map((ligne) => ({ ...ligne, inclure: true })));
+        setStatut("pret");
+        return;
+      }
+      diagnostics.push(
+        `Claude : ${resultatClaude.raison}${resultatClaude.details ? ` — ${resultatClaude.details}` : ""}`,
+      );
+
       const formDataMindee = new FormData();
       formDataMindee.append("ticket", imagePourEnvoi, "ticket.jpg");
       const resultatMindee = await analyserTicketMindee(formDataMindee);
@@ -68,10 +83,11 @@ export function ScannerTicket({
         setStatut("pret");
         return;
       }
-
-      setDiagnosticMindee(
-        `${resultatMindee.raison}${resultatMindee.details ? ` — ${resultatMindee.details}` : ""}`,
+      diagnostics.push(
+        `Mindee : ${resultatMindee.raison}${resultatMindee.details ? ` — ${resultatMindee.details}` : ""}`,
       );
+
+      setDiagnosticIA(diagnostics.join(" · "));
 
       const imageReduite = await redimensionnerImage(fichier);
       const Tesseract = (await import("tesseract.js")).default;
@@ -162,9 +178,9 @@ export function ScannerTicket({
             La lecture a échoué — réessaie avec une photo plus nette et bien
             éclairée.
           </p>
-          {diagnosticMindee && (
+          {diagnosticIA && (
             <p className="text-xs text-ardoise/40">
-              🔧 Mindee non utilisé cette fois : {diagnosticMindee}
+              🔧 Services distants non utilisés cette fois : {diagnosticIA}
             </p>
           )}
           <button
@@ -229,9 +245,9 @@ export function ScannerTicket({
               </ul>
             </>
           )}
-          {diagnosticMindee && (
+          {diagnosticIA && (
             <p className="text-xs text-ardoise/40">
-              🔧 Mindee non utilisé cette fois : {diagnosticMindee}
+              🔧 Services distants non utilisés cette fois : {diagnosticIA}
             </p>
           )}
           {texteBrut && (

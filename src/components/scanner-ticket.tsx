@@ -10,9 +10,14 @@ type LigneEditable = LigneTicket & { inclure: boolean };
 export function ScannerTicket({
   contribuerAction,
   ajouterAuBudgetAction,
+  sessionCourses,
 }: {
   contribuerAction: (lignes: { label: string; price: number }[]) => Promise<void>;
-  ajouterAuBudgetAction?: (lignes: { label: string; price: number }[]) => Promise<void>;
+  ajouterAuBudgetAction?: (
+    lignes: { label: string; price: number }[],
+    sessionCourses: string | null,
+  ) => Promise<void>;
+  sessionCourses?: string | null;
 }) {
   const [ouvert, setOuvert] = useState(false);
   const [statut, setStatut] = useState<"idle" | "analyse" | "pret" | "erreur" | "envoye">("idle");
@@ -104,7 +109,7 @@ export function ScannerTicket({
     if (aEnvoyer.length === 0) return;
     await contribuerAction(aEnvoyer);
     if (ajouterAuBudget && ajouterAuBudgetAction) {
-      await ajouterAuBudgetAction(aEnvoyer);
+      await ajouterAuBudgetAction(aEnvoyer, sessionCourses ?? null);
     }
     setStatut("envoye");
   }
@@ -245,7 +250,7 @@ export function ScannerTicket({
                     onChange={(e) => setAjouterAuBudget(e.target.checked)}
                   />
                   Ajouter aussi ces articles à mon budget du mois (déjà
-                  achetés)
+                  achetés{sessionCourses ? ` — session « ${sessionCourses} »` : ""})
                 </label>
               )}
             </>

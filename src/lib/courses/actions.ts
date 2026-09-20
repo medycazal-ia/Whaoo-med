@@ -11,6 +11,14 @@ function lireSourcePrix(formData: FormData): SourcePrix {
   return valeur === "communaute" || valeur === "statique" ? valeur : "manuel";
 }
 
+// "Budget immédiat" : nom de session (ex. "Courses du 20/09") rattaché à
+// un achat, saisi par l'utilisateur (texte ou dictée) — ne concerne
+// jamais un article "à acheter", seulement un achat effectif.
+function lireSessionCourses(formData: FormData): string | null {
+  const valeur = String(formData.get("sessionCourses") ?? "").trim();
+  return valeur || null;
+}
+
 function moisEnDateISO(reference = new Date()): string {
   return premierJourDuMois(reference).toISOString().slice(0, 10);
 }
@@ -56,6 +64,7 @@ export async function ajouterArticle(formData: FormData): Promise<void> {
   const partagerPrix = formData.get("partagerPrix") === "on";
   const enseigne = String(formData.get("enseigne") ?? "").trim();
   const prixSource = lireSourcePrix(formData);
+  const sessionCourses = lireSessionCourses(formData);
 
   if (!label) {
     redirect("/app?error=article_invalide");
@@ -70,6 +79,7 @@ export async function ajouterArticle(formData: FormData): Promise<void> {
     status,
     achat_mois: status === "achete" ? moisEnDateISO() : null,
     prix_source: prixSource,
+    session_courses: status === "achete" ? sessionCourses : null,
   });
 
   // Contribution communautaire de prix (section "prix estimés", inspirée
@@ -102,6 +112,7 @@ export async function ajouterArticleAvecRetour(formData: FormData): Promise<stri
   const quantity = Math.max(1, Number(formData.get("quantity") ?? 1) || 1);
   const status = formData.get("status") === "achete" ? "achete" : "a_acheter";
   const prixSource = lireSourcePrix(formData);
+  const sessionCourses = lireSessionCourses(formData);
 
   if (!label) return null;
 
@@ -116,6 +127,7 @@ export async function ajouterArticleAvecRetour(formData: FormData): Promise<stri
       status,
       achat_mois: status === "achete" ? moisEnDateISO() : null,
       prix_source: prixSource,
+      session_courses: status === "achete" ? sessionCourses : null,
     })
     .select("id")
     .single();
@@ -203,6 +215,7 @@ export async function contribuerPrixDepuisTicket(
 // peut choisir l'une, l'autre, ou les deux.
 export async function ajouterArticlesAchetesDepuisTicket(
   lignes: LigneTicketAContribuer[],
+  sessionCourses: string | null = null,
 ): Promise<void> {
   const { supabase, user } = await requireUser();
   if (lignes.length === 0) return;
@@ -217,6 +230,7 @@ export async function ajouterArticlesAchetesDepuisTicket(
       status: "achete" as const,
       achat_mois: moisEnDateISO(),
       prix_source: "manuel" as const,
+      session_courses: sessionCourses,
     })),
   );
 
@@ -227,12 +241,14 @@ export async function basculerStatutArticle(formData: FormData): Promise<void> {
   const { supabase, user } = await requireUser();
   const id = String(formData.get("id") ?? "");
   const nouveauStatut = formData.get("status") === "achete" ? "achete" : "a_acheter";
+  const sessionCourses = lireSessionCourses(formData);
 
   await supabase
     .from("items")
     .update({
       status: nouveauStatut,
       achat_mois: nouveauStatut === "achete" ? moisEnDateISO() : null,
+      session_courses: nouveauStatut === "achete" ? sessionCourses : null,
       updated_at: new Date().toISOString(),
     })
     .eq("id", id)

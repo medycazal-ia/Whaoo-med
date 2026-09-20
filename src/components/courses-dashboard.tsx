@@ -3,11 +3,13 @@
 import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import { calculerRythme, premierJourDuMois } from "@/lib/courses/rythme";
+import { nomSessionParDefaut } from "@/lib/courses/session";
 import { SaisieVocale } from "@/components/saisie-vocale";
 import { ChampsArticlePrix } from "@/components/champs-article-prix";
 import { AjouterDepuisDocument } from "@/components/ajouter-depuis-document";
 import { AideVocale } from "@/components/aide-vocale";
 import { BudgetFlottant } from "@/components/budget-flottant";
+import { BudgetImmediat } from "@/components/budget-immediat";
 import { FaqPanel } from "@/components/faq-panel";
 import { ScannerTicket } from "@/components/scanner-ticket";
 import { PromotionsLocales } from "@/components/promotions-locales";
@@ -23,6 +25,7 @@ export type ArticleCourse = {
   status: "achete" | "a_acheter";
   prixSource?: SourcePrix | null;
   listeNom?: string | null;
+  sessionCourses?: string | null;
 };
 
 type CoursesActions = {
@@ -33,7 +36,10 @@ type CoursesActions = {
   definirBudget: (formData: FormData) => Promise<void>;
   ajouterArticlesEnLot: (items: IngredientParse[], listeNom: string | null) => Promise<void>;
   contribuerPrixTicket?: (lignes: { label: string; price: number }[]) => Promise<void>;
-  ajouterArticlesAcheteesTicket?: (lignes: { label: string; price: number }[]) => Promise<void>;
+  ajouterArticlesAcheteesTicket?: (
+    lignes: { label: string; price: number }[],
+    sessionCourses: string | null,
+  ) => Promise<void>;
   ajouterArticleAvecRetour?: (formData: FormData) => Promise<string | null>;
 };
 
@@ -58,6 +64,8 @@ export function CoursesDashboard({
   listePdfHref,
   indexCommunautaire,
   proposerPartagePrix = false,
+  sessionActive,
+  sessionsAujourdHui = [],
 }: {
   baseHref: string;
   budgetAmount: number;
@@ -70,11 +78,20 @@ export function CoursesDashboard({
   footer?: ReactNode;
   indexCommunautaire?: IndexCommunautaire;
   proposerPartagePrix?: boolean;
+  // "Budget immédiat" (section demandée par Medy) : nom de la session de
+  // courses en cours, rattaché automatiquement à chaque achat validé
+  // (case cochée, scan de ticket, dictée) tant que l'utilisateur n'en
+  // choisit pas un autre — voir <BudgetImmediat>.
+  sessionActive?: string;
+  sessionsAujourdHui?: string[];
 }) {
   const [aideOuverte, setAideOuverte] = useState(false);
   // Repliées par défaut à l'ouverture : un seul bouton "Voir mes listes"
   // les révèle toutes d'un coup, mis en valeur tant qu'elles sont cachées.
   const [listesVisibles, setListesVisibles] = useState(false);
+  const [nomSessionActive, setNomSessionActive] = useState(
+    sessionActive ?? nomSessionParDefaut(),
+  );
 
   const totalDepense = items
     .filter((item) => item.status === "achete")
@@ -117,6 +134,7 @@ export function CoursesDashboard({
           <form action={actions.basculerStatutArticle}>
             <input type="hidden" name="id" value={item.id} />
             <input type="hidden" name="status" value="achete" />
+            <input type="hidden" name="sessionCourses" value={nomSessionActive} />
             <button type="submit" className="rounded-lg bg-basilic px-2 py-1 text-xs font-medium text-craie">
               Acheté ✓
             </button>
@@ -170,6 +188,14 @@ export function CoursesDashboard({
           </p>
           <p className="text-xs text-craie/60">{rythme.conseilCagnotte}</p>
         </div>
+      </section>
+
+      <section className="mx-auto w-full max-w-lg md:max-w-2xl lg:max-w-4xl px-4 sm:px-6">
+        <BudgetImmediat
+          valeur={nomSessionActive}
+          onChanger={setNomSessionActive}
+          sessionsRecentes={sessionsAujourdHui}
+        />
       </section>
 
       <section className="mx-auto flex w-full max-w-lg md:max-w-2xl lg:max-w-4xl flex-col gap-4 px-4 sm:px-6 pt-6">
@@ -246,6 +272,7 @@ export function CoursesDashboard({
             indexCommunautaire={indexCommunautaire}
             proposerPartage={proposerPartagePrix}
           />
+          <input type="hidden" name="sessionCourses" value={nomSessionActive} />
           <button
             type="submit"
             className="rounded-lg bg-ardoise px-4 py-2 font-medium text-craie hover:bg-ardoise-light"
@@ -263,6 +290,7 @@ export function CoursesDashboard({
           <ScannerTicket
             contribuerAction={actions.contribuerPrixTicket}
             ajouterAuBudgetAction={actions.ajouterArticlesAcheteesTicket}
+            sessionCourses={nomSessionActive}
           />
         )}
 
@@ -329,6 +357,11 @@ export function CoursesDashboard({
                       📋 {item.listeNom}
                     </span>
                   )}
+                  {item.sessionCourses && (
+                    <span className="ml-2 rounded-full bg-kaki/10 px-2 py-0.5 font-sans text-[11px] font-medium text-kaki">
+                      🛍️ {item.sessionCourses}
+                    </span>
+                  )}
                 </p>
               </div>
               {/* Boutons toujours sur leur propre ligne, jamais à côté du
@@ -347,6 +380,7 @@ export function CoursesDashboard({
                     name="status"
                     value={item.status === "achete" ? "a_acheter" : "achete"}
                   />
+                  <input type="hidden" name="sessionCourses" value={nomSessionActive} />
                   <button
                     type="submit"
                     className="rounded-lg border border-basilic/40 px-2 py-1 text-xs text-basilic"

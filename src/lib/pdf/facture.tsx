@@ -26,6 +26,14 @@ const styles = StyleSheet.create({
     fontWeight: 700,
   },
   budgetLigne: { marginTop: 4, color: "#6B6255" },
+  sessionTitre: {
+    marginTop: 14,
+    marginBottom: 2,
+    fontSize: 12,
+    fontWeight: 700,
+    color: "#2B3A32",
+  },
+  sessionSousTotal: { marginTop: 2, fontSize: 10, color: "#6B6255" },
 });
 
 export type ArticleFacture = {
@@ -33,7 +41,25 @@ export type ArticleFacture = {
   detail?: string | null;
   price: number;
   quantity: number;
+  session?: string | null;
 };
+
+// Regroupe les articles par "budget immédiat" (session de courses), dans
+// l'ordre de leur première apparition — les articles sans session (achats
+// plus anciens, avant l'ajout de cette fonctionnalité) restent groupés
+// sous un intitulé neutre plutôt que d'être exclus.
+const SANS_SESSION = "Achats sans session";
+
+function grouperParSession(articles: ArticleFacture[]): [string, ArticleFacture[]][] {
+  const groupes = new Map<string, ArticleFacture[]>();
+  for (const article of articles) {
+    const cle = article.session ?? SANS_SESSION;
+    const liste = groupes.get(cle) ?? [];
+    liste.push(article);
+    groupes.set(cle, liste);
+  }
+  return Array.from(groupes);
+}
 
 export function FacturePDF({
   moisLabel,
@@ -45,6 +71,8 @@ export function FacturePDF({
   budgetAmount: number;
 }) {
   const total = articles.reduce((s, a) => s + a.price * a.quantity, 0);
+  const groupes = grouperParSession(articles);
+  const plusieursSessions = groupes.length > 1 || groupes[0]?.[0] !== SANS_SESSION;
 
   return (
     <Document>
@@ -59,14 +87,29 @@ export function FacturePDF({
           <Text style={styles.prixCol}>Prix</Text>
         </View>
 
-        {articles.map((article, i) => (
-          <View style={styles.ligne} key={i}>
-            <Text style={styles.labelCol}>{article.label}</Text>
-            <Text style={styles.detailCol}>{article.detail ?? ""}</Text>
-            <Text style={styles.qtyCol}>{article.quantity}</Text>
-            <Text style={styles.prixCol}>
-              {(article.price * article.quantity).toFixed(2)} €
-            </Text>
+        {groupes.map(([nomSession, articlesDuGroupe]) => (
+          <View key={nomSession}>
+            {plusieursSessions && (
+              <Text style={styles.sessionTitre}>🛍️ {nomSession}</Text>
+            )}
+            {articlesDuGroupe.map((article, i) => (
+              <View style={styles.ligne} key={i}>
+                <Text style={styles.labelCol}>{article.label}</Text>
+                <Text style={styles.detailCol}>{article.detail ?? ""}</Text>
+                <Text style={styles.qtyCol}>{article.quantity}</Text>
+                <Text style={styles.prixCol}>
+                  {(article.price * article.quantity).toFixed(2)} €
+                </Text>
+              </View>
+            ))}
+            {plusieursSessions && (
+              <Text style={styles.sessionSousTotal}>
+                Sous-total : {articlesDuGroupe
+                  .reduce((s, a) => s + a.price * a.quantity, 0)
+                  .toFixed(2)}{" "}
+                €
+              </Text>
+            )}
           </View>
         ))}
 

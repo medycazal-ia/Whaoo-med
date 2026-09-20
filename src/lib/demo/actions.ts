@@ -10,6 +10,11 @@ import {
 } from "@/lib/demo/state";
 import { estimerPrix } from "@/lib/prix-estimes";
 
+function lireSessionCoursesDemo(formData: FormData): string | null {
+  const valeur = String(formData.get("sessionCourses") ?? "").trim();
+  return valeur || null;
+}
+
 async function ecrireEtatDemo(state: DemoState) {
   const cookieStore = await cookies();
   // Cookie de session (pas de maxAge) : réinitialisé à la fermeture du
@@ -28,6 +33,7 @@ export async function ajouterArticleDemo(formData: FormData): Promise<void> {
   const price = Number(formData.get("price") ?? 0) || 0;
   const quantity = Math.max(1, Number(formData.get("quantity") ?? 1) || 1);
   const status = formData.get("status") === "achete" ? "achete" : "a_acheter";
+  const sessionCourses = lireSessionCoursesDemo(formData);
 
   state.items.unshift({
     id: crypto.randomUUID(),
@@ -36,6 +42,7 @@ export async function ajouterArticleDemo(formData: FormData): Promise<void> {
     price,
     quantity,
     status,
+    sessionCourses: status === "achete" ? sessionCourses : null,
   });
 
   await ecrireEtatDemo(state);
@@ -55,9 +62,18 @@ export async function ajouterArticleAvecRetourDemo(formData: FormData): Promise<
   const price = Number(formData.get("price") ?? 0) || 0;
   const quantity = Math.max(1, Number(formData.get("quantity") ?? 1) || 1);
   const status = formData.get("status") === "achete" ? "achete" : "a_acheter";
+  const sessionCourses = lireSessionCoursesDemo(formData);
   const id = crypto.randomUUID();
 
-  state.items.unshift({ id, label, detail: detail || null, price, quantity, status });
+  state.items.unshift({
+    id,
+    label,
+    detail: detail || null,
+    price,
+    quantity,
+    status,
+    sessionCourses: status === "achete" ? sessionCourses : null,
+  });
 
   await ecrireEtatDemo(state);
   revalidatePath("/demo");
@@ -96,9 +112,10 @@ export async function basculerStatutArticleDemo(formData: FormData): Promise<voi
   const state = lireEtatDemo(cookieStore);
   const id = String(formData.get("id") ?? "");
   const nouveauStatut = formData.get("status") === "achete" ? "achete" : "a_acheter";
+  const sessionCourses = nouveauStatut === "achete" ? lireSessionCoursesDemo(formData) : null;
 
   state.items = state.items.map((item) =>
-    item.id === id ? { ...item, status: nouveauStatut } : item,
+    item.id === id ? { ...item, status: nouveauStatut, sessionCourses } : item,
   );
 
   await ecrireEtatDemo(state);

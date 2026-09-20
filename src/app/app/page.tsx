@@ -16,6 +16,7 @@ import {
   supprimerListeNommee,
 } from "@/lib/courses/actions";
 import { premierJourDuMois } from "@/lib/courses/rythme";
+import { calculerSessionActive } from "@/lib/courses/session";
 import { CoursesDashboard } from "@/components/courses-dashboard";
 import { avatarSrc } from "@/lib/avatars";
 
@@ -53,14 +54,14 @@ export default async function AppHomePage({
   const [{ data: itemsAAcheter }, { data: itemsAchetesCeMois }] = await Promise.all([
     supabase
       .from("items")
-      .select("id, label, detail, price, quantity, status, prix_source, liste_nom")
+      .select("id, label, detail, price, quantity, status, prix_source, liste_nom, session_courses")
       .eq("user_id", user.id)
       .eq("status", "a_acheter")
       .order("created_at", { ascending: false }),
     periode
       ? supabase
           .from("items")
-          .select("id, label, detail, price, quantity, status, prix_source, liste_nom")
+          .select("id, label, detail, price, quantity, status, prix_source, liste_nom, session_courses, created_at")
           .eq("user_id", user.id)
           .eq("status", "achete")
           .eq("achat_mois", moisISO)
@@ -69,9 +70,24 @@ export default async function AppHomePage({
   ]);
 
   const items = [...(itemsAAcheter ?? []), ...(itemsAchetesCeMois ?? [])].map(
-    (item) => ({ ...item, prixSource: item.prix_source, listeNom: item.liste_nom }),
+    (item) => ({
+      ...item,
+      prixSource: item.prix_source,
+      listeNom: item.liste_nom,
+      sessionCourses: item.session_courses,
+    }),
   );
   const indexCommunautaire = await recupererIndexCommunautaire();
+
+  // "Budget immédiat" : reprend la session utilisée pour le dernier achat
+  // d'aujourd'hui (pour continuer le même passage en caisse), ou en
+  // propose une nouvelle par défaut sinon.
+  const { sessionActive, sessionsAujourdHui } = calculerSessionActive(
+    (itemsAchetesCeMois ?? []).map((item) => ({
+      sessionCourses: item.session_courses,
+      createdAt: item.created_at,
+    })),
+  );
 
   return (
     <main className="flex flex-1 flex-col fond-marche">
@@ -166,6 +182,8 @@ export default async function AppHomePage({
           listePdfHref="/app/export-liste-pdf"
           indexCommunautaire={indexCommunautaire}
           proposerPartagePrix
+          sessionActive={sessionActive}
+          sessionsAujourdHui={sessionsAujourdHui}
         />
       )}
     </main>

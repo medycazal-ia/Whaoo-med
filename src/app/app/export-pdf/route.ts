@@ -31,7 +31,7 @@ export async function GET() {
       .maybeSingle(),
     supabase
       .from("items")
-      .select("label, detail, price, quantity")
+      .select("label, detail, price, quantity, session_courses")
       .eq("user_id", user.id)
       .eq("status", "achete")
       .eq("achat_mois", moisISO)
@@ -43,7 +43,10 @@ export async function GET() {
   const buffer = await renderToBuffer(
     FacturePDF({
       moisLabel,
-      articles: articles ?? [],
+      articles: (articles ?? []).map((article) => ({
+        ...article,
+        session: article.session_courses,
+      })),
       budgetAmount: periode?.budget_amount ?? 0,
     }),
   );

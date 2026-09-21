@@ -11,7 +11,7 @@ export const EDITEUR = {
   siret: "415 073 055 00139",
   capitalSocial: "Non applicable (entreprise individuelle)",
   rcs: "Non applicable (entreprise individuelle, immatriculée au Registre National des Entreprises)",
-  tva: "[À COMPLÉTER : numéro de TVA intracommunautaire, ou \"non applicable, art. 293 B du CGI\" si en franchise en base]",
+  tva: "Non applicable, article 293 B du Code général des impôts (franchise en base de TVA)",
   directeurPublication: "Medy Cazal",
   emailContact: "cazal@medy.site",
 };

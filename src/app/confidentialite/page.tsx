@@ -103,6 +103,38 @@ export default function ConfidentialitePage() {
       </section>
 
       <section className="mt-6">
+        <h2 className="font-heading text-lg font-semibold">Services tiers utilisés par certaines fonctionnalités</h2>
+        <p className="mt-2 text-sm leading-relaxed text-ardoise/80">
+          Certaines fonctionnalités optionnelles envoient une donnée précise
+          à un prestataire externe, uniquement quand tu les utilises
+          activement :
+        </p>
+        <ul className="mt-2 list-disc space-y-2 pl-5 text-sm leading-relaxed text-ardoise/80">
+          <li>
+            <strong>Anthropic (Claude)</strong> : si tu scannes une photo de
+            ticket de caisse, cette photo est envoyée à Anthropic (États-Unis)
+            pour en lire le contenu, puis n&apos;est pas conservée par nos
+            soins au-delà de l&apos;analyse.
+          </li>
+          <li>
+            <strong>OpenAI</strong> : sur les navigateurs qui ne savent pas
+            faire de dictée vocale eux-mêmes (Safari iOS/iPadOS), ta voix
+            enregistrée est envoyée à OpenAI (États-Unis) pour être
+            transcrite en texte.
+          </li>
+          <li>
+            <strong>ElevenLabs</strong> : ton prénom est envoyé à ElevenLabs
+            (États-Unis) à chaque connexion et déconnexion pour générer le
+            message vocal de bienvenue/au revoir.
+          </li>
+        </ul>
+        <p className="mt-2 text-sm leading-relaxed text-ardoise/80">
+          Ces services sont basés hors Union européenne ; nous ne leur
+          transmettons jamais ton nom complet, ton email ou ton mot de passe.
+        </p>
+      </section>
+
+      <section className="mt-6">
         <h2 className="font-heading text-lg font-semibold">Cookies et traceurs</h2>
         <p className="mt-2 text-sm leading-relaxed text-ardoise/80">
           {NOM_APPLICATION} utilise uniquement des cookies strictement

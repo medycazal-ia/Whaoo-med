@@ -5,6 +5,7 @@ import { FAQ, chercherFaq, type QuestionFaq } from "@/lib/faq";
 import { getSpeechRecognition } from "@/lib/voice/speech-recognition";
 
 const EMAIL_CONTACT = "contact@medy.site";
+const EMAIL_SUGGESTIONS = "suggestions@whaoo.site";
 
 /**
  * Lien discret proposé sous chaque réponse de la FAQ, pour que
@@ -132,7 +133,7 @@ export function FaqPanel({ onFermer }: { onFermer: () => void }) {
 
         <div className="flex flex-col gap-2 border-t border-ardoise/10 bg-white p-3">
           <a
-            href={`mailto:${EMAIL_CONTACT}?subject=${encodeURIComponent("Suggestions Whaoo")}`}
+            href={`mailto:${EMAIL_SUGGESTIONS}?subject=${encodeURIComponent("Suggestions Whaoo")}`}
             className="rounded-lg bg-basilic px-4 py-2 text-center text-sm font-medium text-craie hover:opacity-90"
           >
             ✉️ Envoyer une suggestion

@@ -12,7 +12,10 @@ const VOIX_PAR_DEFAUT = "21m00Tcm4TlvDq8ikWAM";
 
 export async function genererVoix(texte: string): Promise<ArrayBuffer | null> {
   const cle = process.env.ELEVENLABS_API_KEY;
-  if (!cle) return null;
+  if (!cle) {
+    console.error("[voix] ELEVENLABS_API_KEY absente");
+    return null;
+  }
 
   const voixId = process.env.ELEVENLABS_VOICE_ID || VOIX_PAR_DEFAUT;
 
@@ -32,11 +35,18 @@ export async function genererVoix(texte: string): Promise<ArrayBuffer | null> {
         model_id: "eleven_multilingual_v2",
       }),
     });
-  } catch {
+  } catch (erreur) {
+    console.error("[voix] échec réseau vers ElevenLabs :", erreur);
     return null;
   }
 
-  if (!reponse.ok) return null;
+  if (!reponse.ok) {
+    const corps = await reponse.text().catch(() => "");
+    // Journalisé sans jamais renvoyer le détail au client : le corps peut
+    // contenir des informations propres au compte ElevenLabs.
+    console.error(`[voix] ElevenLabs a répondu ${reponse.status} :`, corps.slice(0, 500));
+    return null;
+  }
 
   return reponse.arrayBuffer();
 }

@@ -8,6 +8,7 @@ const ERROR_MESSAGES: Record<string, string> = {
   google: "La connexion avec Google a échoué. Réessaie.",
   oauth: "La connexion a échoué. Réessaie.",
   credentials: "Email ou mot de passe incorrect.",
+  trop_de_tentatives: "Trop de tentatives échouées. Réessaie dans quelques minutes.",
 };
 
 export default async function ConnexionPage({

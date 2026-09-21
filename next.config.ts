@@ -14,7 +14,7 @@ const nextConfig: NextConfig = {
   },
 
   // Durcissement sécurité de base (section 5 du cahier des charges) —
-  // HTTPS est déjà forcé automatiquement par Vercel.
+  // le HTTPS lui-même est déjà forcé automatiquement par Render.
   async headers() {
     return [
       {
@@ -24,6 +24,13 @@ const nextConfig: NextConfig = {
           { key: "X-Frame-Options", value: "DENY" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "Permissions-Policy", value: "microphone=(self), camera=(self)" },
+          // Force le navigateur à toujours utiliser HTTPS pour whaoo.site
+          // pendant un an, y compris pour les sous-domaines, même si un
+          // lien ou un favori pointe encore vers du http://.
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=31536000; includeSubDomains",
+          },
         ],
       },
     ];

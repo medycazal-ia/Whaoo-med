@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { connexionLimitee, enregistrerTentativeEchouee } from "@/lib/auth/rate-limit";
 
 function safeRedirectTarget(raw: FormDataEntryValue | null): string {
   const value = typeof raw === "string" ? raw : "";
@@ -13,10 +14,19 @@ export async function signInWithPassword(formData: FormData): Promise<void> {
   const password = String(formData.get("password") ?? "");
   const redirectTo = safeRedirectTarget(formData.get("redirectTo"));
 
+  // Clé de limitation insensible à la casse/aux espaces, pour qu'on ne
+  // puisse pas la contourner en variant "Test@x.com" / "test@x.com ".
+  const cleLimite = email.trim().toLowerCase();
+
+  if (cleLimite && (await connexionLimitee(cleLimite))) {
+    redirect(`/connexion?error=trop_de_tentatives&redirectTo=${encodeURIComponent(redirectTo)}`);
+  }
+
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
+    if (cleLimite) await enregistrerTentativeEchouee(cleLimite);
     redirect(`/connexion?error=credentials&redirectTo=${encodeURIComponent(redirectTo)}`);
   }
 

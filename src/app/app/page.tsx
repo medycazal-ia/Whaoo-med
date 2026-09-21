@@ -2,7 +2,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { signOut } from "@/lib/auth/actions";
+import { AccueilVocal } from "@/components/accueil-vocal";
+import { BoutonDeconnexion } from "@/components/bouton-deconnexion";
 import {
   ajouterArticle,
   ajouterArticleAvecRetour,
@@ -105,6 +106,7 @@ export default async function AppHomePage({
           <h1 className="truncate font-heading text-base font-semibold text-craie sm:text-xl">
             Bonjour {profile?.prenom ?? ""}
           </h1>
+          <AccueilVocal prenom={profile?.prenom ?? ""} />
         </div>
         <div className="flex shrink-0 items-center gap-1 sm:gap-2">
           <Link
@@ -123,16 +125,10 @@ export default async function AppHomePage({
             <span aria-hidden className="sm:hidden">⚙️</span>
             <span className="hidden sm:inline">Paramètres</span>
           </Link>
-          <form action={signOut}>
-            <button
-              type="submit"
-              title="Se déconnecter"
-              className="rounded-lg border border-craie/30 px-2 py-1.5 text-xs text-craie hover:bg-craie/10 sm:px-3 sm:text-sm"
-            >
-              <span aria-hidden className="sm:hidden">🚪</span>
-              <span className="hidden sm:inline">Se déconnecter</span>
-            </button>
-          </form>
+          <BoutonDeconnexion
+            prenom={profile?.prenom ?? ""}
+            className="rounded-lg border border-craie/30 px-2 py-1.5 text-xs text-craie hover:bg-craie/10 sm:px-3 sm:text-sm disabled:opacity-60"
+          />
         </div>
       </header>
 

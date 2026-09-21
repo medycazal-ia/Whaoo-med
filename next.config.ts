@@ -31,6 +31,45 @@ const nextConfig: NextConfig = {
             key: "Strict-Transport-Security",
             value: "max-age=31536000; includeSubDomains",
           },
+          // Restreint les origines autorisées à charger/exécuter sur la
+          // page — limite les dégâts d'une éventuelle faille XSS. 'self'
+          // uniquement partout : l'app n'appelle aucune API tierce
+          // directement depuis le navigateur (ElevenLabs/Claude/OpenAI
+          // sont appelés côté serveur, via nos propres routes /api/*), les
+          // polices sont auto-hébergées par next/font, et les avatars sont
+          // des SVG locaux.
+          //
+          // 'unsafe-inline' sur script-src ET style-src (et pas une CSP à
+          // base de nonce, plus stricte) : testé en conditions réelles —
+          // un nonce casse toutes les pages statiques/pré-générées au
+          // build (mentions légales, CGU, pitch, pages de partage), qui ne
+          // passent jamais par le serveur au moment de la requête et ne
+          // peuvent donc jamais recevoir de nonce frais. Next.js a aussi
+          // besoin d'exécuter ses propres scripts d'hydratation inline, et
+          // les quelques style={{...}} calculés dynamiquement (curseur de
+          // taille de texte, position glissée à la souris) sont des
+          // attributs inline jamais nonçables.
+          {
+            key: "Content-Security-Policy",
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline'",
+              "style-src 'self' 'unsafe-inline'",
+              "img-src 'self' data:",
+              "font-src 'self'",
+              // blob: pour la lecture du son de bienvenue/au revoir généré
+              // à la volée (URL.createObjectURL sur le résultat de
+              // /api/voix).
+              "media-src 'self' blob:",
+              "connect-src 'self'",
+              "worker-src 'self'",
+              "manifest-src 'self'",
+              "object-src 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
+              "frame-ancestors 'none'",
+            ].join("; "),
+          },
         ],
       },
     ];

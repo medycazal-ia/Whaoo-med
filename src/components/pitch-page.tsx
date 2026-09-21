@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { LANGUES_PITCH, type LangPitch, type ContenuPitch } from "@/lib/pitch-content";
 
-const EMAIL_CONTACT = "contact@medy.site";
+const EMAIL_CONTACT = "cazal@medy.site";
 
 export function PitchPage({ lang, contenu }: { lang: LangPitch; contenu: ContenuPitch }) {
   return (

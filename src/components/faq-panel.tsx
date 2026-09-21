@@ -4,7 +4,7 @@ import { useState } from "react";
 import { FAQ, chercherFaq, type QuestionFaq } from "@/lib/faq";
 import { getSpeechRecognition } from "@/lib/voice/speech-recognition";
 
-const EMAIL_CONTACT = "contact@medy.site";
+const EMAIL_CONTACT = "cazal@medy.site";
 const EMAIL_SUGGESTIONS = "suggestions@whaoo.site";
 
 /**

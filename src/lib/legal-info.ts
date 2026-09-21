@@ -13,7 +13,7 @@ export const EDITEUR = {
   rcs: "Non applicable (entreprise individuelle, immatriculée au Registre National des Entreprises)",
   tva: "[À COMPLÉTER : numéro de TVA intracommunautaire, ou \"non applicable, art. 293 B du CGI\" si en franchise en base]",
   directeurPublication: "Medy Cazal",
-  emailContact: "contact@medy.site",
+  emailContact: "cazal@medy.site",
 };
 
 export const HEBERGEUR = {

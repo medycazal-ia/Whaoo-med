@@ -140,7 +140,7 @@ export const FAQ: QuestionFaq[] = [
   {
     id: "contacter-fondateur",
     question: "Comment contacter le fondateur de whaoo ?",
-    reponse: "Par email à contact@medy.site — n'hésite pas à écrire directement.",
+    reponse: "Par email à cazal@medy.site — n'hésite pas à écrire directement.",
     motsCles: ["contacter", "fondateur", "email", "medy"],
   },
   {

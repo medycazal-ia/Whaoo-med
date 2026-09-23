@@ -1,17 +1,34 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 import {
   CHAMPS_RECHERCHE,
-  estAdmin,
   estChampRecherche,
+  etatAdmin,
   rechercherProfils,
 } from "@/lib/admin";
+import {
+  deverrouillerBackOffice,
+  modifierProfil,
+  verrouillerBackOffice,
+} from "@/lib/admin-actions";
 
 export const metadata: Metadata = {
   title: "Back-office — whaoo",
   robots: { index: false, follow: false },
+};
+
+const MESSAGES_ERREUR: Record<string, string> = {
+  mot_de_passe: "Mot de passe incorrect.",
+  trop_de_tentatives: "Trop de tentatives échouées. Réessaie dans quelques minutes.",
+  non_configure: "Le mot de passe du back-office n'est pas encore configuré (variable ADMIN_PASSWORD sur Render).",
+  nom_invalide: "Le prénom et le nom sont obligatoires (100 caractères maximum).",
+  telephone_invalide: "Numéro de téléphone invalide (chiffres, espaces, +, -, points et parenthèses uniquement).",
+  email_invalide: "Adresse email invalide.",
+  email_deja_utilise: "Cette adresse email est déjà utilisée par un autre compte.",
+  email_echec: "L'email n'a pas pu être modifié. Réessaie.",
+  profil_introuvable: "Profil introuvable.",
+  enregistrement: "L'enregistrement a échoué. Réessaie.",
 };
 
 function formaterDate(iso: string): string {
@@ -22,35 +39,84 @@ function formaterDate(iso: string): string {
   });
 }
 
+function EnTete({ deverrouille }: { deverrouille: boolean }) {
+  return (
+    <header className="flex items-center gap-3 bg-gradient-to-r from-kaki to-basilic px-3 py-3 sm:px-6 sm:py-4">
+      <Link href="/app" className="text-sm text-craie/70 hover:text-craie">
+        ← Retour
+      </Link>
+      <h1 className="flex-1 font-heading text-xl font-semibold text-craie">Back-office</h1>
+      {deverrouille && (
+        <form action={verrouillerBackOffice}>
+          <button
+            type="submit"
+            className="rounded-lg border border-craie/30 px-2 py-1.5 text-xs text-craie hover:bg-craie/10 sm:px-3 sm:text-sm"
+          >
+            🔒 Verrouiller
+          </button>
+        </form>
+      )}
+    </header>
+  );
+}
+
+const CHAMP_SAISIE = "rounded-lg border border-ardoise/20 px-3 py-2 text-sm text-ardoise";
+
 export default async function AdminPage({
   searchParams,
 }: {
-  searchParams: Promise<{ champ?: string; q?: string }>;
+  searchParams: Promise<{ champ?: string; q?: string; ok?: string; erreur?: string; id?: string }>;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) redirect("/connexion");
+  const etat = await etatAdmin();
+  if (etat.statut === "non_connecte") redirect("/connexion");
   // Page introuvable pour tout autre compte : on ne révèle pas son existence.
-  if (!estAdmin(user.email)) notFound();
+  if (etat.statut === "non_admin") notFound();
 
-  const { champ: champBrut, q = "" } = await searchParams;
+  const { champ: champBrut, q = "", ok, erreur, id: idErreur } = await searchParams;
+  const messageErreur = erreur ? (MESSAGES_ERREUR[erreur] ?? "Une erreur est survenue.") : null;
+
+  if (etat.statut === "verrouille") {
+    return (
+      <main className="flex flex-1 flex-col fond-marche">
+        <EnTete deverrouille={false} />
+        <section className="mx-auto w-full max-w-sm px-4 py-10">
+          <form action={deverrouillerBackOffice} className="flex flex-col gap-3 rounded-2xl bg-white p-6">
+            <h2 className="font-heading text-lg font-semibold text-ardoise">🔐 Accès protégé</h2>
+            <p className="text-sm text-ardoise/70">
+              Saisis le mot de passe du back-office pour continuer.
+            </p>
+            {messageErreur && (
+              <p className="rounded-lg bg-tomate/10 px-3 py-2 text-sm text-tomate">{messageErreur}</p>
+            )}
+            <input
+              type="password"
+              name="mot_de_passe"
+              required
+              autoFocus
+              autoComplete="current-password"
+              className={CHAMP_SAISIE}
+            />
+            <button
+              type="submit"
+              className="rounded-lg bg-ardoise px-4 py-2 text-sm font-medium text-craie hover:bg-ardoise-light"
+            >
+              Déverrouiller
+            </button>
+          </form>
+        </section>
+      </main>
+    );
+  }
+
   const champ = estChampRecherche(champBrut) ? champBrut : null;
   const recherche = champ !== null && q.trim() !== "";
 
-  const { profils, total } = await rechercherProfils(user.email, champ, q);
+  const { profils, total } = await rechercherProfils(champ, q);
   const libelleChamp = CHAMPS_RECHERCHE.find((c) => c.id === champ)?.label;
 
   return (
     <main className="flex flex-1 flex-col fond-marche">
-      <header className="flex items-center gap-3 bg-gradient-to-r from-kaki to-basilic px-3 py-3 sm:px-6 sm:py-4">
-        <Link href="/app" className="text-sm text-craie/70 hover:text-craie">
-          ← Retour
-        </Link>
-        <h1 className="font-heading text-xl font-semibold text-craie">Back-office</h1>
-      </header>
+      <EnTete deverrouille />
 
       {/* Chaque outil est une carte de cette grille : pour une nouvelle
           action, ajouter une carte à la suite de "Profils". */}
@@ -68,7 +134,7 @@ export default async function AdminPage({
               name="q"
               defaultValue={q}
               placeholder="Tape un nom, un prénom, un numéro ou un email…"
-              className="rounded-lg border border-ardoise/20 px-3 py-2 text-sm text-ardoise"
+              className={CHAMP_SAISIE}
             />
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
               {CHAMPS_RECHERCHE.map((c) => (
@@ -89,6 +155,10 @@ export default async function AdminPage({
             </div>
           </form>
 
+          {messageErreur && !idErreur && (
+            <p className="mt-4 rounded-lg bg-tomate/10 px-3 py-2 text-sm text-tomate">{messageErreur}</p>
+          )}
+
           <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-sm text-ardoise/70">
             <p>
               {recherche
@@ -108,33 +178,84 @@ export default async function AdminPage({
             </p>
           ) : (
             <ul className="mt-3 flex flex-col divide-y divide-ardoise/10">
-              {profils.map((p) => (
-                <li key={p.id} className="flex flex-col gap-1 py-3 sm:flex-row sm:items-center sm:gap-4">
-                  <div className="min-w-0 sm:w-48">
-                    <p className="truncate font-medium text-ardoise">
-                      {p.prenom} {p.nom}
-                    </p>
-                    <p className="text-xs text-ardoise/50">Inscrit le {formaterDate(p.created_at)}</p>
-                  </div>
-                  <div className="flex min-w-0 flex-1 flex-col gap-0.5 text-sm sm:flex-row sm:gap-4">
-                    {p.email ? (
-                      <a href={`mailto:${p.email}`} className="truncate text-basilic underline underline-offset-2">
-                        {p.email}
-                      </a>
-                    ) : (
-                      <span className="text-ardoise/40">Email inconnu</span>
+              {profils.map((p) => {
+                const erreurIci = idErreur === p.id ? messageErreur : null;
+                const modifieIci = ok === p.id;
+                return (
+                  <li key={p.id} className="py-3">
+                    <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4">
+                      <div className="min-w-0 sm:w-48">
+                        <p className="truncate font-medium text-ardoise">
+                          {p.prenom} {p.nom}
+                        </p>
+                        <p className="text-xs text-ardoise/50">Inscrit le {formaterDate(p.created_at)}</p>
+                      </div>
+                      <div className="flex min-w-0 flex-1 flex-col gap-0.5 text-sm sm:flex-row sm:gap-4">
+                        {p.email ? (
+                          <a href={`mailto:${p.email}`} className="truncate text-basilic underline underline-offset-2">
+                            {p.email}
+                          </a>
+                        ) : (
+                          <span className="text-ardoise/40">Email inconnu</span>
+                        )}
+                        {p.telephone ? (
+                          <a href={`tel:${p.telephone.replace(/\s/g, "")}`} className="text-ardoise underline underline-offset-2">
+                            {p.telephone}
+                          </a>
+                        ) : (
+                          <span className="text-ardoise/40">Pas de téléphone</span>
+                        )}
+                      </div>
+                      <p className="text-xs text-ardoise/50">Code {p.referral_code}</p>
+                    </div>
+
+                    {modifieIci && (
+                      <p className="mt-2 rounded-lg bg-basilic/10 px-3 py-2 text-sm text-basilic">
+                        ✓ Profil mis à jour.
+                      </p>
                     )}
-                    {p.telephone ? (
-                      <a href={`tel:${p.telephone.replace(/\s/g, "")}`} className="text-ardoise underline underline-offset-2">
-                        {p.telephone}
-                      </a>
-                    ) : (
-                      <span className="text-ardoise/40">Pas de téléphone</span>
-                    )}
-                  </div>
-                  <p className="text-xs text-ardoise/50">Code {p.referral_code}</p>
-                </li>
-              ))}
+
+                    <details open={erreurIci !== null} className="mt-2">
+                      <summary className="cursor-pointer text-sm text-ardoise/60 hover:text-ardoise">
+                        ✏️ Modifier
+                      </summary>
+                      <form action={modifierProfil} className="mt-3 grid gap-3 rounded-xl bg-ardoise/5 p-3 sm:grid-cols-2">
+                        <input type="hidden" name="id" value={p.id} />
+                        <input type="hidden" name="retour_champ" value={champ ?? ""} />
+                        <input type="hidden" name="retour_q" value={q} />
+                        <label className="flex flex-col gap-1 text-xs text-ardoise/70">
+                          Prénom
+                          <input name="prenom" defaultValue={p.prenom} required className={CHAMP_SAISIE} />
+                        </label>
+                        <label className="flex flex-col gap-1 text-xs text-ardoise/70">
+                          Nom
+                          <input name="nom" defaultValue={p.nom} required className={CHAMP_SAISIE} />
+                        </label>
+                        <label className="flex flex-col gap-1 text-xs text-ardoise/70">
+                          Téléphone
+                          <input name="telephone" type="tel" defaultValue={p.telephone ?? ""} className={CHAMP_SAISIE} />
+                        </label>
+                        <label className="flex flex-col gap-1 text-xs text-ardoise/70">
+                          Email (identifiant de connexion)
+                          <input name="email" type="email" defaultValue={p.email ?? ""} required className={CHAMP_SAISIE} />
+                        </label>
+                        {erreurIci && (
+                          <p className="rounded-lg bg-tomate/10 px-3 py-2 text-sm text-tomate sm:col-span-2">{erreurIci}</p>
+                        )}
+                        <p className="text-xs text-ardoise/50 sm:col-span-2">
+                          Changer l&apos;email change aussi l&apos;adresse avec laquelle cette personne se connecte.
+                        </p>
+                        <button
+                          type="submit"
+                          className="rounded-lg bg-ardoise px-4 py-2 text-sm font-medium text-craie hover:bg-ardoise-light sm:col-span-2 sm:justify-self-start"
+                        >
+                          Enregistrer
+                        </button>
+                      </form>
+                    </details>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </div>

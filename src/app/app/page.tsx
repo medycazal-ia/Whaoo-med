@@ -21,6 +21,7 @@ import { premierJourDuMois } from "@/lib/courses/rythme";
 import { calculerSessionActive } from "@/lib/courses/session";
 import { CoursesDashboard } from "@/components/courses-dashboard";
 import { avatarSrc } from "@/lib/avatars";
+import { estAdmin } from "@/lib/admin";
 
 export default async function AppHomePage({
   searchParams,
@@ -109,6 +110,16 @@ export default async function AppHomePage({
           <AccueilVocal prenom={profile?.prenom ?? ""} />
         </div>
         <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+          {estAdmin(user.email) && (
+            <Link
+              href="/app/admin"
+              title="Back-office"
+              className="rounded-lg border border-craie/30 px-2 py-1.5 text-xs text-craie hover:bg-craie/10 sm:px-3 sm:text-sm"
+            >
+              <span aria-hidden className="sm:hidden">🛠️</span>
+              <span className="hidden sm:inline">Back-office</span>
+            </Link>
+          )}
           <Link
             href="/app/parrainage"
             title="Parrainage"

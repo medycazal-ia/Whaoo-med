@@ -12,6 +12,7 @@ import {
   modifierProfil,
   verrouillerBackOffice,
 } from "@/lib/admin-actions";
+import { BoutonConfirmation } from "@/components/bouton-confirmation";
 
 export const metadata: Metadata = {
   title: "Back-office — whaoo",
@@ -119,7 +120,8 @@ export default async function AdminPage({
       <EnTete deverrouille />
 
       {/* Chaque outil est une carte de cette grille : pour une nouvelle
-          action, ajouter une carte à la suite de "Profils". */}
+          action, ajouter une carte à la suite de "Profils". Toute action
+          qui modifie la base passe par <BoutonConfirmation>. */}
       <section className="mx-auto grid w-full max-w-lg gap-6 px-4 py-6 sm:px-6 md:max-w-2xl lg:max-w-5xl lg:grid-cols-2">
         <div className="rounded-2xl bg-white p-5 lg:col-span-2">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -225,19 +227,33 @@ export default async function AdminPage({
                         <input type="hidden" name="retour_q" value={q} />
                         <label className="flex flex-col gap-1 text-xs text-ardoise/70">
                           Prénom
-                          <input name="prenom" defaultValue={p.prenom} required className={CHAMP_SAISIE} />
+                          <input name="prenom" data-libelle="Prénom" defaultValue={p.prenom} required className={CHAMP_SAISIE} />
                         </label>
                         <label className="flex flex-col gap-1 text-xs text-ardoise/70">
                           Nom
-                          <input name="nom" defaultValue={p.nom} required className={CHAMP_SAISIE} />
+                          <input name="nom" data-libelle="Nom" defaultValue={p.nom} required className={CHAMP_SAISIE} />
                         </label>
                         <label className="flex flex-col gap-1 text-xs text-ardoise/70">
                           Téléphone
-                          <input name="telephone" type="tel" defaultValue={p.telephone ?? ""} className={CHAMP_SAISIE} />
+                          <input
+                            name="telephone"
+                            type="tel"
+                            data-libelle="Téléphone"
+                            defaultValue={p.telephone ?? ""}
+                            className={CHAMP_SAISIE}
+                          />
                         </label>
                         <label className="flex flex-col gap-1 text-xs text-ardoise/70">
                           Email (identifiant de connexion)
-                          <input name="email" type="email" defaultValue={p.email ?? ""} required className={CHAMP_SAISIE} />
+                          <input
+                            name="email"
+                            type="email"
+                            data-libelle="Email"
+                            data-avertissement={`${p.prenom} devra désormais se connecter avec la nouvelle adresse email.`}
+                            defaultValue={p.email ?? ""}
+                            required
+                            className={CHAMP_SAISIE}
+                          />
                         </label>
                         {erreurIci && (
                           <p className="rounded-lg bg-tomate/10 px-3 py-2 text-sm text-tomate sm:col-span-2">{erreurIci}</p>
@@ -245,12 +261,13 @@ export default async function AdminPage({
                         <p className="text-xs text-ardoise/50 sm:col-span-2">
                           Changer l&apos;email change aussi l&apos;adresse avec laquelle cette personne se connecte.
                         </p>
-                        <button
-                          type="submit"
-                          className="rounded-lg bg-ardoise px-4 py-2 text-sm font-medium text-craie hover:bg-ardoise-light sm:col-span-2 sm:justify-self-start"
+                        <BoutonConfirmation
+                          titre="Confirmer la modification ?"
+                          sujet={`le profil de ${p.prenom} ${p.nom}`}
+                          className="rounded-lg bg-ardoise px-4 py-2 text-sm font-medium text-craie hover:bg-ardoise-light disabled:opacity-60 sm:col-span-2 sm:justify-self-start"
                         >
                           Enregistrer
-                        </button>
+                        </BoutonConfirmation>
                       </form>
                     </details>
                   </li>

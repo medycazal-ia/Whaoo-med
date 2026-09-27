@@ -142,6 +142,14 @@ export default function ConfidentialitePage() {
           connectée). Aucun cookie publicitaire ou de mesure d&apos;audience
           tiers n&apos;est utilisé à ce jour.
         </p>
+        <p className="mt-2 text-sm leading-relaxed text-ardoise/80">
+          Seule exception, à ton initiative : la page d&apos;accueil propose
+          d&apos;afficher une publication Facebook. Elle n&apos;est chargée que
+          si tu cliques sur &quot;Voir la publication&quot; ; Facebook (Meta,
+          États-Unis) peut alors déposer ses propres cookies, selon sa
+          propre politique de confidentialité. Sans ce clic, aucun contenu
+          Facebook n&apos;est chargé.
+        </p>
       </section>
 
       <section className="mt-6">

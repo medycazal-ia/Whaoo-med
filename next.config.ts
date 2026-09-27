@@ -62,6 +62,9 @@ const nextConfig: NextConfig = {
               // /api/voix).
               "media-src 'self' blob:",
               "connect-src 'self'",
+              // Publication Facebook de la page d'accueil, chargée
+              // seulement après un clic du visiteur.
+              "frame-src https://www.facebook.com",
               "worker-src 'self'",
               "manifest-src 'self'",
               "object-src 'none'",

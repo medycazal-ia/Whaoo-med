@@ -3,6 +3,7 @@ import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { BoutonInstaller } from "@/components/bouton-installer";
 import { VideoExplicative } from "@/components/video-explicative";
+import { PublicationFacebook } from "@/components/publication-facebook";
 
 const ARGUMENTS = [
   {
@@ -126,6 +127,10 @@ export default async function Home({
             <p className="text-sm text-ardoise/70">{arg.texte}</p>
           </div>
         ))}
+      </section>
+
+      <section className="px-4 sm:px-6 pb-16">
+        <PublicationFacebook />
       </section>
 
       {supportLinkUrl && (

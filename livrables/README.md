@@ -16,6 +16,8 @@
 - `outils/modele-rangement-drive.html` : modèle réutilisable du script
   Google Apps Script de rangement automatique d'un dossier Drive par projet
   (champs à adapter surlignés en orange, script généré et copiable).
-- `video-soutien/` : sources de la vidéo « Soutiens whaoo » (intro avatar,
-  message dit avec la voix clonée de Medy sur ElevenLabs, sous-titres ASS,
-  carton de fin). Vidéo finale : `public/videos/whaoo-soutien.mp4`.
+- `video-soutien/` : sources de la vidéo « Soutiens whaoo » : intro avatar,
+  avatar animé par Arcads (OmniHuman, 800 crédits, image sans le son),
+  message dit avec la voix clonée de Medy sur ElevenLabs (remis par-dessus
+  l'animation), sous-titres ASS, fond dégradé et masque du cadre arrondi,
+  carton de fin. Vidéo finale : `public/videos/whaoo-soutien.mp4`.

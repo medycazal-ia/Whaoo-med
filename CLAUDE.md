@@ -37,14 +37,12 @@ demander à Medy le zip correspondant et suivre son
 
 ## Demandes en attente (à traiter en début de session suivante)
 
-- **Arcads** : Medy ajoute le connecteur MCP Arcads (https://mcp.arcads.ai).
-  Objectif : refaire la vidéo « Soutiens whaoo » avec Arcads (16:9 pour
-  l'appli, et une version 9:16 en Reel), script dans
-  `livrables/video-soutien/` (message.ass), puis remettre sous-titres et
-  carton de fin de 3,5 s (`DUREE_CARTON_FIN` dans
-  `src/components/soutien-video.tsx`) et remplacer
-  `public/videos/whaoo-soutien.mp4`. Voix de Medy : voix clonée ElevenLabs
-  « Homme francais 56 ans ».
+- **Arcads** : connecteur MCP ajouté. Vidéo « Soutiens whaoo » refaite le
+  2026-09-28 (OmniHuman : avatar figurine animé sur la voix de Medy, 800
+  crédits sur 8 000/mois, offre Starter). Méthode et sources dans
+  `livrables/video-soutien/`. Reste à faire si Medy le demande : version
+  9:16 en Reel. Règle : toujours annoncer le coût et obtenir l'accord de
+  Medy avant toute génération payante (Arcads, ElevenLabs…).
 
 - **Stripe** : contribution libre faite le 2026-09-28, en mode test
   (lien de paiement à montant libre, variable `STRIPE_SUPPORT_LINK_URL` sur

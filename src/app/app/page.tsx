@@ -104,7 +104,7 @@ export default async function AppHomePage({
 
   return (
     <main className="flex flex-1 flex-col fond-marche">
-      <header className="flex flex-wrap items-center justify-between gap-2 bg-gradient-to-r from-kaki to-basilic px-3 py-3 sm:px-6 sm:py-4">
+      <header className="flex flex-wrap items-center justify-between gap-2 bg-gradient-to-r from-menthe to-rose px-3 py-3 sm:px-6 sm:py-4">
         <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           <Image
             src={avatarSrc(profile?.avatar_id)}
@@ -113,7 +113,7 @@ export default async function AppHomePage({
             height={36}
             className="h-8 w-8 shrink-0 rounded-full sm:h-9 sm:w-9"
           />
-          <h1 className="truncate font-heading text-base font-semibold text-craie sm:text-xl">
+          <h1 className="truncate font-heading text-base font-semibold text-ardoise sm:text-xl">
             Bonjour {profile?.prenom ?? ""}
           </h1>
           <AccueilVocal prenom={profile?.prenom ?? ""} />
@@ -123,7 +123,7 @@ export default async function AppHomePage({
             <Link
               href="/app/admin"
               title="Back-office"
-              className="rounded-lg border border-craie/30 px-2 py-1.5 text-xs text-craie hover:bg-craie/10 sm:px-3 sm:text-sm"
+              className="rounded-lg border border-ardoise/20 px-2 py-1.5 text-xs text-ardoise hover:bg-ardoise/5 sm:px-3 sm:text-sm"
             >
               <span aria-hidden className="sm:hidden">🛠️</span>
               <span className="hidden sm:inline">Back-office</span>
@@ -132,7 +132,7 @@ export default async function AppHomePage({
           <Link
             href="/app/parrainage"
             title="Parrainage"
-            className="rounded-lg border border-craie/30 px-2 py-1.5 text-xs text-craie hover:bg-craie/10 sm:px-3 sm:text-sm"
+            className="rounded-lg border border-ardoise/20 px-2 py-1.5 text-xs text-ardoise hover:bg-ardoise/5 sm:px-3 sm:text-sm"
           >
             <span aria-hidden className="sm:hidden">🎁</span>
             <span className="hidden sm:inline">Parrainage</span>
@@ -140,14 +140,14 @@ export default async function AppHomePage({
           <Link
             href="/app/parametres"
             title="Paramètres"
-            className="rounded-lg border border-craie/30 px-2 py-1.5 text-xs text-craie hover:bg-craie/10 sm:px-3 sm:text-sm"
+            className="rounded-lg border border-ardoise/20 px-2 py-1.5 text-xs text-ardoise hover:bg-ardoise/5 sm:px-3 sm:text-sm"
           >
             <span aria-hidden className="sm:hidden">⚙️</span>
             <span className="hidden sm:inline">Paramètres</span>
           </Link>
           <BoutonDeconnexion
             prenom={profile?.prenom ?? ""}
-            className="rounded-lg border border-craie/30 px-2 py-1.5 text-xs text-craie hover:bg-craie/10 sm:px-3 sm:text-sm disabled:opacity-60"
+            className="rounded-lg border border-ardoise/20 px-2 py-1.5 text-xs text-ardoise hover:bg-ardoise/5 sm:px-3 sm:text-sm disabled:opacity-60"
           />
         </div>
       </header>
@@ -157,7 +157,7 @@ export default async function AppHomePage({
           <h2 className="font-heading text-lg font-semibold text-ardoise">
             Nouvelle période, quel budget ?
           </h2>
-          <p className="mt-1 text-sm text-ardoise/70">
+          <p className="mt-1 text-sm text-ardoise/75">
             Indique ton budget pour la période {libellePeriode(debut)}. La
             période précédente reste consultable dans ton historique.
           </p>

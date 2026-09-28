@@ -5,7 +5,7 @@ export default function LienEnvoyePage() {
         <h1 className="font-heading text-2xl font-semibold text-ardoise">
           Email envoyé
         </h1>
-        <p className="mt-2 text-sm text-ardoise/70">
+        <p className="mt-2 text-sm text-ardoise/75">
           Si un compte existe avec cet email, un lien de réinitialisation
           vient d&apos;être envoyé.
         </p>

@@ -133,7 +133,7 @@ export function AjouterDepuisDocument({
       <button
         type="button"
         onClick={() => setOuvert(true)}
-        className="self-start text-sm text-ardoise/60 underline"
+        className="self-start text-sm text-ardoise/75 underline"
       >
         + Ajouter depuis une recette, un régime ou un document
       </button>
@@ -144,7 +144,7 @@ export function AjouterDepuisDocument({
 
   return (
     <div className="flex flex-col gap-2 rounded-xl border border-ardoise/10 bg-white p-4">
-      <p className="text-sm text-ardoise/70">
+      <p className="text-sm text-ardoise/75">
         Colle le texte d&apos;une recette, d&apos;un régime ou d&apos;une liste
         de courses, importe un fichier (.txt, .pdf) ou une photo (liste
         manuscrite, capture d&apos;écran...) — whaoo repère les articles,
@@ -173,7 +173,7 @@ export function AjouterDepuisDocument({
       />
 
       <div className="flex flex-wrap gap-3">
-        <label className="w-fit cursor-pointer text-sm text-ardoise/60 underline">
+        <label className="w-fit cursor-pointer text-sm text-ardoise/75 underline">
           {chargementFichier ? "Lecture du fichier…" : "📎 Importer un fichier (.txt, .pdf)"}
           <input
             type="file"
@@ -183,7 +183,7 @@ export function AjouterDepuisDocument({
             className="hidden"
           />
         </label>
-        <label className="w-fit cursor-pointer text-sm text-ardoise/60 underline">
+        <label className="w-fit cursor-pointer text-sm text-ardoise/75 underline">
           {analysePhotoEnCours ? "Lecture de la photo…" : "📷 Prendre/importer une photo"}
           <input
             type="file"
@@ -217,7 +217,7 @@ export function AjouterDepuisDocument({
         </div>
       ) : (
         <>
-          <p className="text-xs font-medium text-ambre">
+          <p className="text-xs font-medium text-rose-fonce">
             Vérifie et décoche ce qui ne t&apos;intéresse pas avant
             d&apos;ajouter :
           </p>
@@ -239,7 +239,7 @@ export function AjouterDepuisDocument({
                     {ingredient.label}
                     {ingredient.detail ? ` (${ingredient.detail})` : ""}
                     {estimation && (
-                      <span className="ml-1 text-xs text-ardoise/50">
+                      <span className="ml-1 text-xs text-ardoise/75">
                         (~{estimation.prix.toFixed(2)} €)
                       </span>
                     )}

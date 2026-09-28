@@ -119,7 +119,7 @@ export function ScannerTicket({
       <button
         type="button"
         onClick={() => setOuvert(true)}
-        className="self-start text-sm text-ardoise/60 underline"
+        className="self-start text-sm text-ardoise/75 underline"
       >
         📷 Scanner un ticket de caisse
       </button>
@@ -128,14 +128,14 @@ export function ScannerTicket({
 
   return (
     <div className="flex flex-col gap-2 rounded-xl border border-ardoise/10 bg-white p-4">
-      <p className="text-sm text-ardoise/70">
+      <p className="text-sm text-ardoise/75">
         Prends une photo de ton ticket de caisse : whaoo lit les prix et les
         ajoute à l&apos;estimation communautaire (anonyme). Selon la
         disponibilité, l&apos;analyse se fait via un service sécurisé
         spécialisé ou directement dans ton navigateur ; dans les deux cas,
         aucune donnée personnelle n&apos;est associée à ta contribution.
       </p>
-      <p className="text-xs text-ardoise/50">
+      <p className="text-xs text-ardoise/75">
         💡 Pour une meilleure lecture : à plat, bien à plat sous une bonne
         lumière, ticket entier dans le cadre, sans reflet.
       </p>
@@ -166,7 +166,7 @@ export function ScannerTicket({
       )}
 
       {statut === "analyse" && (
-        <p className="text-sm text-ardoise/70">
+        <p className="text-sm text-ardoise/75">
           Lecture du ticket en cours…{progression > 0 ? ` ${progression}%` : ""}
         </p>
       )}
@@ -178,7 +178,7 @@ export function ScannerTicket({
             éclairée.
           </p>
           {diagnosticIA && (
-            <p className="text-xs text-ardoise/40">
+            <p className="text-xs text-ardoise/75">
               🔧 Claude non utilisé cette fois : {diagnosticIA}
             </p>
           )}
@@ -195,13 +195,13 @@ export function ScannerTicket({
       {statut === "pret" && (
         <>
           {lignes.length === 0 ? (
-            <p className="text-sm text-ardoise/60">
+            <p className="text-sm text-ardoise/75">
               Aucun prix reconnu sur cette photo — essaie avec un cadrage
               plus net.
             </p>
           ) : (
             <>
-              <p className="text-xs font-medium text-ambre">
+              <p className="text-xs font-medium text-rose-fonce">
                 Vérifie avant d&apos;envoyer (décoche ce qui n&apos;est pas
                 bon) :
               </p>
@@ -256,7 +256,7 @@ export function ScannerTicket({
             </>
           )}
           {diagnosticIA && (
-            <p className="text-xs text-ardoise/40">
+            <p className="text-xs text-ardoise/75">
               🔧 Claude non utilisé cette fois : {diagnosticIA}
             </p>
           )}
@@ -266,7 +266,7 @@ export function ScannerTicket({
                 <button
                   type="button"
                   onClick={() => setAfficherTexteBrut((v) => !v)}
-                  className="text-xs text-ardoise/50 underline"
+                  className="text-xs text-ardoise/75 underline"
                 >
                   {afficherTexteBrut ? "Cacher" : "Voir"} le texte brut
                   détecté (debug)
@@ -286,7 +286,7 @@ export function ScannerTicket({
                 )}
               </div>
               {afficherTexteBrut && (
-                <pre className="mt-1 max-h-64 overflow-auto whitespace-pre-wrap rounded-lg bg-ardoise/5 p-2 text-xs text-ardoise/70">
+                <pre className="mt-1 max-h-64 overflow-auto whitespace-pre-wrap rounded-lg bg-ardoise/5 p-2 text-xs text-ardoise/75">
                   {texteBrut}
                 </pre>
               )}

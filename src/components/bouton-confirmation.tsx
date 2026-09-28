@@ -74,19 +74,19 @@ export function BoutonConfirmation({
           </h3>
 
           {rienAChanger ? (
-            <p className="text-sm text-ardoise/70">
+            <p className="text-sm text-ardoise/75">
               Tu n&apos;as rien changé sur {sujet} : il n&apos;y a rien à enregistrer.
             </p>
           ) : (
             <>
-              <p className="text-sm text-ardoise/70">
+              <p className="text-sm text-ardoise/75">
                 Tu es sur le point de modifier {sujet} :
               </p>
               <ul className="flex flex-col gap-2 rounded-xl bg-white p-3 text-sm">
                 {changements.map((c) => (
                   <li key={c.libelle}>
                     <span className="font-medium">{c.libelle}</span>
-                    <span className="block break-all text-ardoise/60">
+                    <span className="block break-all text-ardoise/75">
                       <span className="line-through">{c.avant}</span> → <span className="text-ardoise">{c.apres}</span>
                     </span>
                   </li>
@@ -95,11 +95,11 @@ export function BoutonConfirmation({
               {changements
                 .filter((c) => c.avertissement)
                 .map((c) => (
-                  <p key={c.libelle} className="rounded-lg bg-ambre/15 px-3 py-2 text-sm text-ardoise">
+                  <p key={c.libelle} className="rounded-lg bg-rose/15 px-3 py-2 text-sm text-ardoise">
                     ⚠️ {c.avertissement}
                   </p>
                 ))}
-              <p className="text-xs text-ardoise/60">
+              <p className="text-xs text-ardoise/75">
                 La modification sera enregistrée immédiatement dans la base de données.
               </p>
             </>

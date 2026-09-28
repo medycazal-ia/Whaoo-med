@@ -6,7 +6,7 @@ export default function ConfidentialitePage() {
       <h1 className="font-heading text-2xl font-semibold">
         Politique de confidentialité
       </h1>
-      <p className="mt-2 text-sm text-ardoise/60">Dernière mise à jour : à compléter à la mise en ligne.</p>
+      <p className="mt-2 text-sm text-ardoise/75">Dernière mise à jour : à compléter à la mise en ligne.</p>
 
       <section className="mt-6">
         <h2 className="font-heading text-lg font-semibold">Responsable du traitement</h2>

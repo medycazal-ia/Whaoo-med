@@ -52,7 +52,7 @@ export function BoutonCorrigerPrixVocal({
       className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border text-sm ${
         ecoute
           ? "border-tomate bg-tomate/10 text-tomate"
-          : "border-ardoise/20 text-ardoise/60 hover:bg-ardoise/5"
+          : "border-ardoise/20 text-ardoise/75 hover:bg-ardoise/5"
       }`}
     >
       🎙️

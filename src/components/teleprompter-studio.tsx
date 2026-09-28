@@ -163,7 +163,7 @@ export function TeleprompterStudio() {
         <h1 className="font-heading text-xl font-semibold text-ardoise">
           🎥 Studio d&apos;enregistrement whaoo
         </h1>
-        <p className="text-sm text-ardoise/60">
+        <p className="text-sm text-ardoise/75">
           Enregistre-toi en train de présenter whaoo, avec un prompteur qui
           défile devant la caméra. Tout reste sur ton appareil — rien n&apos;est
           envoyé où que ce soit.
@@ -240,7 +240,7 @@ export function TeleprompterStudio() {
 
       {camerActive && (
         <div className="flex flex-col gap-3 rounded-xl border border-ardoise/15 bg-white p-3">
-          <div className="flex flex-wrap items-center gap-3 text-xs text-ardoise/70">
+          <div className="flex flex-wrap items-center gap-3 text-xs text-ardoise/75">
             <label className="flex items-center gap-2">
               Vitesse du texte
               <input
@@ -313,7 +313,7 @@ export function TeleprompterStudio() {
             <button
               type="button"
               onClick={arreterCamera}
-              className="rounded-lg px-3 py-2 text-sm text-ardoise/60 hover:text-ardoise"
+              className="rounded-lg px-3 py-2 text-sm text-ardoise/75 hover:text-ardoise"
             >
               Éteindre la caméra
             </button>

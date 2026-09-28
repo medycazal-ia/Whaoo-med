@@ -56,7 +56,7 @@ export function PromotionsLocales() {
       <button
         type="button"
         onClick={() => setOuvert(true)}
-        className="self-start text-sm text-ardoise/60 underline"
+        className="self-start text-sm text-ardoise/75 underline"
       >
         📍 Promotions près de chez moi
       </button>
@@ -67,7 +67,7 @@ export function PromotionsLocales() {
     <div className="flex flex-col gap-2 rounded-xl border border-ardoise/10 bg-white p-4">
       {statut === "idle" && (
         <>
-          <p className="text-sm text-ardoise/70">
+          <p className="text-sm text-ardoise/75">
             Localise-toi pour voir les promotions des supermarchés proches
             (fonctionnalité en préparation). Ta position n&apos;est jamais
             enregistrée, elle sert juste à cet affichage.
@@ -92,12 +92,12 @@ export function PromotionsLocales() {
       )}
 
       {statut === "recherche" && (
-        <p className="text-sm text-ardoise/70">Localisation en cours…</p>
+        <p className="text-sm text-ardoise/75">Localisation en cours…</p>
       )}
 
       {statut === "refuse" && (
         <>
-          <p className="text-sm text-ardoise/60">
+          <p className="text-sm text-ardoise/75">
             Localisation refusée ou indisponible — pas de souci, tu peux
             réessayer à tout moment.
           </p>
@@ -131,7 +131,7 @@ export function PromotionsLocales() {
           <p className="text-sm text-ardoise">
             📍 {ville ? `Position détectée : ${ville}` : "Position détectée"}
           </p>
-          <p className="text-sm text-ardoise/60">
+          <p className="text-sm text-ardoise/75">
             Les promotions des supermarchés de ta zone arrivent bientôt —
             cette partie a besoin d&apos;une vraie source de données
             (partenariat ou API), pas encore branchée. On ne voulait pas

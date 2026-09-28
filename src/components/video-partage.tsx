@@ -80,7 +80,7 @@ export function VideoPartage({
         )}
       </div>
 
-      <p className="text-center text-sm text-ardoise/60">{titre}</p>
+      <p className="text-center text-sm text-ardoise/75">{titre}</p>
 
       {/* Toujours visible, un clic suffit — pas besoin d'attendre la fin de la vidéo */}
       <div className="flex w-full flex-col gap-2 sm:flex-row">

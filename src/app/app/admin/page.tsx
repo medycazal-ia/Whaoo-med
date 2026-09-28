@@ -42,16 +42,16 @@ function formaterDate(iso: string): string {
 
 function EnTete({ deverrouille }: { deverrouille: boolean }) {
   return (
-    <header className="flex items-center gap-3 bg-gradient-to-r from-kaki to-basilic px-3 py-3 sm:px-6 sm:py-4">
-      <Link href="/app" className="text-sm text-craie/70 hover:text-craie">
+    <header className="flex items-center gap-3 bg-gradient-to-r from-menthe to-rose px-3 py-3 sm:px-6 sm:py-4">
+      <Link href="/app" className="text-sm text-ardoise hover:text-ardoise/80">
         ← Retour
       </Link>
-      <h1 className="flex-1 font-heading text-xl font-semibold text-craie">Back-office</h1>
+      <h1 className="flex-1 font-heading text-xl font-semibold text-ardoise">Back-office</h1>
       {deverrouille && (
         <form action={verrouillerBackOffice}>
           <button
             type="submit"
-            className="rounded-lg border border-craie/30 px-2 py-1.5 text-xs text-craie hover:bg-craie/10 sm:px-3 sm:text-sm"
+            className="rounded-lg border border-ardoise/20 px-2 py-1.5 text-xs text-ardoise hover:bg-ardoise/5 sm:px-3 sm:text-sm"
           >
             🔒 Verrouiller
           </button>
@@ -83,7 +83,7 @@ export default async function AdminPage({
         <section className="mx-auto w-full max-w-sm px-4 py-10">
           <form action={deverrouillerBackOffice} className="flex flex-col gap-3 rounded-2xl bg-white p-6">
             <h2 className="font-heading text-lg font-semibold text-ardoise">🔐 Accès protégé</h2>
-            <p className="text-sm text-ardoise/70">
+            <p className="text-sm text-ardoise/75">
               Saisis le mot de passe du back-office pour continuer.
             </p>
             {messageErreur && (
@@ -126,7 +126,7 @@ export default async function AdminPage({
         <div className="rounded-2xl bg-white p-5 lg:col-span-2">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <h2 className="font-heading text-lg font-semibold text-ardoise">👤 Profils</h2>
-            <p className="text-sm text-ardoise/60">
+            <p className="text-sm text-ardoise/75">
               {total} inscrit{total > 1 ? "s" : ""} au total
             </p>
           </div>
@@ -161,7 +161,7 @@ export default async function AdminPage({
             <p className="mt-4 rounded-lg bg-tomate/10 px-3 py-2 text-sm text-tomate">{messageErreur}</p>
           )}
 
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-sm text-ardoise/70">
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-sm text-ardoise/75">
             <p>
               {recherche
                 ? `${profils.length} résultat${profils.length > 1 ? "s" : ""} pour « ${q.trim()} » (${libelleChamp?.toLowerCase()})`
@@ -175,7 +175,7 @@ export default async function AdminPage({
           </div>
 
           {profils.length === 0 ? (
-            <p className="mt-3 rounded-lg bg-ardoise/5 px-3 py-4 text-center text-sm text-ardoise/60">
+            <p className="mt-3 rounded-lg bg-ardoise/5 px-3 py-4 text-center text-sm text-ardoise/75">
               Aucun profil trouvé.
             </p>
           ) : (
@@ -190,7 +190,7 @@ export default async function AdminPage({
                         <p className="truncate font-medium text-ardoise">
                           {p.prenom} {p.nom}
                         </p>
-                        <p className="text-xs text-ardoise/50">Inscrit le {formaterDate(p.created_at)}</p>
+                        <p className="text-xs text-ardoise/75">Inscrit le {formaterDate(p.created_at)}</p>
                       </div>
                       <div className="flex min-w-0 flex-1 flex-col gap-0.5 text-sm sm:flex-row sm:gap-4">
                         {p.email ? (
@@ -198,17 +198,17 @@ export default async function AdminPage({
                             {p.email}
                           </a>
                         ) : (
-                          <span className="text-ardoise/40">Email inconnu</span>
+                          <span className="text-ardoise/75">Email inconnu</span>
                         )}
                         {p.telephone ? (
                           <a href={`tel:${p.telephone.replace(/\s/g, "")}`} className="text-ardoise underline underline-offset-2">
                             {p.telephone}
                           </a>
                         ) : (
-                          <span className="text-ardoise/40">Pas de téléphone</span>
+                          <span className="text-ardoise/75">Pas de téléphone</span>
                         )}
                       </div>
-                      <p className="text-xs text-ardoise/50">Code {p.referral_code}</p>
+                      <p className="text-xs text-ardoise/75">Code {p.referral_code}</p>
                     </div>
 
                     {modifieIci && (
@@ -218,22 +218,22 @@ export default async function AdminPage({
                     )}
 
                     <details open={erreurIci !== null} className="mt-2">
-                      <summary className="cursor-pointer text-sm text-ardoise/60 hover:text-ardoise">
+                      <summary className="cursor-pointer text-sm text-ardoise/75 hover:text-ardoise">
                         ✏️ Modifier
                       </summary>
                       <form action={modifierProfil} className="mt-3 grid gap-3 rounded-xl bg-ardoise/5 p-3 sm:grid-cols-2">
                         <input type="hidden" name="id" value={p.id} />
                         <input type="hidden" name="retour_champ" value={champ ?? ""} />
                         <input type="hidden" name="retour_q" value={q} />
-                        <label className="flex flex-col gap-1 text-xs text-ardoise/70">
+                        <label className="flex flex-col gap-1 text-xs text-ardoise/75">
                           Prénom
                           <input name="prenom" data-libelle="Prénom" defaultValue={p.prenom} required className={CHAMP_SAISIE} />
                         </label>
-                        <label className="flex flex-col gap-1 text-xs text-ardoise/70">
+                        <label className="flex flex-col gap-1 text-xs text-ardoise/75">
                           Nom
                           <input name="nom" data-libelle="Nom" defaultValue={p.nom} required className={CHAMP_SAISIE} />
                         </label>
-                        <label className="flex flex-col gap-1 text-xs text-ardoise/70">
+                        <label className="flex flex-col gap-1 text-xs text-ardoise/75">
                           Téléphone
                           <input
                             name="telephone"
@@ -243,7 +243,7 @@ export default async function AdminPage({
                             className={CHAMP_SAISIE}
                           />
                         </label>
-                        <label className="flex flex-col gap-1 text-xs text-ardoise/70">
+                        <label className="flex flex-col gap-1 text-xs text-ardoise/75">
                           Email (identifiant de connexion)
                           <input
                             name="email"
@@ -258,7 +258,7 @@ export default async function AdminPage({
                         {erreurIci && (
                           <p className="rounded-lg bg-tomate/10 px-3 py-2 text-sm text-tomate sm:col-span-2">{erreurIci}</p>
                         )}
-                        <p className="text-xs text-ardoise/50 sm:col-span-2">
+                        <p className="text-xs text-ardoise/75 sm:col-span-2">
                           Changer l&apos;email change aussi l&apos;adresse avec laquelle cette personne se connecte.
                         </p>
                         <BoutonConfirmation
@@ -278,8 +278,8 @@ export default async function AdminPage({
         </div>
 
         <div className="flex min-h-32 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-ardoise/20 p-5 text-center">
-          <p className="font-heading font-semibold text-ardoise/50">Prochaine action</p>
-          <p className="mt-1 text-sm text-ardoise/40">
+          <p className="font-heading font-semibold text-ardoise/75">Prochaine action</p>
+          <p className="mt-1 text-sm text-ardoise/75">
             Emplacement réservé pour les prochains outils du back-office.
           </p>
         </div>

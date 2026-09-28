@@ -67,7 +67,7 @@ export function BudgetImmediat({
   return (
     <div className="flex flex-col gap-2 rounded-xl border border-ardoise/10 bg-white p-3">
       <div className="flex items-center justify-between gap-2">
-        <p className="text-xs font-medium text-ardoise/50">🛍️ Budget immédiat</p>
+        <p className="text-xs font-medium text-ardoise/75">🛍️ Budget immédiat</p>
         <button
           type="button"
           onClick={() => onChanger(nomSessionParDefaut(new Date(), true))}
@@ -119,7 +119,7 @@ export function BudgetImmediat({
             onClick={dicterNom}
             title="Nommer cette session (ou changer le budget) à voix haute"
             className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border text-sm ${
-              ecoute ? "border-tomate bg-tomate/10 text-tomate" : "border-ardoise/20 text-ardoise/60"
+              ecoute ? "border-tomate bg-tomate/10 text-tomate" : "border-ardoise/20 text-ardoise/75"
             }`}
           >
             🎙️
@@ -137,13 +137,13 @@ export function BudgetImmediat({
 
       {autresSessions.length > 0 && (
         <div className="flex flex-wrap items-center gap-1.5">
-          <span className="text-[11px] text-ardoise/40">Aujourd&apos;hui :</span>
+          <span className="text-[11px] text-ardoise/75">Aujourd&apos;hui :</span>
           {autresSessions.map((nom) => (
             <button
               key={nom}
               type="button"
               onClick={() => onChanger(nom)}
-              className="rounded-full bg-ardoise/5 px-2 py-0.5 text-[11px] text-ardoise/70 hover:bg-ardoise/10"
+              className="rounded-full bg-ardoise/5 px-2 py-0.5 text-[11px] text-ardoise/75 hover:bg-ardoise/10"
             >
               {nom}
             </button>
@@ -151,7 +151,7 @@ export function BudgetImmediat({
         </div>
       )}
 
-      <p className="text-[11px] text-ardoise/40">
+      <p className="text-[11px] text-ardoise/75">
         Chaque article ajouté ou acheté (case cochée, ticket scanné, dicté) est
         rattaché à cette session : elle forme un groupe dans ta liste, puis sa
         propre facturette, comptée dans la facture de la période.

@@ -24,7 +24,7 @@ export default async function ConnexionPage({
         <h1 className="font-heading text-2xl font-semibold text-ardoise">
           Content de te revoir
         </h1>
-        <p className="mt-1 text-sm text-ardoise/70">
+        <p className="mt-1 text-sm text-ardoise/75">
           Connecte-toi pour retrouver tes courses et ton budget.
         </p>
 
@@ -60,7 +60,7 @@ export default async function ConnexionPage({
           </label>
           <Link
             href="/mot-de-passe-oublie"
-            className="self-end text-xs text-ardoise/60 underline"
+            className="self-end text-xs text-ardoise/75 underline"
           >
             Mot de passe oublié ?
           </Link>
@@ -72,7 +72,7 @@ export default async function ConnexionPage({
           </button>
         </form>
 
-        <div className="my-4 flex items-center gap-3 text-xs text-ardoise/40">
+        <div className="my-4 flex items-center gap-3 text-xs text-ardoise/75">
           <span className="h-px flex-1 bg-ardoise/10" />
           ou
           <span className="h-px flex-1 bg-ardoise/10" />
@@ -87,7 +87,7 @@ export default async function ConnexionPage({
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-ardoise/70">
+        <p className="mt-6 text-center text-sm text-ardoise/75">
           Pas encore de compte ?{" "}
           <Link href="/inscription" className="font-medium text-basilic underline">
             Créer un compte
@@ -96,7 +96,7 @@ export default async function ConnexionPage({
 
         <Link
           href="/demo"
-          className="mt-3 block text-center text-sm text-ardoise/60 underline"
+          className="mt-3 block text-center text-sm text-ardoise/75 underline"
         >
           Essayer la démo, sans inscription
         </Link>

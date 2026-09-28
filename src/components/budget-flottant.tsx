@@ -88,7 +88,7 @@ export function BudgetFlottant({
         <span className="font-mono text-sm font-semibold">
           {totalDepense.toFixed(2)} €
         </span>
-        <span className="text-[10px] text-craie/60">
+        <span className="text-[10px] text-craie/90">
           / {budgetAmount.toFixed(2)} € ({pourcentage.toFixed(0)}%)
         </span>
       </div>

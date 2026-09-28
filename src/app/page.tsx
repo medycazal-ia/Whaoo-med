@@ -83,7 +83,7 @@ export default async function Home({
         <h1 className="max-w-lg font-heading text-3xl font-semibold">
           Tes courses, sans les mauvaises surprises en caisse
         </h1>
-        <p className="max-w-md text-ardoise/70">
+        <p className="max-w-md text-ardoise/75">
           Une appli simple qui note tes courses à la voix pendant que tu fais
           tes achats, suit ton budget du mois en temps réel, et te dit quand
           tu peux te faire plaisir — sans tableur, sans y penser.
@@ -108,7 +108,7 @@ export default async function Home({
         {referralCode && (
           <Link
             href={`/inscription?parrain=${referralCode}`}
-            className="text-sm text-ardoise/60 underline"
+            className="text-sm text-ardoise/75 underline"
           >
             Inviter quelqu&apos;un
           </Link>
@@ -124,7 +124,7 @@ export default async function Home({
           >
             <span className="text-2xl">{arg.icon}</span>
             <h2 className="font-heading text-base font-semibold">{arg.titre}</h2>
-            <p className="text-sm text-ardoise/70">{arg.texte}</p>
+            <p className="text-sm text-ardoise/75">{arg.texte}</p>
           </div>
         ))}
       </section>
@@ -135,7 +135,7 @@ export default async function Home({
 
       {supportLinkUrl && (
         <div className="border-t border-ardoise/10 px-4 sm:px-6 py-8 text-center">
-          <p className="mx-auto max-w-md text-sm text-ardoise/70">
+          <p className="mx-auto max-w-md text-sm text-ardoise/75">
             Cette appli est gratuite à l&apos;usage de base et développée
             seule. Si elle te rend service, une contribution libre est
             toujours appréciée —{" "}
@@ -150,13 +150,13 @@ export default async function Home({
           <audio controls preload="none" className="mx-auto mt-3 h-9 max-w-xs">
             <source src="/audio/soutien.mp3" type="audio/mpeg" />
           </audio>
-          <p className="mx-auto mt-1 max-w-md text-xs text-ardoise/40">
+          <p className="mx-auto mt-1 max-w-md text-xs text-ardoise/75">
             🔊 Message vocal (15 secondes)
           </p>
         </div>
       )}
 
-      <footer className="flex flex-wrap justify-center gap-4 border-t border-ardoise/10 px-4 sm:px-6 py-6 text-xs text-ardoise/50">
+      <footer className="flex flex-wrap justify-center gap-4 border-t border-ardoise/10 px-4 sm:px-6 py-6 text-xs text-ardoise/75">
         <Link href="/mentions-legales" className="underline">
           Mentions légales
         </Link>

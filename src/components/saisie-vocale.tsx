@@ -383,8 +383,8 @@ export function SaisieVocale({
   if (brouillonsMultiples) {
     const nbInclus = brouillonsMultiples.filter((b) => b.inclure).length;
     return (
-      <div className="flex flex-col gap-2 rounded-xl border border-ambre/40 bg-ambre/10 p-4">
-        <p className="text-xs font-medium text-ambre">
+      <div className="flex flex-col gap-2 rounded-xl border border-rose/40 bg-rose/10 p-4">
+        <p className="text-xs font-medium text-rose-fonce">
           Plusieurs articles reconnus dans ta phrase — vérifie avant
           d&apos;ajouter :
         </p>
@@ -481,13 +481,13 @@ export function SaisieVocale({
     return (
       <form
         action={ajouterArticleAction}
-        className="flex flex-col gap-2 rounded-xl border border-ambre/40 bg-ambre/10 p-4"
+        className="flex flex-col gap-2 rounded-xl border border-rose/40 bg-rose/10 p-4"
         onSubmit={() => {
           setBrouillon(null);
           setSourcePrix(null);
         }}
       >
-        <p className="text-xs font-medium text-ambre">
+        <p className="text-xs font-medium text-rose-fonce">
           Vérifie avant d&apos;enregistrer — la reconnaissance vocale n&apos;est
           jamais fiable à 100 %
         </p>
@@ -516,7 +516,7 @@ export function SaisieVocale({
               />
             </div>
             {sourcePrix && (
-              <span className="text-xs text-ardoise/50">{LABEL_SOURCE_PRIX[sourcePrix]}</span>
+              <span className="text-xs text-ardoise/75">{LABEL_SOURCE_PRIX[sourcePrix]}</span>
             )}
           </div>
           <input
@@ -538,7 +538,7 @@ export function SaisieVocale({
         <input type="hidden" name="prixSource" value={sourcePrix ?? "manuel"} />
 
         {proposerPartage && (
-          <div className="flex flex-wrap items-center gap-2 text-xs text-ardoise/70">
+          <div className="flex flex-wrap items-center gap-2 text-xs text-ardoise/75">
             <input
               name="enseigne"
               placeholder="Enseigne (optionnel)"
@@ -575,7 +575,7 @@ export function SaisieVocale({
 
   if (nonSupporte) {
     return (
-      <div className="flex flex-col gap-2 rounded-xl border border-ambre/40 bg-ambre/10 p-3 text-sm text-ardoise/80">
+      <div className="flex flex-col gap-2 rounded-xl border border-rose/40 bg-rose/10 p-3 text-sm text-ardoise/80">
         <p>
           La dictée intégrée à whaoo n&apos;est pas disponible sur Safari
           (iPhone/iPad) — c&apos;est une limitation d&apos;Apple, pas de
@@ -598,7 +598,7 @@ export function SaisieVocale({
           </button>
         )}
 
-        <p className="text-xs text-ardoise/60">
+        <p className="text-xs text-ardoise/75">
           💡 Autre solution : dans le champ « Article » ci-dessous, appuie
           sur le petit micro 🎤 du clavier de ton iPhone/iPad pour dicter —
           le texte s&apos;écrit tout seul.
@@ -625,7 +625,7 @@ export function SaisieVocale({
             ? "Analyse en cours…"
             : "🎙️ Parlez-moi"}
       </button>
-      <p className="text-xs text-ardoise/50">
+      <p className="text-xs text-ardoise/75">
         Reste à l&apos;écoute en continu et ajoute chaque article dicté
         automatiquement, jusqu&apos;à ce que tu appuies pour arrêter.
         Fonctionne aussi pour le budget (« change mon budget à 400 euros ») et

@@ -54,12 +54,12 @@ function euros(montant: number): string {
   return `${montant.toFixed(2)} €`;
 }
 
-// Pastilles pensées pour la carte budget au fond sombre (dégradé
-// kaki→ardoise) : un fond clair opaque garantit le contraste, quelle que
+// Pastilles pensées pour la carte budget au fond vert (dégradé
+// basilic→kaki) : un fond clair opaque garantit le contraste, quelle que
 // soit la couleur de statut.
 const STATUT_STYLES: Record<string, string> = {
   serein: "bg-craie text-basilic",
-  vigilant: "bg-craie text-ambre",
+  vigilant: "bg-craie text-rose-fonce",
   attention: "bg-craie text-tomate",
 };
 
@@ -201,12 +201,12 @@ export function CoursesDashboard({
       <BudgetFlottant totalDepense={totalDepense} budgetAmount={budgetAmount} />
 
       <section className="px-4 sm:px-6 pt-6 pb-6">
-        <div className="mx-auto flex max-w-lg md:max-w-2xl lg:max-w-4xl flex-col gap-3 rounded-2xl bg-gradient-to-br from-kaki to-ardoise p-5 shadow-lg">
+        <div className="mx-auto flex max-w-lg md:max-w-2xl lg:max-w-4xl flex-col gap-3 rounded-2xl bg-gradient-to-br from-basilic to-kaki p-5 shadow-lg">
           <div className="flex items-baseline justify-between font-mono text-craie">
             <span className="text-2xl font-semibold">
               {totalDepense.toFixed(2)} €
             </span>
-            <span className="text-sm text-craie/60">
+            <span className="text-sm text-craie">
               / {budgetAmount.toFixed(2)} €
             </span>
           </div>
@@ -223,11 +223,11 @@ export function CoursesDashboard({
           >
             {rythme.statutLabel}
           </span>
-          <p className="text-xs text-craie/70">📅 Période {libellePeriode(debut)}</p>
-          <p className="text-sm text-craie/80">
+          <p className="text-xs text-craie">📅 Période {libellePeriode(debut)}</p>
+          <p className="text-sm text-craie">
             🐷 Cagnotte estimée : <strong>{rythme.cagnotte.toFixed(2)} €</strong>
           </p>
-          <p className="text-xs text-craie/60">{rythme.conseilCagnotte}</p>
+          <p className="text-xs text-craie">{rythme.conseilCagnotte}</p>
         </div>
       </section>
 
@@ -256,7 +256,7 @@ export function CoursesDashboard({
 
       {itemsEnAttente.length > 0 && (
         <section className="mx-auto w-full max-w-lg md:max-w-2xl lg:max-w-4xl px-4 sm:px-6 pt-6">
-          <div className="rounded-xl border border-ambre bg-ambre/15 p-4">
+          <div className="rounded-xl border border-rose bg-rose/15 p-4">
             <div className="flex items-center justify-between gap-2">
               <p className="font-heading text-sm font-semibold text-ardoise">
                 🔔 À ne pas oublier ({itemsEnAttente.length})
@@ -264,7 +264,7 @@ export function CoursesDashboard({
               <button
                 type="button"
                 onClick={() => setRappelsMasques((v) => !v)}
-                className="shrink-0 text-xs text-ardoise/60 underline"
+                className="shrink-0 text-xs text-ardoise/75 underline"
               >
                 {rappelsMasques ? "👁️ Afficher" : "🙈 Masquer"}
               </button>
@@ -283,7 +283,7 @@ export function CoursesDashboard({
                         <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
                           <p className="text-xs font-semibold text-ardoise">
                             🛒 {session}{" "}
-                            <span className="font-normal text-ardoise/60">
+                            <span className="font-normal text-ardoise/75">
                               ({groupe.items.length} · ≈ {euros(groupe.total)})
                             </span>
                           </p>
@@ -291,7 +291,7 @@ export function CoursesDashboard({
                             <button
                               type="button"
                               onClick={() => basculerMasquageListe(cle)}
-                              className="text-xs text-ardoise/60 underline"
+                              className="text-xs text-ardoise/75 underline"
                             >
                               {masquee ? "👁️ Afficher" : "🙈 Masquer"}
                             </button>
@@ -348,13 +348,13 @@ export function CoursesDashboard({
                 {itemsSansSession.length > 0 && (
                   <div className="mt-2">
                     <div className="flex items-center justify-between gap-2">
-                      <p className="text-xs font-medium text-ardoise/50">
+                      <p className="text-xs font-medium text-ardoise/75">
                         Articles seuls ({itemsSansSession.length})
                       </p>
                       <button
                         type="button"
                         onClick={() => setSansNomMasque((v) => !v)}
-                        className="text-xs text-ardoise/60 underline"
+                        className="text-xs text-ardoise/75 underline"
                       >
                         {sansNomMasque ? "👁️ Afficher" : "🙈 Masquer"}
                       </button>
@@ -380,7 +380,7 @@ export function CoursesDashboard({
                   <button
                     type="button"
                     onClick={() => setListesReveleesUneFois(true)}
-                    className="mt-3 w-full rounded-lg bg-ambre px-3 py-2 text-sm font-semibold text-ardoise shadow hover:opacity-90"
+                    className="mt-3 w-full rounded-lg bg-rose px-3 py-2 text-sm font-semibold text-ardoise shadow hover:opacity-90"
                   >
                     👀 Voir mes listes ({groupesNommes.length})
                   </button>
@@ -392,14 +392,14 @@ export function CoursesDashboard({
                     return (
                       <div key={nom} className="mt-3">
                         <div className="flex items-center justify-between gap-2">
-                          <p className="text-xs font-medium text-ambre">
+                          <p className="text-xs font-medium text-rose-fonce">
                             📋 {nom} ({itemsDuGroupe.length})
                           </p>
                           <div className="flex items-center gap-2">
                             <button
                               type="button"
                               onClick={() => basculerMasquageListe(nom)}
-                              className="text-xs text-ardoise/60 underline"
+                              className="text-xs text-ardoise/75 underline"
                             >
                               {masquee ? "👁️ Afficher" : "🙈 Masquer"}
                             </button>
@@ -415,7 +415,7 @@ export function CoursesDashboard({
                           sousGroupesParAjout(itemsDuGroupe).map(([sousTitre, itemsAjout], i) => (
                             <div key={sousTitre ?? i}>
                               {sousTitre && (
-                                <p className="mt-1.5 text-[11px] font-medium text-ardoise/40">
+                                <p className="mt-1.5 text-[11px] font-medium text-ardoise/75">
                                   {sousTitre}
                                 </p>
                               )}
@@ -478,12 +478,12 @@ export function CoursesDashboard({
 
         <div className="flex flex-wrap gap-x-4 gap-y-1">
           {pdfHref && (
-            <a href={pdfHref} className="text-sm text-ardoise/60 underline">
+            <a href={pdfHref} className="text-sm text-ardoise/75 underline">
               🖨️ Facture PDF de la période
             </a>
           )}
           {listePdfHref && (
-            <a href={listePdfHref} className="text-sm text-ardoise/60 underline">
+            <a href={listePdfHref} className="text-sm text-ardoise/75 underline">
               🖨️ Liste de courses PDF
             </a>
           )}
@@ -510,13 +510,13 @@ export function CoursesDashboard({
 
         {itemsAffiches.length > 0 && (
           <div className="flex items-center justify-between gap-2">
-            <p className="text-xs font-medium text-ardoise/50">
+            <p className="text-xs font-medium text-ardoise/75">
               {vueActive === "a_acheter" ? "À acheter" : "Acheté"} ({itemsAffiches.length})
             </p>
             <button
               type="button"
               onClick={basculerMasquageGrille}
-              className="text-xs text-ardoise/60 underline"
+              className="text-xs text-ardoise/75 underline"
             >
               {grilleMasquee ? "👁️ Afficher" : "🙈 Masquer"}
             </button>
@@ -524,12 +524,12 @@ export function CoursesDashboard({
         )}
 
         {grilleMasquee ? (
-          <p className="rounded-lg bg-white p-4 text-center text-sm text-ardoise/60">
+          <p className="rounded-lg bg-white p-4 text-center text-sm text-ardoise/75">
             {itemsAffiches.length} article{itemsAffiches.length > 1 ? "s" : ""} masqué
             {itemsAffiches.length > 1 ? "s" : ""}.
           </p>
         ) : itemsAffiches.length === 0 ? (
-          <p className="rounded-lg bg-white p-4 text-center text-sm text-ardoise/60">
+          <p className="rounded-lg bg-white p-4 text-center text-sm text-ardoise/75">
             Rien ici pour l&apos;instant.
           </p>
         ) : (
@@ -549,7 +549,7 @@ export function CoursesDashboard({
                     <div className="mb-2 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
                       <p className="text-sm font-semibold text-ardoise">
                         {facturette ? "🧾" : "🛒"} {groupe.session ?? "Sans date"}{" "}
-                        <span className="font-normal text-ardoise/60">
+                        <span className="font-normal text-ardoise/75">
                           · {groupe.items.length} article{groupe.items.length > 1 ? "s" : ""}
                         </span>
                       </p>
@@ -561,7 +561,7 @@ export function CoursesDashboard({
                           {pdfHref && groupe.session && (
                             <a
                               href={`${pdfHref}?session=${encodeURIComponent(groupe.session)}`}
-                              className="text-xs text-ardoise/60 underline"
+                              className="text-xs text-ardoise/75 underline"
                             >
                               🖨️ Facturette PDF
                             </a>
@@ -586,7 +586,7 @@ export function CoursesDashboard({
               );
             })}
             {vueActive === "achete" && groupesGrille.length > 1 && (
-              <p className="text-right text-sm text-ardoise/70">
+              <p className="text-right text-sm text-ardoise/75">
                 Total de la période : <strong className="font-mono">{euros(totalDepense)}</strong>
               </p>
             )}

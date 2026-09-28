@@ -21,7 +21,7 @@ export function AideVocale() {
   const [ouvert, setOuvert] = useState(false);
 
   return (
-    <div className="text-xs text-ardoise/60">
+    <div className="text-xs text-ardoise/75">
       <button
         type="button"
         onClick={() => setOuvert((v) => !v)}

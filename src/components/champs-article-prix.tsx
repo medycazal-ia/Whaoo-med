@@ -74,7 +74,7 @@ export function ChampsArticlePrix({
           />
         </div>
         {source && (
-          <span className="text-xs text-ardoise/50">{LABEL_SOURCE_PRIX[source]}</span>
+          <span className="text-xs text-ardoise/75">{LABEL_SOURCE_PRIX[source]}</span>
         )}
       </div>
       <input type="hidden" name="prixSource" value={source ?? "manuel"} />
@@ -95,7 +95,7 @@ export function ChampsArticlePrix({
       </select>
 
       {proposerPartage && (
-        <div className="flex basis-full flex-wrap items-center gap-2 text-xs text-ardoise/70">
+        <div className="flex basis-full flex-wrap items-center gap-2 text-xs text-ardoise/75">
           <input
             name="enseigne"
             placeholder="Enseigne (optionnel)"

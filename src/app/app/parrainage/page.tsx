@@ -31,18 +31,18 @@ export default async function ParrainagePage() {
 
   return (
     <main className="flex flex-1 flex-col fond-marche">
-      <header className="flex items-center gap-3 bg-gradient-to-r from-kaki to-basilic px-3 py-3 sm:px-6 sm:py-4">
-        <Link href="/app" className="text-sm text-craie/70 hover:text-craie">
+      <header className="flex items-center gap-3 bg-gradient-to-r from-menthe to-rose px-3 py-3 sm:px-6 sm:py-4">
+        <Link href="/app" className="text-sm text-ardoise hover:text-ardoise/80">
           ← Retour
         </Link>
-        <h1 className="font-heading text-xl font-semibold text-craie">
+        <h1 className="font-heading text-xl font-semibold text-ardoise">
           Parrainage
         </h1>
       </header>
 
       <section className="mx-auto w-full max-w-lg md:max-w-2xl lg:max-w-4xl px-4 sm:px-6 py-6">
         <div className="rounded-2xl bg-white p-5">
-          <p className="text-sm text-ardoise/70">Ton lien de parrainage</p>
+          <p className="text-sm text-ardoise/75">Ton lien de parrainage</p>
           <p className="mt-1 break-all font-mono text-sm text-ardoise">
             {lienParrainage}
           </p>
@@ -66,7 +66,7 @@ export default async function ParrainagePage() {
                   className={`rounded-full px-2 py-1 text-xs font-medium ${
                     filleul.actif
                       ? "bg-basilic/15 text-basilic"
-                      : "bg-ambre/15 text-ambre"
+                      : "bg-rose/15 text-rose-fonce"
                   }`}
                 >
                   {filleul.actif ? "Actif" : "Inscrit"}
@@ -74,7 +74,7 @@ export default async function ParrainagePage() {
               </li>
             ))
           ) : (
-            <p className="rounded-lg bg-white p-4 text-center text-sm text-ardoise/60">
+            <p className="rounded-lg bg-white p-4 text-center text-sm text-ardoise/75">
               Personne pour l&apos;instant — partage ton lien pour inviter tes
               proches.
             </p>

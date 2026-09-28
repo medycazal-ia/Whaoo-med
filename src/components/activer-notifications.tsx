@@ -75,7 +75,7 @@ export function ActiverNotifications() {
 
   if (statut === "non_supporte") {
     return (
-      <p className="text-sm text-ardoise/60">
+      <p className="text-sm text-ardoise/75">
         Les notifications push ne sont pas disponibles sur ce navigateur.
       </p>
     );
@@ -83,7 +83,7 @@ export function ActiverNotifications() {
 
   return (
     <div>
-      <p className="text-sm text-ardoise/70">
+      <p className="text-sm text-ardoise/75">
         Reçois un rappel quand des articles attendent encore d&apos;être
         achetés.
       </p>

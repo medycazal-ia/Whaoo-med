@@ -5,14 +5,16 @@
      aux retours de testeurs (la v1 paraissait trop sombre et terne). Les
      noms de tokens restent identiques pour ne pas toucher aux classes
      utilisées dans les composants ; seules les valeurs changent. */
-  --color-ardoise: #1e3a34;
-  --color-ardoise-light: #2a4d45;
-  --color-craie: #e9f3e1;
-  --color-ticket: #fbfdf8;
-  --color-tomate: #e2492e;
-  --color-basilic: #3fa35b;
-  --color-ambre: #f0a93a;
-  --color-kaki: #1fa97c;
+  --color-ardoise: #264a41;
+  --color-ardoise-light: #33604f;
+  --color-craie: #f1f7ee;
+  --color-ticket: #fffdfd;
+  --color-tomate: #c43d5c;
+  --color-basilic: #2a7a4a;
+  --color-rose: #f6bfcf;
+  --color-rose-fonce: #a8345a;
+  --color-kaki: #1c6f5a;
+  --color-menthe: #dcefe3;
 
   --background: var(--color-ticket);
   --foreground: var(--color-ardoise);
@@ -25,8 +27,10 @@
   --color-ticket: var(--color-ticket);
   --color-tomate: var(--color-tomate);
   --color-basilic: var(--color-basilic);
-  --color-ambre: var(--color-ambre);
+  --color-rose: var(--color-rose);
+  --color-rose-fonce: var(--color-rose-fonce);
   --color-kaki: var(--color-kaki);
+  --color-menthe: var(--color-menthe);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);

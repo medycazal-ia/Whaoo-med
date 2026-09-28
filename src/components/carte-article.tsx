@@ -39,8 +39,8 @@ export function CarteArticle({
           {item.quantity > 1 ? `${item.quantity} × ` : ""}
           {item.label}
         </p>
-        <p className="text-xs text-ardoise/50">{item.detail}</p>
-        <p className="font-mono text-sm text-ardoise/60">
+        <p className="text-xs text-ardoise/75">{item.detail}</p>
+        <p className="font-mono text-sm text-ardoise/75">
           {(item.price * item.quantity).toFixed(2)} €
           {item.prixSource && item.prixSource !== "manuel" && (
             <span className="ml-2 rounded-full bg-basilic/10 px-2 py-0.5 font-sans text-[11px] font-medium text-basilic">
@@ -48,7 +48,7 @@ export function CarteArticle({
             </span>
           )}
           {item.listeNom && (
-            <span className="ml-2 rounded-full bg-ambre/10 px-2 py-0.5 font-sans text-[11px] font-medium text-ambre">
+            <span className="ml-2 rounded-full bg-rose/10 px-2 py-0.5 font-sans text-[11px] font-medium text-rose-fonce">
               📋 {item.listeNom}
             </span>
           )}
@@ -69,7 +69,7 @@ export function CarteArticle({
           <button
             type="button"
             onClick={() => setEdition(true)}
-            className="rounded-lg border border-ardoise/20 px-2 py-1 text-xs text-ardoise/70"
+            className="rounded-lg border border-ardoise/20 px-2 py-1 text-xs text-ardoise/75"
           >
             ✏️ Modifier
           </button>

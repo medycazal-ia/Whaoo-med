@@ -29,19 +29,19 @@ export default async function DemoPage({
 
   return (
     <main className="flex flex-1 flex-col fond-marche">
-      <div className="bg-ambre px-4 sm:px-6 py-2 text-center text-sm font-medium text-ardoise">
+      <div className="bg-rose px-4 sm:px-6 py-2 text-center text-sm font-medium text-ardoise">
         Mode démo — tes modifications ne seront pas conservées
       </div>
 
-      <header className="flex flex-wrap items-center justify-between gap-2 bg-gradient-to-r from-kaki to-basilic px-3 py-3 sm:px-6 sm:py-4">
-        <h1 className="truncate font-heading text-base font-semibold text-craie sm:text-xl">
+      <header className="flex flex-wrap items-center justify-between gap-2 bg-gradient-to-r from-menthe to-rose px-3 py-3 sm:px-6 sm:py-4">
+        <h1 className="truncate font-heading text-base font-semibold text-ardoise sm:text-xl">
           Bienvenue dans la démo
         </h1>
         <div className="flex shrink-0 gap-1.5 sm:gap-2">
           <form action={reinitialiserDemo}>
             <button
               type="submit"
-              className="rounded-lg border border-craie/30 px-2 py-1.5 text-xs text-craie hover:bg-craie/10 sm:px-3 sm:text-sm"
+              className="rounded-lg border border-ardoise/20 px-2 py-1.5 text-xs text-ardoise hover:bg-ardoise/5 sm:px-3 sm:text-sm"
             >
               Réinitialiser
             </button>
@@ -56,7 +56,7 @@ export default async function DemoPage({
       </header>
 
       <div className="mx-auto w-full max-w-lg md:max-w-2xl lg:max-w-4xl px-4 sm:px-6 pt-4">
-        <form action={definirBudgetDemo} className="flex items-center gap-2 text-sm text-ardoise/70">
+        <form action={definirBudgetDemo} className="flex items-center gap-2 text-sm text-ardoise/75">
           Budget du mois :
           <input
             type="number"

@@ -49,7 +49,7 @@ export function VideoExplicative() {
 
         {!demarree && !terminee && (
           <div className="absolute inset-x-0 top-[6%] flex flex-col items-center gap-3 px-4">
-            <span className="rounded-full bg-ambre px-4 py-2 text-center text-sm font-medium text-ardoise shadow-lg">
+            <span className="rounded-full bg-rose px-4 py-2 text-center text-sm font-medium text-ardoise shadow-lg">
               🎬 40 secondes pour tout comprendre
             </span>
             <button
@@ -68,7 +68,7 @@ export function VideoExplicative() {
             <p className="font-heading text-lg font-semibold text-craie">
               Convaincu·e ?
             </p>
-            <p className="max-w-xs text-sm text-craie/80">
+            <p className="max-w-xs text-sm text-craie/90">
               Crée ton compte gratuitement et commence dès maintenant.
             </p>
             <div className="flex flex-wrap justify-center gap-2">
@@ -88,7 +88,7 @@ export function VideoExplicative() {
               <button
                 type="button"
                 onClick={() => setPromptFerme(true)}
-                className="rounded-lg px-4 py-2 text-sm text-craie/60 hover:text-craie"
+                className="rounded-lg px-4 py-2 text-sm text-craie/90 hover:text-craie"
               >
                 Plus tard
               </button>

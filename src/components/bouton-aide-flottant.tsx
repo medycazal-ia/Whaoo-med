@@ -58,7 +58,7 @@ export function BoutonAideFlottant() {
               setIndiceVisible(false);
               setPanelOuvert(true);
             }}
-            className="flex animate-bounce items-center gap-2 rounded-2xl bg-ambre px-3 py-2 text-sm font-medium text-ardoise shadow-lg"
+            className="flex animate-bounce items-center gap-2 rounded-2xl bg-rose px-3 py-2 text-sm font-medium text-ardoise shadow-lg"
           >
             <span aria-hidden>👉</span>
             Dis « aide moi » ou clique ici !

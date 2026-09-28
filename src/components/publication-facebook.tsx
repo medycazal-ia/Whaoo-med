@@ -41,7 +41,7 @@ export function PublicationFacebook() {
         <div className="flex flex-col items-center gap-3 rounded-2xl bg-white p-6 text-center text-ardoise shadow-sm">
           <span className="text-3xl" aria-hidden>📣</span>
           <p className="font-heading font-semibold">whaoo sur Facebook</p>
-          <p className="text-sm text-ardoise/70">
+          <p className="text-sm text-ardoise/75">
             Afficher la publication charge un contenu de Facebook, qui peut
             déposer ses propres cookies.
           </p>

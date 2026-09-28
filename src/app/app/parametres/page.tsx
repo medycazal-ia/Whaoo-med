@@ -37,11 +37,11 @@ export default async function ParametresPage({
 
   return (
     <main className="flex flex-1 flex-col fond-marche">
-      <header className="flex items-center gap-3 bg-gradient-to-r from-kaki to-basilic px-3 py-3 sm:px-6 sm:py-4">
-        <Link href="/app" className="text-sm text-craie/70 hover:text-craie">
+      <header className="flex items-center gap-3 bg-gradient-to-r from-menthe to-rose px-3 py-3 sm:px-6 sm:py-4">
+        <Link href="/app" className="text-sm text-ardoise hover:text-ardoise/80">
           ← Retour
         </Link>
-        <h1 className="font-heading text-xl font-semibold text-craie">
+        <h1 className="font-heading text-xl font-semibold text-ardoise">
           Paramètres
         </h1>
       </header>
@@ -51,7 +51,7 @@ export default async function ParametresPage({
           <h2 className="font-heading text-lg font-semibold text-ardoise">
             Période du budget
           </h2>
-          <p className="mt-1 text-sm text-ardoise/70">
+          <p className="mt-1 text-sm text-ardoise/75">
             Par défaut, ton budget suit le mois calendaire. Tu peux le caler
             sur ton jour de paie : avec le 25, il court du 25 au 24 du mois
             suivant. Tes totaux, ta cagnotte et tes factures suivent ces dates.
@@ -92,7 +92,7 @@ export default async function ParametresPage({
               Enregistrer
             </button>
           </form>
-          <p className="mt-2 text-xs text-ardoise/50">
+          <p className="mt-2 text-xs text-ardoise/75">
             Jusqu&apos;au 28 seulement, pour que chaque mois ait ce jour-là
             (février compris).
           </p>
@@ -111,7 +111,7 @@ export default async function ParametresPage({
           <h2 className="font-heading text-lg font-semibold text-ardoise">
             Tes données
           </h2>
-          <p className="mt-1 text-sm text-ardoise/70">
+          <p className="mt-1 text-sm text-ardoise/75">
             Télécharge une copie de toutes tes données (profil, budgets,
             articles) au format JSON.
           </p>
@@ -128,7 +128,7 @@ export default async function ParametresPage({
             <h2 className="font-heading text-lg font-semibold text-ardoise">
               Soutenir whaoo
             </h2>
-            <p className="mt-1 text-sm text-ardoise/70">
+            <p className="mt-1 text-sm text-ardoise/75">
               whaoo est gratuite à l&apos;usage de base et développée seule.
               Si elle te rend service, une contribution libre est toujours
               appréciée —{" "}
@@ -150,7 +150,7 @@ export default async function ParametresPage({
           <h2 className="font-heading text-lg font-semibold text-tomate">
             Supprimer mon compte
           </h2>
-          <p className="mt-1 text-sm text-ardoise/70">
+          <p className="mt-1 text-sm text-ardoise/75">
             Supprime définitivement ton compte et toutes tes données
             (profil, budgets, articles). Cette action est irréversible.
           </p>
@@ -160,7 +160,7 @@ export default async function ParametresPage({
             </p>
           )}
           <form action={supprimerMonCompte} className="mt-4 flex flex-col gap-2">
-            <label className="text-xs text-ardoise/70">
+            <label className="text-xs text-ardoise/75">
               Tape <strong>SUPPRIMER</strong> pour confirmer
               <input
                 type="text"

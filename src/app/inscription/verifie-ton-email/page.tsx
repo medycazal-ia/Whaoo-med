@@ -5,7 +5,7 @@ export default function VerifieTonEmailPage() {
         <h1 className="font-heading text-2xl font-semibold text-ardoise">
           Vérifie ta boîte mail
         </h1>
-        <p className="mt-2 text-sm text-ardoise/70">
+        <p className="mt-2 text-sm text-ardoise/75">
           On t&apos;a envoyé un lien de confirmation. Clique dessus pour
           activer ton compte.
         </p>

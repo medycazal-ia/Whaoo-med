@@ -15,10 +15,10 @@ export function ConfirmationBudget({
   return (
     <form
       action={definirBudgetAction}
-      className="flex flex-col gap-2 rounded-xl border border-ambre/40 bg-ambre/10 p-4"
+      className="flex flex-col gap-2 rounded-xl border border-rose/40 bg-rose/10 p-4"
       onSubmit={onFermer}
     >
-      <p className="text-xs font-medium text-ambre">
+      <p className="text-xs font-medium text-rose-fonce">
         {montant === null ? "Quel est le nouveau budget du mois ?" : "Confirme le nouveau budget du mois"}
       </p>
       <input

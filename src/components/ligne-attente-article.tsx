@@ -43,7 +43,7 @@ export function LigneAttenteArticle({
             type="button"
             onClick={() => setEdition(true)}
             aria-label="Modifier cet article"
-            className="rounded-lg border border-ardoise/20 px-2 py-1 text-xs text-ardoise/70"
+            className="rounded-lg border border-ardoise/20 px-2 py-1 text-xs text-ardoise/75"
           >
             ✏️
           </button>

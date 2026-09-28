@@ -24,7 +24,7 @@ export default async function InscriptionPage({
         <h1 className="font-heading text-2xl font-semibold text-ardoise">
           Créer un compte
         </h1>
-        <p className="mt-1 text-sm text-ardoise/70">
+        <p className="mt-1 text-sm text-ardoise/75">
           Quelques infos pour démarrer, ça prend une minute.
         </p>
 
@@ -80,7 +80,7 @@ export default async function InscriptionPage({
           </label>
           <label className="flex flex-col gap-1 text-sm text-ardoise">
             Téléphone mobile{" "}
-            <span className="text-ardoise/50">(optionnel)</span>
+            <span className="text-ardoise/75">(optionnel)</span>
             <input
               type="tel"
               name="telephone"
@@ -89,7 +89,7 @@ export default async function InscriptionPage({
             />
           </label>
           <div className="flex flex-col gap-1 text-sm text-ardoise">
-            Avatar <span className="text-ardoise/50">(optionnel)</span>
+            Avatar <span className="text-ardoise/75">(optionnel)</span>
             <div className="grid grid-cols-5 gap-2">
               {AVATARS.map((avatar, i) => (
                 <label key={avatar.id} className="cursor-pointer">
@@ -113,7 +113,7 @@ export default async function InscriptionPage({
           </div>
           <label className="flex flex-col gap-1 text-sm text-ardoise">
             Code de parrainage{" "}
-            <span className="text-ardoise/50">(optionnel)</span>
+            <span className="text-ardoise/75">(optionnel)</span>
             <input
               type="text"
               name="referralCode"
@@ -154,7 +154,7 @@ export default async function InscriptionPage({
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-ardoise/70">
+        <p className="mt-6 text-center text-sm text-ardoise/75">
           Déjà un compte ?{" "}
           <Link href="/connexion" className="font-medium text-basilic underline">
             Se connecter

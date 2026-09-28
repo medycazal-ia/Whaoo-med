@@ -18,7 +18,7 @@ export function PitchPage({ lang, contenu }: { lang: LangPitch; contenu: Contenu
               key={l.code}
               href={`/pitch/${l.code}`}
               className={`rounded-lg px-2.5 py-1 ${
-                l.code === lang ? "bg-ardoise text-craie" : "text-ardoise/60 hover:bg-ardoise/10"
+                l.code === lang ? "bg-ardoise text-craie" : "text-ardoise/75 hover:bg-ardoise/10"
               }`}
             >
               {l.code.toUpperCase()}
@@ -32,7 +32,7 @@ export function PitchPage({ lang, contenu }: { lang: LangPitch; contenu: Contenu
         <h1 className="font-heading text-3xl font-bold leading-tight sm:text-4xl">
           {contenu.tagline}
         </h1>
-        <p className="max-w-2xl text-lg text-ardoise/70">{contenu.intro}</p>
+        <p className="max-w-2xl text-lg text-ardoise/75">{contenu.intro}</p>
         <div className="flex flex-wrap justify-center gap-3">
           <Link
             href="/demo"
@@ -81,7 +81,7 @@ export function PitchPage({ lang, contenu }: { lang: LangPitch; contenu: Contenu
               </div>
               <div>
                 <p className="font-heading font-semibold text-craie">{m.titre}</p>
-                <p className="mt-1 text-sm text-craie/70">{m.texte}</p>
+                <p className="mt-1 text-sm text-craie/90">{m.texte}</p>
               </div>
             </div>
           ))}
@@ -96,7 +96,7 @@ export function PitchPage({ lang, contenu }: { lang: LangPitch; contenu: Contenu
         <ul className="grid gap-3 sm:grid-cols-2">
           {contenu.pourquoiPoints.map((p, i) => (
             <li key={i} className="flex gap-2 rounded-xl border border-ardoise/10 bg-white p-4 text-sm text-ardoise/80">
-              <span className="text-ambre">●</span>
+              <span className="text-rose-fonce">●</span>
               {p}
             </li>
           ))}
@@ -105,8 +105,8 @@ export function PitchPage({ lang, contenu }: { lang: LangPitch; contenu: Contenu
 
       {/* Modèle + feuille de route */}
       <section className="mx-auto grid max-w-5xl gap-6 px-4 pb-14 sm:grid-cols-2 sm:px-8">
-        <div className="rounded-2xl border border-ambre/30 bg-ambre/10 p-6">
-          <h2 className="mb-2 font-heading text-xl font-semibold text-ambre">
+        <div className="rounded-2xl border border-rose/30 bg-rose/10 p-6">
+          <h2 className="mb-2 font-heading text-xl font-semibold text-rose-fonce">
             {contenu.modeleTitre}
           </h2>
           <p className="text-ardoise/80">{contenu.modeleTexte}</p>
@@ -127,7 +127,7 @@ export function PitchPage({ lang, contenu }: { lang: LangPitch; contenu: Contenu
       {/* Contact */}
       <section className="border-t border-ardoise/10 bg-white px-4 py-14 text-center sm:px-8">
         <h2 className="mb-2 font-heading text-2xl font-semibold">{contenu.contactTitre}</h2>
-        <p className="mx-auto mb-5 max-w-xl text-ardoise/70">{contenu.contactTexte}</p>
+        <p className="mx-auto mb-5 max-w-xl text-ardoise/75">{contenu.contactTexte}</p>
         <a
           href={`mailto:${EMAIL_CONTACT}`}
           className="inline-block rounded-xl bg-basilic px-6 py-3 font-medium text-craie hover:opacity-90"

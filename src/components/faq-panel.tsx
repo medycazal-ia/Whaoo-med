@@ -13,7 +13,7 @@ const EMAIL_SUGGESTIONS = "suggestions@whaoo.site";
  */
 function RelanceAide() {
   return (
-    <p className="mt-2 text-xs text-ardoise/60">
+    <p className="mt-2 text-xs text-ardoise/75">
       Pas satisfait de cette réponse ?{" "}
       <a
         href={`mailto:${EMAIL_CONTACT}`}
@@ -86,7 +86,7 @@ export function FaqPanel({ onFermer }: { onFermer: () => void }) {
             onClick={dicterQuestion}
             title="Poser la question à voix haute"
             className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border text-sm ${
-              ecoute ? "border-tomate bg-tomate/10 text-tomate" : "border-ardoise/20 text-ardoise/60"
+              ecoute ? "border-tomate bg-tomate/10 text-tomate" : "border-ardoise/20 text-ardoise/75"
             }`}
           >
             🎙️
@@ -122,7 +122,7 @@ export function FaqPanel({ onFermer }: { onFermer: () => void }) {
                 </button>
                 {ouverte?.id === item.id && (
                   <div className="pb-2.5">
-                    <p className="text-sm text-ardoise/70">{item.reponse}</p>
+                    <p className="text-sm text-ardoise/75">{item.reponse}</p>
                     <RelanceAide />
                   </div>
                 )}

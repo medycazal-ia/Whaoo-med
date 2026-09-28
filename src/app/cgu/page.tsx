@@ -6,7 +6,7 @@ export default function CguPage() {
       <h1 className="font-heading text-2xl font-semibold">
         Conditions générales d&apos;utilisation
       </h1>
-      <p className="mt-2 text-sm text-ardoise/60">Dernière mise à jour : à compléter à la mise en ligne.</p>
+      <p className="mt-2 text-sm text-ardoise/75">Dernière mise à jour : à compléter à la mise en ligne.</p>
 
       <section className="mt-6">
         <h2 className="font-heading text-lg font-semibold">1. Objet</h2>

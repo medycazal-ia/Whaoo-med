@@ -7,7 +7,7 @@ export default function MotDePasseOubliePage() {
         <h1 className="font-heading text-2xl font-semibold text-ardoise">
           Mot de passe oublié
         </h1>
-        <p className="mt-1 text-sm text-ardoise/70">
+        <p className="mt-1 text-sm text-ardoise/75">
           Indique ton email, on t&apos;envoie un lien de réinitialisation.
         </p>
 

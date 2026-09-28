@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Coffre des clés whaoo</title>
+<style>
+:root {
+  --fond: #f1f7ee; --carte: #ffffff; --texte: #264a41; --doux: #3f5f56;
+  --bord: #cfe0d6; --accent: #2a7a4a; --accent-texte: #ffffff;
+  --rose: #f6bfcf; --rose-fonce: #a8345a; --alerte: #c43d5c; --menthe: #dcefe3;
+  --champ: #fbfdfb;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fond: #13211d; --carte: #1c2f29; --texte: #e6f1ea; --doux: #b5cabf;
+    --bord: #2f4a41; --accent: #4fb67a; --accent-texte: #0f1c18;
+    --rose: #5a2b3a; --rose-fonce: #f3a3bb; --alerte: #f08aa3; --menthe: #213a31;
+    --champ: #16261f;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--fond); color: var(--texte);
+  font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+main { max-width: 860px; margin: 0 auto; padding: 16px; }
+h1 { font-size: 1.5rem; margin: 8px 0 4px; }
+h2 { font-size: 1.15rem; margin: 0; }
+h3 { font-size: 1rem; margin: 0; }
+p { margin: 6px 0; }
+a { color: var(--accent); }
+.doux { color: var(--doux); font-size: .9rem; }
+.carte { background: var(--carte); border: 1px solid var(--bord); border-radius: 16px; padding: 16px; margin: 14px 0; }
+.bandeau { background: linear-gradient(90deg, var(--menthe), var(--rose)); border-radius: 16px; padding: 16px; }
+.ecran { display: none; }
+.ecran.actif { display: block; }
+label { display: block; font-size: .85rem; color: var(--doux); margin: 10px 0 4px; }
+input, textarea { width: 100%; font: inherit; color: var(--texte); background: var(--champ);
+  border: 1px solid var(--bord); border-radius: 10px; padding: 9px 11px; }
+textarea { min-height: 60px; resize: vertical; }
+input:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+button { font: inherit; cursor: pointer; border-radius: 10px; border: 1px solid var(--bord);
+  background: transparent; color: var(--texte); padding: 8px 12px; }
+button:hover { background: var(--menthe); }
+button.principal { background: var(--accent); border-color: var(--accent); color: var(--accent-texte); font-weight: 600; }
+button.principal:hover { filter: brightness(1.08); }
+button.petit { padding: 5px 9px; font-size: .85rem; }
+.erreur { color: var(--alerte); font-weight: 600; min-height: 1.4em; }
+.barre { position: sticky; top: 0; z-index: 5; background: var(--fond); padding: 10px 0;
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center; border-bottom: 1px solid var(--bord); }
+.barre input { flex: 1 1 200px; width: auto; }
+.etat { font-size: .85rem; padding: 4px 10px; border-radius: 999px; background: var(--menthe); }
+.etat.modifie { background: var(--rose); color: var(--texte); font-weight: 600; }
+.categorie > summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.categorie > summary::-webkit-details-marker { display: none; }
+.categorie > summary::after { content: "▾"; color: var(--doux); }
+.categorie:not([open]) > summary::after { content: "▸"; }
+.outil { border-top: 1px dashed var(--bord); padding-top: 12px; margin-top: 12px; }
+.outil-tete { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: baseline; }
+.ligne { display: flex; gap: 6px; align-items: center; }
+.ligne input { flex: 1; min-width: 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9rem; }
+.env { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .75rem; background: var(--menthe);
+  border-radius: 6px; padding: 1px 6px; margin-left: 6px; color: var(--texte); }
+.pastille { font-size: .7rem; border-radius: 999px; padding: 1px 8px; margin-left: 6px; vertical-align: middle; }
+.pastille.secret { background: var(--rose); color: var(--texte); }
+.pastille.public { background: var(--menthe); color: var(--texte); }
+.pastille.avenir { border: 1px solid var(--bord); color: var(--doux); }
+.compte { font-size: .8rem; color: var(--doux); }
+.masque { display: none !important; }
+.force { height: 6px; border-radius: 3px; background: var(--bord); margin-top: 6px; overflow: hidden; }
+.force > div { height: 100%; width: 0; background: var(--alerte); transition: width .2s; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.perso { display: grid; grid-template-columns: 1fr 1.4fr auto; gap: 6px; margin-top: 8px; }
+@media (max-width: 560px) { .perso { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main>
+  <div class="bandeau">
+    <h1>🔐 Coffre des clés whaoo</h1>
+    <p class="doux">Fichier chiffré (AES-256) avec ton mot de passe. Il fonctionne hors ligne et n'envoie rien sur Internet.</p>
+  </div>
+
+  <!-- Création : premier lancement -->
+  <section id="ecran-creation" class="ecran carte">
+    <h2>Créer ton coffre</h2>
+    <p>Choisis le mot de passe qui protégera toutes tes clés. <strong>Si tu l'oublies, personne ne pourra rouvrir le coffre</strong>, pas même Claude : note-le dans un endroit sûr, hors de cet ordinateur.</p>
+    <label for="mdp-nouveau">Mot de passe (12 caractères minimum, une phrase fonctionne très bien)</label>
+    <input id="mdp-nouveau" type="password" autocomplete="new-password">
+    <div class="force"><div id="force-barre"></div></div>
+    <p id="force-texte" class="doux"></p>
+    <label for="mdp-confirmation">Confirme le mot de passe</label>
+    <input id="mdp-confirmation" type="password" autocomplete="new-password">
+    <p id="erreur-creation" class="erreur"></p>
+    <button id="bouton-creer" class="principal">Créer le coffre</button>
+  </section>
+
+  <!-- Déverrouillage -->
+  <section id="ecran-deverrouillage" class="ecran carte">
+    <h2>Coffre verrouillé</h2>
+    <p class="doux" id="info-coffre"></p>
+    <label for="mdp-ouverture">Mot de passe</label>
+    <input id="mdp-ouverture" type="password" autocomplete="current-password">
+    <p id="erreur-ouverture" class="erreur"></p>
+    <button id="bouton-ouvrir" class="principal">Déverrouiller</button>
+  </section>
+
+  <!-- Coffre ouvert -->
+  <section id="ecran-coffre" class="ecran">
+    <div class="barre">
+      <input id="recherche" type="search" placeholder="Rechercher un outil, une clé, un nom de variable…">
+      <span id="etat" class="etat">Enregistré</span>
+      <button id="bouton-enregistrer" class="principal">💾 Enregistrer le coffre</button>
+      <button id="bouton-verrouiller">🔒 Verrouiller</button>
+    </div>
+    <p class="doux">Après « Enregistrer », ton navigateur télécharge une nouvelle version du fichier. Remplace l'ancienne par celle-ci : c'est elle qui contient tes dernières modifications. Le coffre se verrouille seul après 10 minutes sans activité.</p>
+    <div id="categories"></div>
+    <div class="carte">
+      <h2>Réglages du coffre</h2>
+      <p class="doux" id="info-derniere"></p>
+      <div class="actions">
+        <button id="bouton-changer-mdp">Changer le mot de passe</button>
+      </div>
+      <div id="zone-changer-mdp" class="masque">
+        <label for="mdp-change-1">Nouveau mot de passe (12 caractères minimum)</label>
+        <input id="mdp-change-1" type="password" autocomplete="new-password">
+        <label for="mdp-change-2">Confirme le nouveau mot de passe</label>
+        <input id="mdp-change-2" type="password" autocomplete="new-password">
+        <p id="erreur-change" class="erreur"></p>
+        <button id="bouton-valider-mdp" class="principal">Valider le nouveau mot de passe</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script id="coffre" type="application/json">null</script>
+<script>
+"use strict";
+// Copie intacte du fichier, capturée avant toute modification de la page :
+// sert à produire le nouveau fichier lors de l'enregistrement.
+const SOURCE = "<!doctype html>\n" + document.documentElement.outerHTML;
+const ITERATIONS = 600000;
+const VERROU_MINUTES = 10;
+
+// Catalogue : catégories → outils → clés. `env` = nom de la variable
+// d'environnement sur Render ; `secret` = à ne jamais montrer ni partager.
+const CATALOGUE = [
+  { id: "hebergement", icone: "🌐", titre: "Hébergement, domaine et code", outils: [
+    { id: "render", nom: "Render (hébergement de l'appli)", lien: "https://dashboard.render.com",
+      aide: "Les variables de l'appli se trouvent dans Render → service whaoo → Environment.",
+      champs: [
+        { id: "email", libelle: "Email du compte" },
+        { id: "mdp", libelle: "Mot de passe du compte", secret: true },
+        { id: "api", libelle: "Clé API Render (facultative)", secret: true },
+      ] },
+    { id: "lws", nom: "LWS (domaine whaoo.site et boîtes mail)", lien: "https://panel.lws.fr",
+      champs: [
+        { id: "identifiant", libelle: "Identifiant client" },
+        { id: "mdp", libelle: "Mot de passe de l'espace client", secret: true },
+      ] },
+    { id: "github", nom: "GitHub (code source)", lien: "https://github.com/settings/tokens",
+      champs: [
+        { id: "identifiant", libelle: "Identifiant", defaut: "medycazal-ia" },
+        { id: "mdp", libelle: "Mot de passe", secret: true },
+        { id: "jeton", libelle: "Jeton d'accès personnel (facultatif)", secret: true },
+      ] },
+  ] },
+  { id: "donnees", icone: "🗄️", titre: "Base de données et comptes utilisateurs", outils: [
+    { id: "supabase", nom: "Supabase", lien: "https://supabase.com/dashboard/project/hqbysglomilntvcyvcqa/settings/api-keys",
+      aide: "Si tu changes la clé secrète, reporte-la aussi sur Render.",
+      champs: [
+        { id: "url", libelle: "URL du projet", env: "NEXT_PUBLIC_SUPABASE_URL", public: true, defaut: "https://hqbysglomilntvcyvcqa.supabase.co" },
+        { id: "publishable", libelle: "Clé publishable (sb_publishable_…)", env: "NEXT_PUBLIC_SUPABASE_ANON_KEY", public: true },
+        { id: "secret", libelle: "Clé secrète (sb_secret_…)", env: "SUPABASE_SERVICE_ROLE_KEY", secret: true },
+        { id: "db", libelle: "Mot de passe de la base Postgres", secret: true },
+        { id: "email", libelle: "Email du compte Supabase" },
+        { id: "mdp", libelle: "Mot de passe du compte Supabase", secret: true },
+      ] },
+  ] },
+  { id: "ia", icone: "🤖", titre: "Intelligence artificielle et voix", outils: [
+    { id: "openai", nom: "OpenAI (dictée vocale sur iPhone)", lien: "https://platform.openai.com/api-keys",
+      champs: [ { id: "cle", libelle: "Clé API (sk-proj-…)", env: "OPENAI_API_KEY", secret: true } ] },
+    { id: "anthropic", nom: "Anthropic / Claude (lecture des tickets de caisse)", lien: "https://console.anthropic.com/settings/keys",
+      champs: [
+        { id: "cle", libelle: "Clé API (sk-ant-…)", env: "ANTHROPIC_TICKET_API_KEY", secret: true },
+        { id: "workspace", libelle: "ID du workspace (si demandé)", env: "ANTHROPIC_TICKET_WORKSPACE_ID" },
+      ] },
+    { id: "elevenlabs", nom: "ElevenLabs (voix Bonjour / Au revoir)", lien: "https://elevenlabs.io/app/settings/api-keys",
+      champs: [
+        { id: "cle", libelle: "Clé API", env: "ELEVENLABS_API_KEY", secret: true },
+        { id: "voix", libelle: "ID de la voix (facultatif)", env: "ELEVENLABS_VOICE_ID", public: true },
+      ] },
+  ] },
+  { id: "admin", icone: "🛠️", titre: "Administration et sécurité de l'appli", outils: [
+    { id: "backoffice", nom: "Back-office whaoo (/app/admin)", lien: "https://whaoo.site/app/admin",
+      champs: [
+        { id: "emails", libelle: "Emails administrateurs (séparés par des virgules)", env: "ADMIN_EMAILS" },
+        { id: "mdp", libelle: "Mot de passe du back-office", env: "ADMIN_PASSWORD", secret: true },
+      ] },
+    { id: "app", nom: "Adresse de l'appli", lien: "https://whaoo.site",
+      champs: [ { id: "url", libelle: "URL publique", env: "NEXT_PUBLIC_APP_URL", public: true, defaut: "https://whaoo.site" } ] },
+    { id: "push", nom: "Notifications push (clés VAPID)", aide: "Générées avec « npx web-push generate-vapid-keys » : aucun compte à créer.",
+      champs: [
+        { id: "public", libelle: "Clé publique", env: "NEXT_PUBLIC_VAPID_PUBLIC_KEY", public: true },
+        { id: "prive", libelle: "Clé privée", env: "VAPID_PRIVATE_KEY", secret: true },
+      ] },
+    { id: "cron", nom: "Tâches planifiées (rappels)",
+      champs: [ { id: "secret", libelle: "Secret des tâches planifiées", env: "CRON_SECRET", secret: true } ] },
+  ] },
+  { id: "paiement", icone: "💳", titre: "Paiement et dons", outils: [
+    { id: "stripe", nom: "Stripe", lien: "https://dashboard.stripe.com/apikeys", avenir: true,
+      aide: "Noms de variables prévus pour l'intégration à venir.",
+      champs: [
+        { id: "email", libelle: "Email du compte" },
+        { id: "mdp", libelle: "Mot de passe du compte", secret: true },
+        { id: "publiable", libelle: "Clé publiable (pk_live_…)", env: "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY", public: true },
+        { id: "secrete", libelle: "Clé secrète (sk_live_…)", env: "STRIPE_SECRET_KEY", secret: true },
+        { id: "webhook", libelle: "Secret de webhook (whsec_…)", env: "STRIPE_WEBHOOK_SECRET", secret: true },
+        { id: "test-publiable", libelle: "Clé publiable de test (pk_test_…)", public: true },
+        { id: "test-secrete", libelle: "Clé secrète de test (sk_test_…)", secret: true },
+      ] },
+    { id: "lydia", nom: "Lydia (contribution libre)", lien: "https://lydia-app.com",
+      champs: [
+        { id: "lien", libelle: "Lien de la cagnotte", env: "SUPPORT_LINK_URL", public: true },
+        { id: "identifiant", libelle: "Identifiant du compte" },
+        { id: "mdp", libelle: "Mot de passe / code", secret: true },
+      ] },
+  ] },
+  { id: "mail", icone: "✉️", titre: "Messagerie", outils: [
+    { id: "suggestions", nom: "suggestions@whaoo.site (boîte LWS)", lien: "https://mail.lws.fr",
+      champs: [
+        { id: "adresse", libelle: "Adresse", defaut: "suggestions@whaoo.site" },
+        { id: "mdp", libelle: "Mot de passe de la boîte", secret: true },
+      ] },
+    { id: "contact", nom: "Adresse de contact des pages légales",
+      champs: [
+        { id: "adresse", libelle: "Adresse", defaut: "cazal@medy.site" },
+        { id: "mdp", libelle: "Mot de passe de la boîte", secret: true },
+      ] },
+    { id: "gmail", nom: "Gmail (réception des boîtes whaoo)", lien: "https://myaccount.google.com/apppasswords",
+      champs: [
+        { id: "adresse", libelle: "Adresse Gmail" },
+        { id: "mdp-app", libelle: "Mot de passe d'application (POP / SMTP)", secret: true },
+      ] },
+  ] },
+  { id: "connecteurs", icone: "🔗", titre: "Connexion et connecteurs de données", outils: [
+    { id: "google", nom: "Google (connexion et Google Sheets)", lien: "https://console.cloud.google.com/apis/credentials", avenir: true,
+      champs: [
+        { id: "id", libelle: "ID client", env: "GOOGLE_CLIENT_ID", public: true },
+        { id: "secret", libelle: "Secret client", env: "GOOGLE_CLIENT_SECRET", secret: true },
+      ] },
+    { id: "airtable", nom: "Airtable", lien: "https://airtable.com/create/oauth", avenir: true,
+      champs: [
+        { id: "id", libelle: "ID client", env: "AIRTABLE_CLIENT_ID", public: true },
+        { id: "secret", libelle: "Secret client", env: "AIRTABLE_CLIENT_SECRET", secret: true },
+      ] },
+    { id: "microsoft", nom: "Microsoft (Excel / OneDrive)", lien: "https://entra.microsoft.com", avenir: true,
+      champs: [
+        { id: "id", libelle: "ID client", env: "MICROSOFT_CLIENT_ID", public: true },
+        { id: "secret", libelle: "Secret client", env: "MICROSOFT_CLIENT_SECRET", secret: true },
+        { id: "tenant", libelle: "ID du tenant", env: "MICROSOFT_TENANT_ID" },
+      ] },
+  ] },
+  { id: "reseaux", icone: "📣", titre: "Réseaux sociaux et création", outils: [
+    { id: "facebook", nom: "Facebook (page whaoo)", lien: "https://www.facebook.com",
+      champs: [
+        { id: "identifiant", libelle: "Identifiant" },
+        { id: "mdp", libelle: "Mot de passe", secret: true },
+      ] },
+    { id: "video", nom: "D-ID / HeyGen (vidéo avatar)", lien: "https://studio.d-id.com",
+      champs: [
+        { id: "identifiant", libelle: "Identifiant" },
+        { id: "mdp", libelle: "Mot de passe", secret: true },
+      ] },
+  ] },
+  { id: "autres", icone: "🗂️", titre: "Autres", outils: [] },
+];
+
+const $ = (id) => document.getElementById(id);
+const enc = new TextEncoder();
+const dec = new TextDecoder();
+const b64 = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf)));
+const deb64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+
+let cle = null;     // CryptoKey dérivée du mot de passe (en mémoire seulement)
+let sel = null;     // sel PBKDF2 associé
+let etat = null;    // { valeurs, notes, perso, majLe }
+let modifie = false;
+let minuteur = null;
+
+async function deriver(motDePasse, selOctets) {
+  const base = await crypto.subtle.importKey("raw", enc.encode(motDePasse), "PBKDF2", false, ["deriveKey"]);
+  return crypto.subtle.deriveKey(
+    { name: "PBKDF2", salt: selOctets, iterations: ITERATIONS, hash: "SHA-256" },
+    base, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
+}
+
+async function chiffrer(objet) {
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, cle, enc.encode(JSON.stringify(objet)));
+  return { v: 1, kdf: "PBKDF2-SHA256", iterations: ITERATIONS, sel: b64(sel), iv: b64(iv), donnees: b64(ct) };
+}
+
+function lireCoffre() {
+  try { return JSON.parse($("coffre").textContent); } catch { return null; }
+}
+
+function afficher(ecran) {
+  for (const e of document.querySelectorAll(".ecran")) e.classList.toggle("actif", e.id === ecran);
+}
+
+function forceMotDePasse(mdp) {
+  let score = 0;
+  if (mdp.length >= 12) score++;
+  if (mdp.length >= 16) score++;
+  if (/[a-z]/.test(mdp) && /[A-Z]/.test(mdp)) score++;
+  if (/\d/.test(mdp)) score++;
+  if (/[^A-Za-z0-9]/.test(mdp)) score++;
+  return score;
+}
+
+function validerNouveau(m1, m2) {
+  if (m1.length < 12) return "Le mot de passe doit faire au moins 12 caractères.";
+  if (m1 !== m2) return "Les deux mots de passe ne sont pas identiques.";
+  return "";
+}
+
+function marquerModifie(v = true) {
+  modifie = v;
+  $("etat").textContent = v ? "Modifications non enregistrées" : "Enregistré";
+  $("etat").classList.toggle("modifie", v);
+}
+
+function valeur(cleChamp) { return etat.valeurs[cleChamp] ?? ""; }
+
+function champSaisie({ cleChamp, secret, placeholder, surChangement, val }) {
+  const ligne = document.createElement("div");
+  ligne.className = "ligne";
+  const input = document.createElement("input");
+  input.type = secret ? "password" : "text";
+  input.value = val;
+  input.placeholder = placeholder || "";
+  input.autocomplete = "off";
+  input.spellcheck = false;
+  if (cleChamp) input.id = "c-" + cleChamp;
+  input.addEventListener("input", () => { surChangement(input.value); marquerModifie(); });
+  ligne.append(input);
+  if (secret) {
+    const voir = document.createElement("button");
+    voir.className = "petit"; voir.type = "button"; voir.textContent = "👁"; voir.title = "Afficher / masquer";
+    voir.addEventListener("click", () => { input.type = input.type === "password" ? "text" : "password"; });
+    ligne.append(voir);
+  }
+  const copier = document.createElement("button");
+  copier.className = "petit"; copier.type = "button"; copier.textContent = "Copier";
+  copier.addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(input.value); }
+    catch { const t = input.type; input.type = "text"; input.select(); document.execCommand("copy"); input.type = t; }
+    copier.textContent = "Copié ✓"; setTimeout(() => (copier.textContent = "Copier"), 1500);
+  });
+  ligne.append(copier);
+  return ligne;
+}
+
+function construire() {
+  const conteneur = $("categories");
+  conteneur.textContent = "";
+  for (const cat of CATALOGUE) {
+    const details = document.createElement("details");
+    details.className = "carte categorie"; details.open = true; details.dataset.cat = cat.id;
+    const resume = document.createElement("summary");
+    const titre = document.createElement("h2");
+    titre.textContent = `${cat.icone} ${cat.titre}`;
+    const compte = document.createElement("span");
+    compte.className = "compte";
+    resume.append(titre, compte);
+    details.append(resume);
+
+    for (const outil of cat.outils) {
+      const bloc = document.createElement("div");
+      bloc.className = "outil";
+      bloc.dataset.recherche = [outil.nom, outil.aide, ...outil.champs.flatMap((c) => [c.libelle, c.env])].join(" ").toLowerCase();
+      const tete = document.createElement("div");
+      tete.className = "outil-tete";
+      const h = document.createElement("h3");
+      h.textContent = outil.nom;
+      if (outil.avenir) { const p = document.createElement("span"); p.className = "pastille avenir"; p.textContent = "à venir"; h.append(p); }
+      tete.append(h);
+      if (outil.lien) {
+        const a = document.createElement("a");
+        a.href = outil.lien; a.target = "_blank"; a.rel = "noreferrer noopener"; a.textContent = "Ouvrir le site ↗";
+        tete.append(a);
+      }
+      bloc.append(tete);
+      if (outil.aide) { const p = document.createElement("p"); p.className = "doux"; p.textContent = outil.aide; bloc.append(p); }
+
+      for (const champ of outil.champs) {
+        const cleChamp = `${outil.id}.${champ.id}`;
+        const label = document.createElement("label");
+        label.htmlFor = "c-" + cleChamp;
+        label.textContent = champ.libelle;
+        if (champ.env) { const e = document.createElement("span"); e.className = "env"; e.textContent = champ.env; e.title = "Nom de la variable sur Render"; label.append(e); }
+        if (champ.secret) { const p = document.createElement("span"); p.className = "pastille secret"; p.textContent = "secret"; label.append(p); }
+        else if (champ.public) { const p = document.createElement("span"); p.className = "pastille public"; p.textContent = "non secret"; label.append(p); }
+        bloc.append(label, champSaisie({
+          cleChamp, secret: !!champ.secret, placeholder: champ.defaut ? "" : "À renseigner",
+          val: etat.valeurs[cleChamp] ?? champ.defaut ?? "",
+          surChangement: (v) => { etat.valeurs[cleChamp] = v; majCompteurs(); },
+        }));
+      }
+      const labelNote = document.createElement("label");
+      labelNote.textContent = "Notes";
+      const note = document.createElement("textarea");
+      note.value = etat.notes[outil.id] ?? "";
+      note.placeholder = "Date de création, date de renouvellement, compte associé…";
+      note.addEventListener("input", () => { etat.notes[outil.id] = note.value; marquerModifie(); });
+      bloc.append(labelNote, note);
+      details.append(bloc);
+    }
+
+    // Clés ajoutées librement dans cette catégorie.
+    const zonePerso = document.createElement("div");
+    zonePerso.className = "outil";
+    const titrePerso = document.createElement("h3");
+    titrePerso.textContent = cat.outils.length ? "Autres clés de cette catégorie" : "Tes clés";
+    zonePerso.append(titrePerso);
+    const liste = document.createElement("div");
+    zonePerso.append(liste);
+    const dessinerPerso = () => {
+      liste.textContent = "";
+      (etat.perso[cat.id] ||= []).forEach((entree, i) => {
+        const ligne = document.createElement("div");
+        ligne.className = "perso";
+        ligne.dataset.recherche = (entree.libelle || "").toLowerCase();
+        const lib = document.createElement("input");
+        lib.value = entree.libelle; lib.placeholder = "Outil et nom de la clé";
+        lib.addEventListener("input", () => { entree.libelle = lib.value; ligne.dataset.recherche = lib.value.toLowerCase(); marquerModifie(); });
+        const suppr = document.createElement("button");
+        suppr.className = "petit"; suppr.type = "button"; suppr.textContent = "Supprimer";
+        suppr.addEventListener("click", () => {
+          if (!confirm(`Supprimer « ${entree.libelle || "cette clé"} » du coffre ?`)) return;
+          etat.perso[cat.id].splice(i, 1); marquerModifie(); dessinerPerso(); majCompteurs();
+        });
+        ligne.append(lib, champSaisie({ secret: true, placeholder: "Valeur", val: entree.valeur,
+          surChangement: (v) => { entree.valeur = v; majCompteurs(); } }), suppr);
+        liste.append(ligne);
+      });
+    };
+    dessinerPerso();
+    const ajouter = document.createElement("button");
+    ajouter.className = "petit"; ajouter.type = "button"; ajouter.textContent = "+ Ajouter une clé";
+    ajouter.style.marginTop = "8px";
+    ajouter.addEventListener("click", () => {
+      (etat.perso[cat.id] ||= []).push({ libelle: "", valeur: "" });
+      marquerModifie(); dessinerPerso(); majCompteurs();
+      liste.lastElementChild?.querySelector("input")?.focus();
+    });
+    zonePerso.append(ajouter);
+    details.append(zonePerso);
+    conteneur.append(details);
+  }
+  majCompteurs();
+  $("info-derniere").textContent = etat.majLe
+    ? `Dernier enregistrement : ${new Date(etat.majLe).toLocaleString("fr-FR")}.`
+    : "Pas encore enregistré.";
+}
+
+function majCompteurs() {
+  for (const cat of CATALOGUE) {
+    let total = 0, remplis = 0;
+    for (const o of cat.outils) for (const c of o.champs) {
+      total++;
+      if ((etat.valeurs[`${o.id}.${c.id}`] ?? c.defaut ?? "").trim()) remplis++;
+    }
+    for (const p of etat.perso[cat.id] || []) { total++; if ((p.valeur || "").trim()) remplis++; }
+    const el = document.querySelector(`[data-cat="${cat.id}"] .compte`);
+    if (el) el.textContent = `${remplis} / ${total} renseignée${remplis > 1 ? "s" : ""}`;
+  }
+}
+
+function filtrer(texte) {
+  const t = texte.trim().toLowerCase();
+  for (const cat of document.querySelectorAll(".categorie")) {
+    let visible = 0;
+    for (const el of cat.querySelectorAll(".outil[data-recherche], .perso")) {
+      const ok = !t || el.dataset.recherche.includes(t) || [...el.querySelectorAll("input")].some((i) => i.type !== "password" && i.value.toLowerCase().includes(t));
+      el.classList.toggle("masque", !ok);
+      if (ok) visible++;
+    }
+    cat.classList.toggle("masque", !!t && visible === 0);
+    if (t) cat.open = true;
+  }
+}
+
+async function enregistrer() {
+  etat.majLe = new Date().toISOString();
+  // Les valeurs par défaut non modifiées sont aussi conservées.
+  for (const o of CATALOGUE.flatMap((c) => c.outils)) for (const c of o.champs) {
+    const k = `${o.id}.${c.id}`;
+    if (etat.valeurs[k] === undefined && c.defaut) etat.valeurs[k] = c.defaut;
+  }
+  const paquet = await chiffrer(etat);
+  const html = SOURCE.replace(
+    /(<script id="coffre" type="application\/json">)[\s\S]*?(<\/script>)/,
+    (_, debut, fin) => debut + JSON.stringify(paquet) + fin);
+  const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "whaoo-coffre-cles.html";
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  marquerModifie(false);
+  $("info-derniere").textContent = `Dernier enregistrement : ${new Date(etat.majLe).toLocaleString("fr-FR")}.`;
+}
+
+function verrouiller() {
+  cle = null; etat = null;
+  location.reload();
+}
+
+function relancerMinuteur() {
+  clearTimeout(minuteur);
+  if (!etat) return;
+  minuteur = setTimeout(() => {
+    if (modifie) { $("etat").textContent = "Inactif : enregistre tes modifications"; relancerMinuteur(); return; }
+    verrouiller();
+  }, VERROU_MINUTES * 60 * 1000);
+}
+
+// --- Démarrage ---
+const paquet = lireCoffre();
+if (paquet) {
+  afficher("ecran-deverrouillage");
+  $("mdp-ouverture").focus();
+} else {
+  afficher("ecran-creation");
+  $("mdp-nouveau").focus();
+}
+
+$("mdp-nouveau").addEventListener("input", (e) => {
+  const s = forceMotDePasse(e.target.value);
+  const couleurs = ["var(--alerte)", "var(--alerte)", "var(--rose-fonce)", "var(--rose-fonce)", "var(--accent)", "var(--accent)"];
+  $("force-barre").style.width = (s / 5) * 100 + "%";
+  $("force-barre").style.background = couleurs[s];
+  $("force-texte").textContent = e.target.value ? ["Très faible", "Faible", "Moyen", "Correct", "Solide", "Très solide"][s] : "";
+});
+
+$("bouton-creer").addEventListener("click", async () => {
+  const m1 = $("mdp-nouveau").value, m2 = $("mdp-confirmation").value;
+  const erreur = validerNouveau(m1, m2);
+  $("erreur-creation").textContent = erreur;
+  if (erreur) return;
+  $("bouton-creer").disabled = true; $("bouton-creer").textContent = "Création…";
+  sel = crypto.getRandomValues(new Uint8Array(16));
+  cle = await deriver(m1, sel);
+  etat = { valeurs: {}, notes: {}, perso: {}, majLe: null };
+  $("mdp-nouveau").value = ""; $("mdp-confirmation").value = "";
+  construire(); afficher("ecran-coffre"); marquerModifie(true); relancerMinuteur();
+});
+
+async function ouvrir() {
+  $("erreur-ouverture").textContent = "";
+  $("bouton-ouvrir").disabled = true; $("bouton-ouvrir").textContent = "Vérification…";
+  try {
+    sel = deb64(paquet.sel);
+    cle = await deriver($("mdp-ouverture").value, sel);
+    const clair = await crypto.subtle.decrypt({ name: "AES-GCM", iv: deb64(paquet.iv) }, cle, deb64(paquet.donnees));
+    etat = JSON.parse(dec.decode(clair));
+    etat.valeurs ||= {}; etat.notes ||= {}; etat.perso ||= {};
+    $("mdp-ouverture").value = "";
+    construire(); afficher("ecran-coffre"); marquerModifie(false); relancerMinuteur();
+  } catch {
+    cle = null;
+    $("erreur-ouverture").textContent = "Mot de passe incorrect.";
+  } finally {
+    $("bouton-ouvrir").disabled = false; $("bouton-ouvrir").textContent = "Déverrouiller";
+  }
+}
+$("bouton-ouvrir").addEventListener("click", ouvrir);
+$("mdp-ouverture").addEventListener("keydown", (e) => { if (e.key === "Enter") ouvrir(); });
+$("mdp-confirmation").addEventListener("keydown", (e) => { if (e.key === "Enter") $("bouton-creer").click(); });
+
+if (paquet) {
+  $("info-coffre").textContent = "Coffre chiffré. Saisis ton mot de passe pour l'ouvrir.";
+}
+
+$("bouton-enregistrer").addEventListener("click", enregistrer);
+$("bouton-verrouiller").addEventListener("click", () => {
+  if (modifie && !confirm("Tes modifications ne sont pas enregistrées. Verrouiller quand même ?")) return;
+  modifie = false; verrouiller();
+});
+$("recherche").addEventListener("input", (e) => filtrer(e.target.value));
+$("bouton-changer-mdp").addEventListener("click", () => $("zone-changer-mdp").classList.toggle("masque"));
+$("bouton-valider-mdp").addEventListener("click", async () => {
+  const m1 = $("mdp-change-1").value, m2 = $("mdp-change-2").value;
+  const erreur = validerNouveau(m1, m2);
+  $("erreur-change").textContent = erreur;
+  if (erreur) return;
+  // Le sel et la clé changent ensemble, une fois la dérivation terminée :
+  // un enregistrement pendant le calcul utilise encore l'ancien couple.
+  $("bouton-valider-mdp").disabled = true; $("bouton-enregistrer").disabled = true;
+  const nouveauSel = crypto.getRandomValues(new Uint8Array(16));
+  const nouvelleCle = await deriver(m1, nouveauSel);
+  sel = nouveauSel; cle = nouvelleCle;
+  $("bouton-valider-mdp").disabled = false; $("bouton-enregistrer").disabled = false;
+  $("mdp-change-1").value = ""; $("mdp-change-2").value = "";
+  $("zone-changer-mdp").classList.add("masque");
+  marquerModifie(true);
+  $("erreur-change").textContent = "";
+  alert("Nouveau mot de passe prêt. Clique sur « Enregistrer le coffre » pour qu'il soit pris en compte.");
+});
+
+for (const ev of ["mousemove", "keydown", "click", "touchstart", "scroll"]) {
+  document.addEventListener(ev, relancerMinuteur, { passive: true });
+}
+window.addEventListener("beforeunload", (e) => { if (modifie) { e.preventDefault(); e.returnValue = ""; } });
+</script>
+</body>
+</html>

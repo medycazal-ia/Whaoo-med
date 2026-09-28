@@ -72,6 +72,20 @@ button.petit { padding: 5px 9px; font-size: .85rem; }
 .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 .perso { display: grid; grid-template-columns: 1fr 1.4fr auto; gap: 6px; margin-top: 8px; }
 @media (max-width: 560px) { .perso { grid-template-columns: 1fr; } }
+.code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 1.35rem; letter-spacing: .06em;
+  background: var(--menthe); border-radius: 12px; padding: 14px; text-align: center; margin: 10px 0; }
+.alerte-carte { border: 2px solid var(--rose-fonce); }
+.lien { background: none; border: none; padding: 0; color: var(--accent); text-decoration: underline; }
+.lien:hover { background: none; }
+.case { display: flex; gap: 8px; align-items: flex-start; color: var(--texte); font-size: .95rem; }
+.case input { width: auto; margin-top: 4px; }
+#impression { display: none; }
+@media print {
+  body { background: #fff; }
+  main { display: none; }
+  #impression { display: block; color: #000; font: 14pt/1.5 system-ui, sans-serif; padding: 2cm; }
+  #impression .code { background: none; border: 2px solid #000; color: #000; font-size: 20pt; }
+}
 </style>
 </head>
 <body>
@@ -84,7 +98,7 @@ button.petit { padding: 5px 9px; font-size: .85rem; }
   <!-- Création : premier lancement -->
   <section id="ecran-creation" class="ecran carte">
     <h2>Créer ton coffre</h2>
-    <p>Choisis le mot de passe qui protégera toutes tes clés. <strong>Si tu l'oublies, personne ne pourra rouvrir le coffre</strong>, pas même Claude : note-le dans un endroit sûr, hors de cet ordinateur.</p>
+    <p>Choisis le mot de passe qui protégera toutes tes clés. Juste après, le coffre te donnera un <strong>code de récupération</strong> : c'est le seul moyen de le rouvrir si tu oublies ton mot de passe, personne d'autre (pas même Claude) ne peut le faire.</p>
     <label for="mdp-nouveau">Mot de passe (12 caractères minimum, une phrase fonctionne très bien)</label>
     <input id="mdp-nouveau" type="password" autocomplete="new-password">
     <div class="force"><div id="force-barre"></div></div>
@@ -103,6 +117,13 @@ button.petit { padding: 5px 9px; font-size: .85rem; }
     <input id="mdp-ouverture" type="password" autocomplete="current-password">
     <p id="erreur-ouverture" class="erreur"></p>
     <button id="bouton-ouvrir" class="principal">Déverrouiller</button>
+    <p style="margin-top:14px"><button id="lien-code" class="lien" type="button">Mot de passe oublié ? Utiliser le code de récupération</button></p>
+    <div id="zone-code" class="masque">
+      <label for="code-ouverture">Code de récupération (les tirets sont facultatifs)</label>
+      <input id="code-ouverture" type="text" autocomplete="off" spellcheck="false" placeholder="XXXXX-XXXXX-XXXXX-XXXXX" style="font-family: ui-monospace, monospace; text-transform: uppercase">
+      <p id="erreur-code" class="erreur"></p>
+      <button id="bouton-ouvrir-code" class="principal">Ouvrir avec le code</button>
+    </div>
   </section>
 
   <!-- Coffre ouvert -->
@@ -113,6 +134,22 @@ button.petit { padding: 5px 9px; font-size: .85rem; }
       <button id="bouton-enregistrer" class="principal">💾 Enregistrer le coffre</button>
       <button id="bouton-verrouiller">🔒 Verrouiller</button>
     </div>
+    <div id="panneau-code" class="carte alerte-carte masque">
+      <h2>🧾 Ton code de récupération</h2>
+      <p>Si tu oublies ton mot de passe, ce code permet de rouvrir le coffre et d'en choisir un nouveau. <strong>Il n'est affiché qu'une seule fois.</strong></p>
+      <div id="code-recuperation" class="code"></div>
+      <p class="doux">Créé le <span id="code-date"></span>. Imprime-le ou recopie-le sur papier, puis range-le à part (chez toi, ou confié à une personne de confiance). Ne le garde pas dans le même endroit que le fichier du coffre : ensemble, ils ouvrent tout.</p>
+      <div class="actions">
+        <button id="bouton-imprimer-code" type="button">🖨️ Imprimer</button>
+        <button id="bouton-copier-code" type="button">Copier</button>
+      </div>
+      <label class="case"><input id="case-code-note" type="checkbox"> J'ai imprimé ou recopié ce code et je le garde en lieu sûr.</label>
+      <div class="actions"><button id="bouton-code-note" class="principal" type="button" disabled>C'est noté</button></div>
+    </div>
+    <div id="avis-recuperation" class="carte alerte-carte masque">
+      <h2>🔑 Coffre ouvert avec le code de récupération</h2>
+      <p>Choisis un nouveau mot de passe dans « Réglages du coffre » en bas de page, puis enregistre le coffre. Ton code de récupération reste valable.</p>
+    </div>
     <p class="doux">Après « Enregistrer », ton navigateur télécharge une nouvelle version du fichier. Remplace l'ancienne par celle-ci : c'est elle qui contient tes dernières modifications. Le coffre se verrouille seul après 10 minutes sans activité.</p>
     <div id="categories"></div>
     <div class="carte">
@@ -120,8 +157,10 @@ button.petit { padding: 5px 9px; font-size: .85rem; }
       <p class="doux" id="info-derniere"></p>
       <div class="actions">
         <button id="bouton-changer-mdp">Changer le mot de passe</button>
+        <button id="bouton-nouveau-code">Créer un nouveau code de récupération</button>
       </div>
       <div id="zone-changer-mdp" class="masque">
+        <h3 id="titre-changer-mdp"></h3>
         <label for="mdp-change-1">Nouveau mot de passe (12 caractères minimum)</label>
         <input id="mdp-change-1" type="password" autocomplete="new-password">
         <label for="mdp-change-2">Confirme le nouveau mot de passe</label>
@@ -132,6 +171,12 @@ button.petit { padding: 5px 9px; font-size: .85rem; }
     </div>
   </section>
 </main>
+<div id="impression">
+  <h1>Code de récupération — coffre des clés whaoo</h1>
+  <p>Ce code ouvre le fichier « whaoo-coffre-cles.html » si le mot de passe est oublié : bouton « Mot de passe oublié ? Utiliser le code de récupération ».</p>
+  <div id="impression-code" class="code"></div>
+  <p>Créé le <span id="impression-date"></span>. À conserver en lieu sûr, séparément du fichier du coffre.</p>
+</div>
 
 <script id="coffre" type="application/json">null</script>
 <script>
@@ -281,24 +326,97 @@ const enc = new TextEncoder();
 const dec = new TextDecoder();
 const b64 = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf)));
 const deb64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+// Alphabet sans caractères ambigus (ni I, L, O, U, ni 0/1 confondables).
+const ALPHABET_CODE = "23456789ABCDEFGHJKMNPQRSTVWXYZ";
 
-let cle = null;     // CryptoKey dérivée du mot de passe (en mémoire seulement)
-let sel = null;     // sel PBKDF2 associé
-let etat = null;    // { valeurs, notes, perso, majLe }
+// Chiffrement en enveloppe : les données sont chiffrées avec une clé
+// maîtresse aléatoire, elle-même chiffrée deux fois — avec le mot de passe
+// et avec le code de récupération. L'un ou l'autre suffit pour ouvrir.
+let maitre = null;          // clé maîtresse (32 octets, en mémoire seulement)
+let enveloppeMdp = null;    // clé maîtresse chiffrée par le mot de passe
+let enveloppeRecup = null;  // clé maîtresse chiffrée par le code de récupération
+let codeAffiche = null;     // code à noter, affiché une seule fois
+let etat = null;            // { valeurs, notes, perso, majLe }
 let modifie = false;
 let minuteur = null;
 
-async function deriver(motDePasse, selOctets) {
-  const base = await crypto.subtle.importKey("raw", enc.encode(motDePasse), "PBKDF2", false, ["deriveKey"]);
+async function deriver(secret, selOctets) {
+  const base = await crypto.subtle.importKey("raw", enc.encode(secret), "PBKDF2", false, ["deriveKey"]);
   return crypto.subtle.deriveKey(
     { name: "PBKDF2", salt: selOctets, iterations: ITERATIONS, hash: "SHA-256" },
     base, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
 }
 
+async function envelopper(secret, octets) {
+  const sel = crypto.getRandomValues(new Uint8Array(16));
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const kek = await deriver(secret, sel);
+  const ct = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, kek, octets);
+  return { sel: b64(sel), iv: b64(iv), cle: b64(ct) };
+}
+
+async function desenvelopper(secret, env) {
+  const kek = await deriver(secret, deb64(env.sel));
+  return new Uint8Array(await crypto.subtle.decrypt({ name: "AES-GCM", iv: deb64(env.iv) }, kek, deb64(env.cle)));
+}
+
+const cleDonnees = () => crypto.subtle.importKey("raw", maitre, "AES-GCM", false, ["encrypt", "decrypt"]);
+
 async function chiffrer(objet) {
   const iv = crypto.getRandomValues(new Uint8Array(12));
-  const ct = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, cle, enc.encode(JSON.stringify(objet)));
-  return { v: 1, kdf: "PBKDF2-SHA256", iterations: ITERATIONS, sel: b64(sel), iv: b64(iv), donnees: b64(ct) };
+  const ct = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, await cleDonnees(), enc.encode(JSON.stringify(objet)));
+  return { v: 2, kdf: "PBKDF2-SHA256", iterations: ITERATIONS, mdp: enveloppeMdp, recup: enveloppeRecup, iv: b64(iv), donnees: b64(ct) };
+}
+
+async function dechiffrerDonnees(paquet) {
+  const clair = await crypto.subtle.decrypt({ name: "AES-GCM", iv: deb64(paquet.iv) }, await cleDonnees(), deb64(paquet.donnees));
+  return JSON.parse(dec.decode(clair));
+}
+
+function genererCode() {
+  const octets = crypto.getRandomValues(new Uint8Array(20));
+  let code = "";
+  for (let i = 0; i < 20; i++) {
+    // Rejet des valeurs hautes pour une distribution uniforme (240 = 8 × 30).
+    let o = octets[i];
+    while (o >= 240) o = crypto.getRandomValues(new Uint8Array(1))[0];
+    code += ALPHABET_CODE[o % ALPHABET_CODE.length];
+    if (i % 5 === 4 && i < 19) code += "-";
+  }
+  return code;
+}
+
+const normaliserCode = (s) => s.toUpperCase().replace(/[^A-Z0-9]/g, "").replace(/(.{5})(?=.)/g, "$1-");
+
+// Nouveau code : la clé maîtresse est ré-enveloppée, l'ancien code cesse
+// de fonctionner dès l'enregistrement suivant.
+async function nouveauCodeRecuperation() {
+  const code = genererCode();
+  const env = await envelopper(code, maitre);
+  enveloppeRecup = env;
+  codeAffiche = code;
+  afficherPanneauCode();
+  marquerModifie(true);
+}
+
+function afficherPanneauCode() {
+  $("code-recuperation").textContent = codeAffiche;
+  $("code-date").textContent = new Date().toLocaleDateString("fr-FR");
+  $("impression-code").textContent = codeAffiche;
+  $("impression-date").textContent = new Date().toLocaleDateString("fr-FR");
+  $("case-code-note").checked = false;
+  $("bouton-code-note").disabled = true;
+  $("panneau-code").classList.remove("masque");
+  majBoutonEnregistrer();
+  $("panneau-code").scrollIntoView({ block: "start" });
+}
+
+function majBoutonEnregistrer() {
+  const codeEnAttente = !$("panneau-code").classList.contains("masque");
+  const sansMdp = !enveloppeMdp;
+  $("bouton-enregistrer").disabled = codeEnAttente || sansMdp;
+  $("bouton-enregistrer").title = sansMdp ? "Choisis d'abord un nouveau mot de passe"
+    : codeEnAttente ? "Confirme d'abord avoir noté ton code de récupération" : "";
 }
 
 function lireCoffre() {
@@ -331,8 +449,6 @@ function marquerModifie(v = true) {
   $("etat").classList.toggle("modifie", v);
 }
 
-function valeur(cleChamp) { return etat.valeurs[cleChamp] ?? ""; }
-
 function champSaisie({ cleChamp, secret, placeholder, surChangement, val }) {
   const ligne = document.createElement("div");
   ligne.className = "ligne";
@@ -353,13 +469,18 @@ function champSaisie({ cleChamp, secret, placeholder, surChangement, val }) {
   }
   const copier = document.createElement("button");
   copier.className = "petit"; copier.type = "button"; copier.textContent = "Copier";
-  copier.addEventListener("click", async () => {
-    try { await navigator.clipboard.writeText(input.value); }
-    catch { const t = input.type; input.type = "text"; input.select(); document.execCommand("copy"); input.type = t; }
-    copier.textContent = "Copié ✓"; setTimeout(() => (copier.textContent = "Copier"), 1500);
-  });
+  copier.addEventListener("click", () => copierTexte(input.value, copier, input));
   ligne.append(copier);
   return ligne;
+}
+
+async function copierTexte(texte, bouton, input) {
+  try { await navigator.clipboard.writeText(texte); }
+  catch {
+    if (input) { const t = input.type; input.type = "text"; input.select(); document.execCommand("copy"); input.type = t; }
+  }
+  const avant = bouton.textContent;
+  bouton.textContent = "Copié ✓"; setTimeout(() => (bouton.textContent = avant), 1500);
 }
 
 function construire() {
@@ -493,6 +614,7 @@ function filtrer(texte) {
 }
 
 async function enregistrer() {
+  if (!enveloppeMdp || !enveloppeRecup) return;
   etat.majLe = new Date().toISOString();
   // Les valeurs par défaut non modifiées sont aussi conservées.
   for (const o of CATALOGUE.flatMap((c) => c.outils)) for (const c of o.champs) {
@@ -514,7 +636,7 @@ async function enregistrer() {
 }
 
 function verrouiller() {
-  cle = null; etat = null;
+  maitre = null; etat = null; codeAffiche = null;
   location.reload();
 }
 
@@ -527,10 +649,22 @@ function relancerMinuteur() {
   }, VERROU_MINUTES * 60 * 1000);
 }
 
+function ouvrirCoffre() {
+  etat.valeurs ||= {}; etat.notes ||= {}; etat.perso ||= {};
+  construire(); afficher("ecran-coffre"); relancerMinuteur();
+}
+
+function occuper(bouton, texte) {
+  const avant = bouton.textContent;
+  bouton.disabled = true; bouton.textContent = texte;
+  return () => { bouton.disabled = false; bouton.textContent = avant; };
+}
+
 // --- Démarrage ---
 const paquet = lireCoffre();
 if (paquet) {
   afficher("ecran-deverrouillage");
+  $("info-coffre").textContent = "Coffre chiffré. Saisis ton mot de passe pour l'ouvrir.";
   $("mdp-ouverture").focus();
 } else {
   afficher("ecran-creation");
@@ -550,39 +684,96 @@ $("bouton-creer").addEventListener("click", async () => {
   const erreur = validerNouveau(m1, m2);
   $("erreur-creation").textContent = erreur;
   if (erreur) return;
-  $("bouton-creer").disabled = true; $("bouton-creer").textContent = "Création…";
-  sel = crypto.getRandomValues(new Uint8Array(16));
-  cle = await deriver(m1, sel);
-  etat = { valeurs: {}, notes: {}, perso: {}, majLe: null };
+  occuper($("bouton-creer"), "Création…");
+  maitre = crypto.getRandomValues(new Uint8Array(32));
+  enveloppeMdp = await envelopper(m1, maitre);
   $("mdp-nouveau").value = ""; $("mdp-confirmation").value = "";
-  construire(); afficher("ecran-coffre"); marquerModifie(true); relancerMinuteur();
+  etat = { valeurs: {}, notes: {}, perso: {}, majLe: null };
+  ouvrirCoffre();
+  await nouveauCodeRecuperation();
 });
 
-async function ouvrir() {
+async function ouvrirAvecMotDePasse() {
   $("erreur-ouverture").textContent = "";
-  $("bouton-ouvrir").disabled = true; $("bouton-ouvrir").textContent = "Vérification…";
+  const liberer = occuper($("bouton-ouvrir"), "Vérification…");
+  const mdp = $("mdp-ouverture").value;
   try {
-    sel = deb64(paquet.sel);
-    cle = await deriver($("mdp-ouverture").value, sel);
-    const clair = await crypto.subtle.decrypt({ name: "AES-GCM", iv: deb64(paquet.iv) }, cle, deb64(paquet.donnees));
-    etat = JSON.parse(dec.decode(clair));
-    etat.valeurs ||= {}; etat.notes ||= {}; etat.perso ||= {};
+    if (paquet.v === 1) {
+      // Ancien format (sans code de récupération) : on l'ouvre, puis on
+      // passe au nouveau format en créant un code.
+      const kek = await deriver(mdp, deb64(paquet.sel));
+      const clair = await crypto.subtle.decrypt({ name: "AES-GCM", iv: deb64(paquet.iv) }, kek, deb64(paquet.donnees));
+      etat = JSON.parse(dec.decode(clair));
+      maitre = crypto.getRandomValues(new Uint8Array(32));
+      enveloppeMdp = await envelopper(mdp, maitre);
+      $("mdp-ouverture").value = "";
+      ouvrirCoffre();
+      await nouveauCodeRecuperation();
+      return;
+    }
+    maitre = await desenvelopper(mdp, paquet.mdp);
+    etat = await dechiffrerDonnees(paquet);
+    enveloppeMdp = paquet.mdp; enveloppeRecup = paquet.recup;
     $("mdp-ouverture").value = "";
-    construire(); afficher("ecran-coffre"); marquerModifie(false); relancerMinuteur();
+    ouvrirCoffre(); marquerModifie(false); majBoutonEnregistrer();
   } catch {
-    cle = null;
+    maitre = null;
     $("erreur-ouverture").textContent = "Mot de passe incorrect.";
   } finally {
-    $("bouton-ouvrir").disabled = false; $("bouton-ouvrir").textContent = "Déverrouiller";
+    liberer();
   }
 }
-$("bouton-ouvrir").addEventListener("click", ouvrir);
-$("mdp-ouverture").addEventListener("keydown", (e) => { if (e.key === "Enter") ouvrir(); });
-$("mdp-confirmation").addEventListener("keydown", (e) => { if (e.key === "Enter") $("bouton-creer").click(); });
 
-if (paquet) {
-  $("info-coffre").textContent = "Coffre chiffré. Saisis ton mot de passe pour l'ouvrir.";
+async function ouvrirAvecCode() {
+  $("erreur-code").textContent = "";
+  if (paquet.v === 1) {
+    $("erreur-code").textContent = "Ce coffre a été créé avant l'ajout du code de récupération : seul le mot de passe peut l'ouvrir.";
+    return;
+  }
+  const liberer = occuper($("bouton-ouvrir-code"), "Vérification…");
+  try {
+    maitre = await desenvelopper(normaliserCode($("code-ouverture").value), paquet.recup);
+    etat = await dechiffrerDonnees(paquet);
+    enveloppeRecup = paquet.recup; enveloppeMdp = null;
+    $("code-ouverture").value = "";
+    ouvrirCoffre(); marquerModifie(true);
+    // Mot de passe oublié : on impose d'en choisir un nouveau.
+    $("titre-changer-mdp").textContent = "Choisis ton nouveau mot de passe";
+    $("zone-changer-mdp").classList.remove("masque");
+    $("avis-recuperation").classList.remove("masque");
+    majBoutonEnregistrer();
+    $("avis-recuperation").scrollIntoView({ block: "start" });
+    $("mdp-change-1").focus();
+  } catch {
+    maitre = null;
+    $("erreur-code").textContent = "Code de récupération incorrect.";
+  } finally {
+    liberer();
+  }
 }
+
+$("bouton-ouvrir").addEventListener("click", ouvrirAvecMotDePasse);
+$("mdp-ouverture").addEventListener("keydown", (e) => { if (e.key === "Enter") ouvrirAvecMotDePasse(); });
+$("mdp-confirmation").addEventListener("keydown", (e) => { if (e.key === "Enter") $("bouton-creer").click(); });
+$("lien-code").addEventListener("click", () => { $("zone-code").classList.toggle("masque"); $("code-ouverture").focus(); });
+$("bouton-ouvrir-code").addEventListener("click", ouvrirAvecCode);
+$("code-ouverture").addEventListener("keydown", (e) => { if (e.key === "Enter") ouvrirAvecCode(); });
+
+$("case-code-note").addEventListener("change", (e) => { $("bouton-code-note").disabled = !e.target.checked; });
+$("bouton-code-note").addEventListener("click", () => {
+  $("panneau-code").classList.add("masque");
+  codeAffiche = null;
+  $("code-recuperation").textContent = ""; $("impression-code").textContent = "";
+  majBoutonEnregistrer();
+});
+$("bouton-copier-code").addEventListener("click", (e) => copierTexte(codeAffiche, e.target));
+$("bouton-imprimer-code").addEventListener("click", () => window.print());
+$("bouton-nouveau-code").addEventListener("click", async () => {
+  if (!confirm("Créer un nouveau code de récupération ? L'ancien ne fonctionnera plus dès que tu auras enregistré le coffre.")) return;
+  const liberer = occuper($("bouton-nouveau-code"), "Création…");
+  await nouveauCodeRecuperation();
+  liberer();
+});
 
 $("bouton-enregistrer").addEventListener("click", enregistrer);
 $("bouton-verrouiller").addEventListener("click", () => {
@@ -596,17 +787,18 @@ $("bouton-valider-mdp").addEventListener("click", async () => {
   const erreur = validerNouveau(m1, m2);
   $("erreur-change").textContent = erreur;
   if (erreur) return;
-  // Le sel et la clé changent ensemble, une fois la dérivation terminée :
-  // un enregistrement pendant le calcul utilise encore l'ancien couple.
-  $("bouton-valider-mdp").disabled = true; $("bouton-enregistrer").disabled = true;
-  const nouveauSel = crypto.getRandomValues(new Uint8Array(16));
-  const nouvelleCle = await deriver(m1, nouveauSel);
-  sel = nouveauSel; cle = nouvelleCle;
-  $("bouton-valider-mdp").disabled = false; $("bouton-enregistrer").disabled = false;
+  // L'enveloppe n'est remplacée qu'une fois prête : un enregistrement
+  // pendant le calcul reste bloqué.
+  const liberer = occuper($("bouton-valider-mdp"), "Calcul…");
+  $("bouton-enregistrer").disabled = true;
+  enveloppeMdp = await envelopper(m1, maitre);
+  liberer();
   $("mdp-change-1").value = ""; $("mdp-change-2").value = "";
   $("zone-changer-mdp").classList.add("masque");
+  $("avis-recuperation").classList.add("masque");
+  $("titre-changer-mdp").textContent = "";
   marquerModifie(true);
-  $("erreur-change").textContent = "";
+  majBoutonEnregistrer();
   alert("Nouveau mot de passe prêt. Clique sur « Enregistrer le coffre » pour qu'il soit pris en compte.");
 });
 

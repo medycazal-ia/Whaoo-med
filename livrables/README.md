@@ -11,4 +11,5 @@
   `public/videos/`.
 - `coffre-cles/whaoo-coffre-cles.html` : coffre des clés vierge (fichier
   HTML autonome, chiffré AES-256 avec le mot de passe choisi à sa
-  création). Ne jamais committer une version remplie.
+  création, et un code de récupération en cas d'oubli). Ne jamais
+  committer une version remplie.

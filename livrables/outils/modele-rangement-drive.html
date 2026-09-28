@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Modèle de rangement Drive</title>
+<style>
+:root {
+  --fond: #f6f7f5; --carte: #ffffff; --texte: #1f2a26; --doux: #4a5a53; --bord: #d8e0db;
+  --fluo: #ff7a00; --fluo-texte: #111111; --code: #16211d; --code-texte: #e8f1ec; --accent: #2a7a4a;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --fond: #121816; --carte: #1b2420; --texte: #e8f1ec; --doux: #b3c2ba; --bord: #2e3b35;
+    --code: #0c110f; --accent: #5cc48a;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--fond); color: var(--texte);
+  font: 15px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+main { max-width: 880px; margin: 0 auto; padding: 16px; }
+h1 { font-size: 1.5rem; margin: 12px 0 4px; }
+h2 { font-size: 1.15rem; margin: 0 0 8px; }
+p, li { margin: 6px 0; }
+.doux { color: var(--doux); }
+.carte { background: var(--carte); border: 1px solid var(--bord); border-radius: 14px; padding: 16px; margin: 14px 0; }
+.fluo { background: var(--fluo); color: var(--fluo-texte); font-weight: 700; border-radius: 4px; padding: 0 4px;
+  box-shadow: 0 0 0 1px #ffb366 inset; }
+.grille { display: grid; grid-template-columns: 1fr 1.6fr; gap: 8px 12px; align-items: center; }
+@media (max-width: 600px) { .grille { grid-template-columns: 1fr; } }
+label { font-size: .9rem; }
+label small { display: block; color: var(--doux); font-size: .8rem; }
+input { width: 100%; font: inherit; color: var(--texte); background: var(--fond); border: 1px solid var(--bord);
+  border-radius: 8px; padding: 8px 10px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .85rem; }
+input.rempli { border-color: var(--accent); }
+pre { background: var(--code); color: var(--code-texte); border-radius: 12px; padding: 14px; overflow-x: auto;
+  font: 12.5px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre; }
+pre .fluo { font-weight: 700; }
+button { font: inherit; cursor: pointer; border-radius: 10px; border: 1px solid var(--bord); background: var(--carte);
+  color: var(--texte); padding: 8px 14px; }
+button.principal { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 10px 0; }
+.avertissement { color: #b3261e; font-weight: 600; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .avertissement { color: #ff9b8f; } }
+ol li { margin: 8px 0; }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9em; }
+@media print { .actions, .no-print { display: none; } pre { white-space: pre-wrap; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>🗂️ Rangement automatique Google Drive</h1>
+  <p class="doux">Modèle réutilisable pour n'importe quel projet. Tout ce qui est
+  <span class="fluo">surligné en orange fluo</span> est à adapter au projet. Remplis les
+  champs ci-dessous : le script se met à jour tout seul, puis clique sur « Copier le script ».</p>
+
+  <section class="carte">
+    <h2>1. Ce qu'il faut adapter pour un nouveau projet</h2>
+    <p>Crée d'abord dans Google Drive un dossier pour le projet avec ses sous-dossiers
+    (<code>00 - À trier</code> à <code>07 - Support et emails</code>), plus un dossier
+    <code>Téléchargements</code> à la racine de Mon Drive si tu ne l'as pas déjà.</p>
+    <p>Pour chaque dossier, ouvre-le dans Drive et copie son adresse : tu peux coller
+    l'adresse entière, l'identifiant (la fin de l'adresse, après <code>/folders/</code>)
+    est extrait automatiquement.</p>
+    <div class="grille" id="champs"></div>
+    <p id="manquants" class="avertissement"></p>
+  </section>
+
+  <section class="carte">
+    <h2>2. Le script</h2>
+    <div class="actions">
+      <button id="copier" class="principal" type="button">📋 Copier le script</button>
+      <button id="imprimer" type="button">🖨️ Imprimer</button>
+      <span id="retour" class="doux"></span>
+    </div>
+    <pre id="apercu"></pre>
+  </section>
+
+  <section class="carte">
+    <h2>3. L'installer (5 minutes, une seule fois par projet)</h2>
+    <ol>
+      <li>Va sur <strong>script.google.com</strong> → <strong>Nouveau projet</strong>, et renomme-le
+        (par exemple « <span class="fluo" data-miroir="NOM_DU_PROJET">NOM_DU_PROJET</span> - Rangement automatique »).</li>
+      <li>Efface tout le contenu, colle le script copié, puis clique sur 💾.</li>
+      <li><strong>Ne clique pas sur « Déployer »</strong> : ce n'est pas nécessaire.</li>
+      <li>Dans le menu de gauche, clique sur l'horloge ⏰ <strong>Déclencheurs</strong> →
+        <strong>+ Ajouter un déclencheur</strong> :
+        <ul>
+          <li>Fonction à exécuter : <strong>rangerTelechargements</strong></li>
+          <li>Source de l'événement : <strong>Déclencheur horaire</strong></li>
+          <li>Type : <strong>Minuteur</strong> — Intervalle : <strong>Toutes les 10 minutes</strong></li>
+        </ul>
+        puis <strong>Enregistrer</strong>.</li>
+      <li>Google demande ton autorisation : <strong>Paramètres avancés</strong> →
+        <strong>Accéder à… (non sécurisé)</strong> → <strong>Autoriser</strong>
+        (normal pour un script que tu as créé toi-même).</li>
+      <li>Sur le Chromebook : Paramètres → Téléchargements → Emplacement →
+        <strong>Google Drive → Mon Drive → Téléchargements</strong> (une seule fois, commun à tous les projets).</li>
+    </ol>
+    <p class="doux">Les fichiers téléchargés dont le nom commence par le préfixe du projet sont rangés
+    toutes les 10 minutes. Tout ce que tu déposes toi-même dans <code>00 - À trier</code> est aussi classé.
+    Ce qui n'est pas reconnu reste dans <code>00 - À trier</code>.</p>
+  </section>
+</main>
+
+<script type="text/plain" id="modele">// Rangement automatique des fichiers du projet {{NOM_DU_PROJET}} dans Google Drive.
+// Toutes les 10 minutes : les fichiers dont le nom commence par « {{NOM_DU_PROJET}} »
+// arrivés dans Mon Drive/Téléchargements, et tout ce qui est déposé dans
+// « 00 - À trier », sont classés dans le bon sous-dossier.
+// Ce qui n'est pas reconnu reste dans « 00 - À trier ».
+
+const PREFIXE = '{{NOM_DU_PROJET}}';
+
+const DOSSIERS = {
+  telechargements: '{{ID_TELECHARGEMENTS}}', // Mon Drive/Téléchargements
+  aTrier: '{{ID_A_TRIER}}',                  // 00 - À trier
+  sauvegardes: '{{ID_SAUVEGARDES}}',         // 01 - Sauvegardes
+  securite: '{{ID_SECURITE}}',               // 02 - Sécurité
+  videos: '{{ID_VIDEOS}}',                   // 03 - Vidéos et réseaux
+  visuels: '{{ID_VISUELS}}',                 // 04 - Logo et visuels
+  juridique: '{{ID_JURIDIQUE}}',             // 05 - Juridique et RGPD
+  presentations: '{{ID_PRESENTATIONS}}',     // 06 - Présentations
+  support: '{{ID_SUPPORT}}',                 // 07 - Support et emails
+};
+
+// Règles appliquées dans l'ordre : la première qui correspond au nom gagne.
+const REGLES = [
+  { dossier: 'securite', motif: /coffre|cles|cle-|secret/ },
+  { dossier: 'juridique', motif: /registre|cnil|rgpd|mentions|cgu|confidentialite|legal/ },
+  { dossier: 'videos', motif: /\.(mp4|webm|mov|m4v|mp3|wav|m4a)$|video|reel|scenario/ },
+  { dossier: 'visuels', motif: /logo|icon|banniere|avatar|visuel|\.(png|jpe?g|svg|webp|gif)$/ },
+  { dossier: 'presentations', motif: /pitch|presentation|rapport|feuille|roadmap|\.(pptx?|key)$/ },
+  { dossier: 'support', motif: /support|suggestion|email|mail|faq/ },
+];
+
+function rangerTelechargements() {
+  for (const id of [DOSSIERS.telechargements, DOSSIERS.aTrier]) {
+    const fichiers = DriveApp.getFolderById(id).getFiles();
+    while (fichiers.hasNext()) {
+      const fichier = fichiers.next();
+      const nom = simplifier_(fichier.getName());
+      if (id === DOSSIERS.telechargements && !nom.startsWith(simplifier_(PREFIXE))) continue;
+      const cible = dossierPour_(nom);
+      if (cible.getId() !== id) fichier.moveTo(cible);
+    }
+  }
+}
+
+function dossierPour_(nom) {
+  // Sauvegardes : PREFIXE-v1.2-2026-10-01.zip, …-historique-git.zip, .z01…
+  const prefixe = simplifier_(PREFIXE).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const version = nom.match(new RegExp('^' + prefixe + '-(v\\d+\\.\\d+)-(\\d{4}-\\d{2}-\\d{2})'));
+  if (version && /\.(zip|z\d\d)$/.test(nom)) {
+    const parent = DriveApp.getFolderById(DOSSIERS.sauvegardes);
+    const nomDossier = version[1] + ' - ' + version[2];
+    const existants = parent.getFoldersByName(nomDossier);
+    return existants.hasNext() ? existants.next() : parent.createFolder(nomDossier);
+  }
+  for (const regle of REGLES) {
+    if (regle.motif.test(nom)) return DriveApp.getFolderById(DOSSIERS[regle.dossier]);
+  }
+  return DriveApp.getFolderById(DOSSIERS.aTrier);
+}
+
+function simplifier_(texte) {
+  return texte.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+</script>
+
+<script>
+"use strict";
+const CHAMPS = [
+  { id: "NOM_DU_PROJET", libelle: "Nom du projet", aide: "Début du nom des fichiers, ex. « whaoo »", exemple: "monprojet" },
+  { id: "ID_TELECHARGEMENTS", libelle: "Dossier Téléchargements", aide: "À la racine de Mon Drive" },
+  { id: "ID_A_TRIER", libelle: "00 - À trier" },
+  { id: "ID_SAUVEGARDES", libelle: "01 - Sauvegardes" },
+  { id: "ID_SECURITE", libelle: "02 - Sécurité" },
+  { id: "ID_VIDEOS", libelle: "03 - Vidéos et réseaux" },
+  { id: "ID_VISUELS", libelle: "04 - Logo et visuels" },
+  { id: "ID_JURIDIQUE", libelle: "05 - Juridique et RGPD" },
+  { id: "ID_PRESENTATIONS", libelle: "06 - Présentations" },
+  { id: "ID_SUPPORT", libelle: "07 - Support et emails" },
+];
+const MODELE = document.getElementById("modele").textContent;
+const valeurs = {};
+
+// Accepte l'adresse complète d'un dossier Drive ou son seul identifiant.
+function extraireId(texte) {
+  const t = texte.trim();
+  const m = t.match(/\/folders\/([A-Za-z0-9_-]+)/) || t.match(/[?&]id=([A-Za-z0-9_-]+)/);
+  return m ? m[1] : t.replace(/[^A-Za-z0-9_-]/g, "");
+}
+
+function nettoyer(id, texte) {
+  if (id === "NOM_DU_PROJET") return texte.trim().toLowerCase().replace(/[\\'"\n]/g, "");
+  return extraireId(texte);
+}
+
+function dessiner() {
+  const pre = document.getElementById("apercu");
+  pre.textContent = "";
+  for (const morceau of MODELE.split(/(\{\{[A-Z_]+\}\})/)) {
+    const m = morceau.match(/^\{\{([A-Z_]+)\}\}$/);
+    if (m) {
+      const span = document.createElement("span");
+      span.className = "fluo";
+      span.textContent = valeurs[m[1]] || m[1];
+      pre.append(span);
+    } else {
+      pre.append(morceau);
+    }
+  }
+  for (const el of document.querySelectorAll("[data-miroir]")) {
+    el.textContent = valeurs[el.dataset.miroir] || el.dataset.miroir;
+  }
+  const manquants = CHAMPS.filter((c) => !valeurs[c.id]).map((c) => c.libelle);
+  document.getElementById("manquants").textContent = manquants.length
+    ? `Encore à remplir : ${manquants.join(", ")}.` : "";
+}
+
+function scriptFinal() {
+  return MODELE.replace(/\{\{([A-Z_]+)\}\}/g, (_, id) => valeurs[id] || id);
+}
+
+const grille = document.getElementById("champs");
+for (const champ of CHAMPS) {
+  const label = document.createElement("label");
+  label.htmlFor = "champ-" + champ.id;
+  label.innerHTML = "";
+  label.append(document.createTextNode(champ.libelle));
+  if (champ.aide) { const s = document.createElement("small"); s.textContent = champ.aide; label.append(s); }
+  const input = document.createElement("input");
+  input.id = "champ-" + champ.id;
+  input.placeholder = champ.exemple || "https://drive.google.com/drive/folders/…";
+  input.autocomplete = "off"; input.spellcheck = false;
+  input.addEventListener("input", () => {
+    valeurs[champ.id] = nettoyer(champ.id, input.value);
+    input.classList.toggle("rempli", !!valeurs[champ.id]);
+    dessiner();
+  });
+  input.addEventListener("change", () => { if (champ.id !== "NOM_DU_PROJET" && valeurs[champ.id]) input.value = valeurs[champ.id]; });
+  grille.append(label, input);
+}
+
+document.getElementById("copier").addEventListener("click", async () => {
+  const retour = document.getElementById("retour");
+  const manquants = CHAMPS.filter((c) => !valeurs[c.id]);
+  const texte = scriptFinal();
+  try { await navigator.clipboard.writeText(texte); }
+  catch {
+    const zone = document.createElement("textarea");
+    zone.value = texte; document.body.append(zone); zone.select(); document.execCommand("copy"); zone.remove();
+  }
+  retour.textContent = manquants.length
+    ? `Copié, mais ${manquants.length} champ(s) orange restent à remplir.` : "Script copié ✓";
+});
+document.getElementById("imprimer").addEventListener("click", () => window.print());
+dessiner();
+</script>
+</body>
+</html>

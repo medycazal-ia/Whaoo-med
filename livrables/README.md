@@ -13,3 +13,6 @@
   HTML autonome, chiffré AES-256 avec le mot de passe choisi à sa
   création, et un code de récupération en cas d'oubli). Ne jamais
   committer une version remplie.
+- `outils/modele-rangement-drive.html` : modèle réutilisable du script
+  Google Apps Script de rangement automatique d'un dossier Drive par projet
+  (champs à adapter surlignés en orange, script généré et copiable).

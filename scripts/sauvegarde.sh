@@ -1,18 +1,19 @@
 #!/usr/bin/env bash
-# Crée une sauvegarde complète et versionnée de whaoo :
-#   - un tag Git annoté vX.Y (point de restauration exact, poussé sur GitHub) ;
-#   - un zip daté whaoo-vX.Y-AAAA-MM-JJ.zip contenant le code complet, tout
-#     l'historique Git (bundle), les livrables et la notice de restauration.
+# Crée une sauvegarde complète et versionnée de whaoo : un zip daté
+# whaoo-vX.Y-AAAA-MM-JJ.zip contenant le code complet, tout l'historique Git
+# (bundle), la notice de restauration et le journal des versions.
 #
-# Usage : scripts/sauvegarde.sh [version] [dossier-de-sortie] [dossier-extras]
-#   version            ex. 1.3 — par défaut : dernier tag vX.Y + 0.1 (ou 1.0)
+# Usage : scripts/sauvegarde.sh [dossier-de-sortie] [dossier-extras]
 #   dossier-de-sortie  où écrire le zip (défaut : ../sauvegardes-whaoo)
 #   dossier-extras     facultatif, copié tel quel dans le zip sous extras/
-#                      (fichiers hors dépôt : historique de conversation…)
+#                      (fichiers hors dépôt, sans secrets : historique…)
 #
-# Avant de lancer : ajouter l'entrée de la version dans
-# sauvegardes/SAUVEGARDES.md, committer et pousser (le script refuse un
-# arbre de travail modifié, pour que le zip corresponde exactement au tag).
+# La version est celle de l'entrée la plus récente (la première) de
+# sauvegardes/SAUVEGARDES.md. Avant de lancer : ajouter cette entrée,
+# committer avec le message « Sauvegarde vX.Y — AAAA-MM-JJ » et pousser.
+# Ce commit est le point de restauration de la version sur GitHub (les tags
+# ne peuvent pas être poussés depuis les sessions Claude) ; le script
+# refuse un arbre de travail modifié pour que le zip lui corresponde.
 set -euo pipefail
 
 cd "$(git rev-parse --show-toplevel)"
@@ -22,34 +23,21 @@ if [ -n "$(git status --porcelain)" ]; then
   exit 1
 fi
 
-dernier=$(git tag --list 'v[0-9]*.[0-9]*' --sort=-v:refname | head -n1)
-if [ -n "${1:-}" ]; then
-  version="$1"
-elif [ -z "$dernier" ]; then
-  version="1.0"
-else
-  majeur=${dernier#v}; majeur=${majeur%%.*}
-  mineur=${dernier##*.}
-  version="$majeur.$((mineur + 1))"
+entree=$(grep -m1 -E '^## v[0-9]+\.[0-9]+ — [0-9]{4}-[0-9]{2}-[0-9]{2}' sauvegardes/SAUVEGARDES.md || true)
+if [ -z "$entree" ]; then
+  echo "Aucune entrée « ## vX.Y — AAAA-MM-JJ » dans sauvegardes/SAUVEGARDES.md." >&2
+  exit 1
 fi
-
-tag="v$version"
-date_jour=$(date +%F)
+tag=$(echo "$entree" | cut -d' ' -f2)
+date_jour=$(echo "$entree" | cut -d' ' -f4)
 nom="whaoo-$tag-$date_jour"
-sortie="${2:-../sauvegardes-whaoo}"
-extras="${3:-}"
+sortie="${1:-../sauvegardes-whaoo}"
+extras="${2:-}"
 branche=$(git rev-parse --abbrev-ref HEAD)
 
-if git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
-  echo "Le tag $tag existe déjà." >&2
-  exit 1
-fi
-if ! grep -q "^## $tag " sauvegardes/SAUVEGARDES.md; then
-  echo "Ajoute d'abord l'entrée « ## $tag — $date_jour » dans sauvegardes/SAUVEGARDES.md." >&2
-  exit 1
-fi
-
-git tag -a "$tag" -m "whaoo $tag — sauvegarde du $date_jour"
+# Tag local, inclus dans le bundle pour retrouver la version une fois
+# l'historique restauré.
+git tag -f -a "$tag" -m "whaoo $tag — sauvegarde du $date_jour" >/dev/null
 
 travail=$(mktemp -d)
 trap 'rm -rf "$travail"' EXIT
@@ -82,5 +70,4 @@ mkdir -p "$sortie"
 sortie=$(cd "$sortie" && pwd)
 (cd "$travail" && zip -qr -9 "$sortie/$nom.zip" "$nom")
 
-echo "Tag créé   : $tag (à pousser : git push origin $tag)"
 echo "Sauvegarde : $sortie/$nom.zip ($(du -h "$sortie/$nom.zip" | cut -f1))"

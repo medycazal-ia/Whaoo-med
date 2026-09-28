@@ -1,11 +1,14 @@
 # Journal des sauvegardes whaoo
 
-Chaque version correspond à un tag Git (`v1.0`, `v1.1`…) poussé sur GitHub
-et à un zip daté `whaoo-vX.Y-AAAA-MM-JJ.zip` remis à Medy. Une nouvelle
-version est créée à chaque session de travail (procédure : `CLAUDE.md`).
+Chaque version correspond à un commit « Sauvegarde vX.Y — date » sur la
+branche `claude/whaoo-med-specs-8xx0r4` et à un zip daté
+`whaoo-vX.Y-AAAA-MM-JJ.zip` remis à Medy. Une nouvelle version est créée à
+chaque session de travail (procédure : `CLAUDE.md`). La plus récente est
+toujours en haut.
 
-Pour rouvrir une version : `git checkout vX.Y`, ou dézipper le zip et
-suivre `LISEZ-MOI-RESTAURATION.md`.
+Pour rouvrir une version : revenir à son commit
+(`git log --grep='^Sauvegarde vX.Y '`), ou dézipper le zip et suivre
+`LISEZ-MOI-RESTAURATION.md`.
 
 ---
 

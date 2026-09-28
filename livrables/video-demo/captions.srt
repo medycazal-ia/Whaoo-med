@@ -1,0 +1,38 @@
+1
+00:00:00,000 --> 00:00:03,600
+Bienvenue sur whaoo, l'appli qui simplifie
+tes courses et ton budget.
+
+2
+00:00:03,600 --> 00:00:10,050
+Dis à voix haute ce que tu achètes : whaoo
+note l'article et te propose un prix.
+
+3
+00:00:10,050 --> 00:00:16,500
+Ton budget du mois s'affiche en temps réel,
+avec un indicateur clair.
+
+4
+00:00:16,500 --> 00:00:21,350
+Si tu dépenses moins que prévu, ta cagnotte
+se remplit toute seule.
+
+5
+00:00:21,350 --> 00:00:25,350
+Article acheté ? Marque-le en un clic,
+il rejoint ton historique.
+
+6
+00:00:25,350 --> 00:00:29,000
+Exporte ta liste ou ta facture en PDF,
+prête à imprimer.
+
+7
+00:00:29,000 --> 00:00:31,400
+Simple, rapide, pensé pour ton smartphone.
+
+8
+00:00:31,400 --> 00:00:38,730
+Essaie whaoo dès maintenant, en démo,
+sans même créer de compte.

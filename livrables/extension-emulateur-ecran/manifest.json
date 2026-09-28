@@ -1,0 +1,27 @@
+{
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwZCzDz/kxeIkrs2YExiMIFQ0lNOUD2MbMee1rkUwDcZBVSlGzlzy21SDyI07/r5p1aCUgld84LAgVzmJKzG/IgbsT7S0SYJwfmP5kYrz968fCMlHsFuATDde61JkvMdH5YfAGs9hnQrWCEfwQo+ZAc6XxwtwZXa5l6A8e/ddF0+sX3HGLutLGryC1yLny241awHaRlWVZlDH9gekfCXnFnM5XvWZxZMUd5iu+qpYyOh2/8ZxlY+JRiRYoLoWjvwR5tBTqDU+o3i0nXIDFPoDSe0BXhpx7l/fPTmTXR6J3XBW1Aua3aecWSdjJPKl9FvvbPUPiqd5FQF+OC+jia0VaQIDAQAB",
+  "manifest_version": 3,
+  "name": "Émulateur d'écran — PC / Tablette / Smartphone",
+  "version": "2.0.0",
+  "description": "Redimensionne la fenêtre du navigateur pour tester le rendu PC, tablette ou smartphone, sur n'importe quel site.",
+  "permissions": [
+    "windows",
+    "storage"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Émulateur d'écran",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

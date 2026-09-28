@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Émulateur d'écran</title>
+<link rel="stylesheet" href="popup.css">
+</head>
+<body>
+<header>
+  <h1>🖥️ Émulateur d'écran</h1>
+  <p id="statut" class="statut">…</p>
+</header>
+
+<section class="groupe">
+  <h2>Ordinateur</h2>
+  <div class="grille">
+    <button class="preset" data-w="1440" data-h="900" data-label="PC (1440 × 900)">
+      <span class="icone">💻</span>
+      <span>PC</span>
+      <span class="dim">1440 × 900</span>
+    </button>
+    <button class="preset" data-w="1280" data-h="800" data-label="Portable (1280 × 800)">
+      <span class="icone">💻</span>
+      <span>Portable</span>
+      <span class="dim">1280 × 800</span>
+    </button>
+  </div>
+</section>
+
+<section class="groupe">
+  <h2>Tablette</h2>
+  <div class="grille">
+    <button class="preset" data-w="768" data-h="1024" data-label="Tablette portrait (768 × 1024)">
+      <span class="icone">📱</span>
+      <span>Portrait</span>
+      <span class="dim">768 × 1024</span>
+    </button>
+    <button class="preset" data-w="1024" data-h="768" data-label="Tablette paysage (1024 × 768)">
+      <span class="icone">📱</span>
+      <span>Paysage</span>
+      <span class="dim">1024 × 768</span>
+    </button>
+  </div>
+</section>
+
+<section class="groupe">
+  <h2>Smartphone</h2>
+  <div class="grille">
+    <button class="preset" data-w="390" data-h="844" data-label="Smartphone portrait (390 × 844)">
+      <span class="icone">📱</span>
+      <span>Portrait</span>
+      <span class="dim">390 × 844</span>
+    </button>
+    <button class="preset" data-w="844" data-h="390" data-label="Smartphone paysage (844 × 390)">
+      <span class="icone">📱</span>
+      <span>Paysage</span>
+      <span class="dim">844 × 390</span>
+    </button>
+  </div>
+</section>
+
+<section class="groupe">
+  <h2>Taille personnalisée</h2>
+  <div class="perso">
+    <label>Largeur
+      <input type="number" id="largeur" min="200" max="4000" value="414" inputmode="numeric">
+    </label>
+    <label>Hauteur
+      <input type="number" id="hauteur" min="200" max="4000" value="896" inputmode="numeric">
+    </label>
+    <button id="appliquerPerso" class="bouton-principal">Appliquer</button>
+  </div>
+</section>
+
+<button id="restaurer" class="bouton-restaurer">↺ Agrandir la fenêtre</button>
+
+<p id="erreur" class="erreur" hidden></p>
+
+<footer>
+  <p>Redimensionne la fenêtre du navigateur elle-même : la zone de page affichée sera un peu plus petite que la taille choisie (barre d'adresse, onglets...).</p>
+</footer>
+
+<script src="popup.js"></script>
+</body>
+</html>

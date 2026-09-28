@@ -208,6 +208,7 @@ export function CoursesDashboard({
           valeur={nomSessionActive}
           onChanger={setNomSessionActive}
           sessionsRecentes={sessionsAujourdHui}
+          definirBudgetAction={actions.definirBudget}
         />
       </section>
 

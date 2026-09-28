@@ -71,7 +71,7 @@ export const FAQ: QuestionFaq[] = [
     id: "budget-mensuel",
     question: "Comment fonctionne le budget mensuel ?",
     reponse:
-      "Tu indiques un budget en début de mois (ou en le disant à voix haute : « budget du mois 250 euros »). L'appli additionne ensuite tes achats marqués « acheté » ce mois-ci et te montre où tu en es en temps réel.",
+      "Tu indiques un budget en début de mois (ou en le disant à voix haute : « budget du mois 250 euros », « change mon budget à 400 euros » — ou juste « change mon budget » pour ouvrir la saisie). L'appli additionne ensuite tes achats marqués « acheté » ce mois-ci et te montre où tu en es en temps réel.",
     motsCles: ["budget", "mensuel", "mois", "dépense"],
   },
   {

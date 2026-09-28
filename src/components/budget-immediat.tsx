@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { nomSessionParDefaut } from "@/lib/courses/session";
+import { parserPhraseVocale } from "@/lib/courses/parse-vocal";
 import { getSpeechRecognition } from "@/lib/voice/speech-recognition";
+import { ConfirmationBudget } from "@/components/confirmation-budget";
 
 /**
  * "Budget immédiat" : la session de courses en cours (distincte du budget
@@ -12,19 +14,26 @@ import { getSpeechRecognition } from "@/lib/voice/speech-recognition";
  * (texte) ou en dictant (micro), ou repartir sur une nouvelle session
  * (utile pour un deuxième passage en caisse le même jour, qui reçoit
  * alors l'heure pour rester identifiable).
+ *
+ * Le micro est placé juste sous le budget du mois : une phrase qui parle
+ * du budget ("change mon budget à 400 euros") modifie donc le budget au
+ * lieu de devenir le nom de la session.
  */
 export function BudgetImmediat({
   valeur,
   onChanger,
   sessionsRecentes = [],
+  definirBudgetAction,
 }: {
   valeur: string;
   onChanger: (nom: string) => void;
   sessionsRecentes?: string[];
+  definirBudgetAction: (formData: FormData) => Promise<void>;
 }) {
   const [edition, setEdition] = useState(false);
   const [texte, setTexte] = useState(valeur);
   const [ecoute, setEcoute] = useState(false);
+  const [budgetDicte, setBudgetDicte] = useState<{ montant: number | null } | null>(null);
 
   function valider() {
     const nom = texte.trim();
@@ -40,7 +49,11 @@ export function BudgetImmediat({
     recognition.interimResults = false;
     recognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript.trim();
-      if (transcript) onChanger(transcript);
+      if (transcript) {
+        const commande = parserPhraseVocale(transcript);
+        if (commande.type === "budget") setBudgetDicte({ montant: commande.montant });
+        else onChanger(transcript);
+      }
       setEcoute(false);
     };
     recognition.onerror = () => setEcoute(false);
@@ -104,7 +117,7 @@ export function BudgetImmediat({
           <button
             type="button"
             onClick={dicterNom}
-            title="Nommer cette session à voix haute"
+            title="Nommer cette session (ou changer le budget) à voix haute"
             className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border text-sm ${
               ecoute ? "border-tomate bg-tomate/10 text-tomate" : "border-ardoise/20 text-ardoise/60"
             }`}
@@ -112,6 +125,14 @@ export function BudgetImmediat({
             🎙️
           </button>
         </div>
+      )}
+
+      {budgetDicte && (
+        <ConfirmationBudget
+          montant={budgetDicte.montant}
+          definirBudgetAction={definirBudgetAction}
+          onFermer={() => setBudgetDicte(null)}
+        />
       )}
 
       {autresSessions.length > 0 && (

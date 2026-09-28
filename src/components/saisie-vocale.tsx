@@ -11,6 +11,7 @@ import {
 } from "@/lib/prix-estimes";
 import { getSpeechRecognition, type SpeechRecognitionLike } from "@/lib/voice/speech-recognition";
 import { transcrireAudio } from "@/lib/voice/transcription";
+import { ConfirmationBudget } from "@/components/confirmation-budget";
 import { BoutonCorrigerPrixVocal } from "@/components/bouton-corriger-prix-vocal";
 
 // Une phrase dictée qui semble énumérer plusieurs articles (connecteurs
@@ -95,7 +96,8 @@ export function SaisieVocale({
   const [toast, setToast] = useState<{ items: ArticleAjoute[] } | null>(null);
   const toastTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const [budgetDicte, setBudgetDicte] = useState<number | null>(null);
+  // { montant: null } : budget demandé sans montant compris (champ vide).
+  const [budgetDicte, setBudgetDicte] = useState<{ montant: number | null } | null>(null);
   const [sourcePrix, setSourcePrix] = useState<SourcePrix | null>(null);
   const [nonSupporte, setNonSupporte] = useState(false);
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
@@ -116,7 +118,7 @@ export function SaisieVocale({
     }
     const commande = parserPhraseVocale(transcript);
     if (commande.type === "budget") {
-      setBudgetDicte(commande.montant);
+      setBudgetDicte({ montant: commande.montant });
       return;
     }
 
@@ -214,7 +216,7 @@ export function SaisieVocale({
       // demande une confirmation manuelle plutôt que de l'appliquer tout
       // seul.
       arreterEcouteContinue();
-      setBudgetDicte(commande.montant);
+      setBudgetDicte({ montant: commande.montant });
       return;
     }
 
@@ -467,35 +469,11 @@ export function SaisieVocale({
 
   if (budgetDicte !== null) {
     return (
-      <form
-        action={definirBudgetAction}
-        className="flex flex-col gap-2 rounded-xl border border-ambre/40 bg-ambre/10 p-4"
-        onSubmit={() => setBudgetDicte(null)}
-      >
-        <p className="text-xs font-medium text-ambre">
-          Confirme le nouveau budget du mois
-        </p>
-        <input
-          name="budgetAmount"
-          type="number"
-          step="0.01"
-          min={0}
-          defaultValue={budgetDicte}
-          className="rounded-lg border border-ardoise/20 bg-white px-3 py-2 text-ardoise"
-        />
-        <div className="flex gap-2">
-          <button type="submit" className="flex-1 rounded-lg bg-basilic px-3 py-2 font-medium text-craie">
-            Confirmer
-          </button>
-          <button
-            type="button"
-            onClick={() => setBudgetDicte(null)}
-            className="rounded-lg border border-ardoise/20 px-3 py-2 text-ardoise"
-          >
-            Annuler
-          </button>
-        </div>
-      </form>
+      <ConfirmationBudget
+        montant={budgetDicte.montant}
+        definirBudgetAction={definirBudgetAction}
+        onFermer={() => setBudgetDicte(null)}
+      />
     );
   }
 
@@ -650,7 +628,7 @@ export function SaisieVocale({
       <p className="text-xs text-ardoise/50">
         Reste à l&apos;écoute en continu et ajoute chaque article dicté
         automatiquement, jusqu&apos;à ce que tu appuies pour arrêter.
-        Fonctionne aussi pour le budget (« budget du mois 250 euros ») et
+        Fonctionne aussi pour le budget (« change mon budget à 400 euros ») et
         pour l&apos;aide (« aide moi »)
       </p>
 

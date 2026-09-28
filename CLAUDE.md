@@ -60,6 +60,15 @@ demander à Medy le zip correspondant et suivre son
   demander à Medy ses produits). Inactive tant que
   `KLARNA_API_USERNAME` / `KLARNA_API_PASSWORD` ne sont pas sur Render
   (contrat marchand Klarna nécessaire). Jamais testée contre la vraie API.
+- **Boutique « Bons plans »** (`/boutique`, lien dans l'en-tête de l'appli) :
+  affiche les produits du compte Stripe WHAOO qui ont la métadonnée
+  `boutique` = `whaoo` (autres métadonnées : `type`, `frais_port`,
+  `quantite_max`, `prix_barre`, `partenaire`, `lien`, `ordre`, voir
+  `src/lib/boutique/stripe.ts`) ; paiement par Stripe Checkout (Klarna
+  inclus). Masquée tant que `STRIPE_BOUTIQUE_KEY` (clé restreinte) n'est
+  pas sur Render. Produit d'exemple dans « environnement de test WHAOO ».
+  Avant de vendre : CGV de vente à rédiger (les CGU actuelles ne couvrent
+  que l'appli gratuite).
 - **Rangement Google Drive** (Medy est sur Chromebook) : fait le
   2026-09-28. Dans le dossier `WHAOO` de Mon Drive : `00 - À trier` à
   `07 - Support et emails`, `01 - Sauvegardes/vX.Y - date`, et un dossier

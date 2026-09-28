@@ -25,6 +25,7 @@ import { CoursesDashboard } from "@/components/courses-dashboard";
 import { avatarSrc } from "@/lib/avatars";
 import { estAdmin } from "@/lib/admin";
 import { SoutienVideo } from "@/components/soutien-video";
+import { boutiqueActive } from "@/lib/boutique/stripe";
 
 export default async function AppHomePage({
   searchParams,
@@ -135,6 +136,16 @@ export default async function AppHomePage({
             >
               <span aria-hidden className="sm:hidden">🛠️</span>
               <span className="hidden sm:inline">Back-office</span>
+            </Link>
+          )}
+          {boutiqueActive() && (
+            <Link
+              href="/boutique"
+              title="Bons plans"
+              className="rounded-lg border border-ardoise/20 px-2 py-1.5 text-xs text-ardoise hover:bg-ardoise/5 sm:px-3 sm:text-sm"
+            >
+              <span aria-hidden className="sm:hidden">🛍️</span>
+              <span className="hidden sm:inline">Bons plans</span>
             </Link>
           )}
           <Link

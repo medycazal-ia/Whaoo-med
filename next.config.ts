@@ -69,7 +69,8 @@ const nextConfig: NextConfig = {
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.jsdelivr.net",
               "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' data:",
+              // Images des produits de la boutique, hébergées par Stripe.
+              "img-src 'self' data: https://*.stripe.com",
               "font-src 'self'",
               // blob: pour la lecture du son de bienvenue/au revoir généré
               // à la volée (URL.createObjectURL sur le résultat de
@@ -81,9 +82,9 @@ const nextConfig: NextConfig = {
               "manifest-src 'self'",
               "object-src 'none'",
               "base-uri 'self'",
-              // Klarna : le formulaire de /paiement/klarna est redirigé vers
-              // la page de paiement hébergée par Klarna.
-              "form-action 'self' https://*.klarna.com",
+              // Klarna et Stripe : les formulaires de /paiement/klarna et de
+              // /boutique sont redirigés vers leurs pages de paiement.
+              "form-action 'self' https://*.klarna.com https://checkout.stripe.com",
               "frame-ancestors 'none'",
             ].join("; "),
           },

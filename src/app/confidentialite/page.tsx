@@ -123,11 +123,14 @@ export default function ConfidentialitePage() {
             transcrite en texte.
           </li>
           <li>
-            <strong>Stripe</strong> : si tu fais une contribution par carte,
-            le paiement se fait directement sur la page sécurisée de Stripe
-            (Stripe Payments Europe, Irlande). Tes données de carte et ton
-            email de reçu sont traités par Stripe, jamais par whaoo, qui ne
-            voit que le montant reçu.
+            <strong>Stripe</strong> : si tu fais une contribution par carte
+            ou un achat dans la boutique « Bons plans », le paiement se fait
+            directement sur la page sécurisée de Stripe (Stripe Payments
+            Europe, Irlande). Tes données de carte et ton email de reçu sont
+            traités par Stripe, jamais par whaoo. Pour un produit à livrer,
+            ton adresse et ton téléphone de livraison sont recueillis par
+            Stripe et transmis à whaoo (ou au partenaire vendeur) uniquement
+            pour expédier la commande.
           </li>
           <li>
             <strong>Klarna</strong> : si tu paies avec Klarna, le paiement se

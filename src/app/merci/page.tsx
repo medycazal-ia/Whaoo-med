@@ -8,15 +8,23 @@ export const metadata: Metadata = {
 };
 
 // Page de retour après une contribution libre par carte (lien de paiement
-// Stripe). Stripe envoie lui-même le reçu par email.
-export default function MerciPage() {
+// Stripe) ou un achat dans la boutique (?achat=1). Stripe envoie lui-même le
+// reçu par email.
+export default async function MerciPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ achat?: string }>;
+}) {
+  const achat = Boolean((await searchParams).achat);
+
   return (
     <main className="flex flex-1 flex-col items-center justify-center fond-marche px-4 py-16 text-center text-ardoise">
       <Image src="/icon.svg" alt="" width={56} height={56} className="rounded-2xl" />
       <h1 className="mt-4 font-heading text-3xl font-semibold">Merci, du fond du cœur 💚</h1>
       <p className="mt-3 max-w-md text-ardoise/75">
-        Ta contribution aide whaoo à rester simple, gratuite et sans
-        publicité. Tu vas recevoir ton reçu de paiement par email.
+        {achat
+          ? "Ton achat est confirmé. Tu vas recevoir ton reçu de paiement par email."
+          : "Ta contribution aide whaoo à rester simple, gratuite et sans publicité. Tu vas recevoir ton reçu de paiement par email."}
       </p>
       <div className="mt-6 flex flex-col gap-3 sm:flex-row">
         <Link

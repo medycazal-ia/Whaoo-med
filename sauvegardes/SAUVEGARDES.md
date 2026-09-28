@@ -12,6 +12,18 @@ Pour rouvrir une version : revenir à son commit
 
 ---
 
+## v1.1 — 2026-09-28
+
+- Coffre des clés chiffré (`livrables/coffre-cles/whaoo-coffre-cles.html`) :
+  fichier HTML autonome et hors ligne, clés classées par catégorie et par
+  outil avec le nom de leur variable Render, chiffrement AES-256 par un mot
+  de passe choisi à la création, code de récupération imprimable en cas
+  d'oubli (renouvelable), verrouillage automatique après 10 minutes.
+- Sauvegardes découpées en archives de moins de 30 Mo (application d'un
+  côté, historique Git en volumes de l'autre).
+
+**Prochaine étape prévue** : connexion Stripe (nouvelle session).
+
 ## v1.0 — 2026-09-28
 
 Première sauvegarde complète : l'application telle qu'elle tourne sur

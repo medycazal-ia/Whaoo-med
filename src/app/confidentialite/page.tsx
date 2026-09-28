@@ -123,6 +123,13 @@ export default function ConfidentialitePage() {
             transcrite en texte.
           </li>
           <li>
+            <strong>Stripe</strong> : si tu fais une contribution par carte,
+            le paiement se fait directement sur la page sécurisée de Stripe
+            (Stripe Payments Europe, Irlande). Tes données de carte et ton
+            email de reçu sont traités par Stripe, jamais par whaoo, qui ne
+            voit que le montant reçu.
+          </li>
+          <li>
             <strong>ElevenLabs</strong> : ton prénom est envoyé à ElevenLabs
             (États-Unis) à chaque connexion et déconnexion pour générer le
             message vocal de bienvenue/au revoir.

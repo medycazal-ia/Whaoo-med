@@ -154,8 +154,8 @@ export const FAQ: QuestionFaq[] = [
     id: "cagnotte-soutien",
     question: "La cagnotte de soutien (don) est-elle obligatoire ? Est-ce sécurisé ?",
     reponse:
-      "Non, c'est entièrement facultatif, sans aucune obligation. Le paiement passe par Lydia, une plateforme bancaire française sécurisée : whaoo ne voit ni ne conserve aucune donnée bancaire.",
-    motsCles: ["don", "cagnotte", "soutien", "lydia", "obligatoire", "paiement"],
+      "Non, c'est entièrement facultatif, sans aucune obligation. Tu peux contribuer par carte bancaire, Apple Pay ou Google Pay (paiement sécurisé par Stripe, montant libre à partir de 1 €) ou avec Lydia : whaoo ne voit ni ne conserve aucune donnée bancaire.",
+    motsCles: ["don", "cagnotte", "soutien", "lydia", "stripe", "carte", "obligatoire", "paiement", "contribution"],
   },
   {
     id: "recette",

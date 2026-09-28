@@ -253,11 +253,12 @@ const CATALOGUE = [
       champs: [ { id: "secret", libelle: "Secret des tâches planifiées", env: "CRON_SECRET", secret: true } ] },
   ] },
   { id: "paiement", icone: "💳", titre: "Paiement et dons", outils: [
-    { id: "stripe", nom: "Stripe", lien: "https://dashboard.stripe.com/apikeys", avenir: true,
-      aide: "Noms de variables prévus pour l'intégration à venir.",
+    { id: "stripe", nom: "Stripe", lien: "https://dashboard.stripe.com/payment-links",
+      aide: "La contribution libre n'utilise que le lien de paiement ; les clés ne serviront que pour un futur abonnement.",
       champs: [
         { id: "email", libelle: "Email du compte" },
         { id: "mdp", libelle: "Mot de passe du compte", secret: true },
+        { id: "lien-contribution", libelle: "Lien de paiement de la contribution libre", env: "STRIPE_SUPPORT_LINK_URL", public: true },
         { id: "publiable", libelle: "Clé publiable (pk_live_…)", env: "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY", public: true },
         { id: "secrete", libelle: "Clé secrète (sk_live_…)", env: "STRIPE_SECRET_KEY", secret: true },
         { id: "webhook", libelle: "Secret de webhook (whsec_…)", env: "STRIPE_WEBHOOK_SECRET", secret: true },

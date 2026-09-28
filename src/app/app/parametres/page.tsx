@@ -5,6 +5,7 @@ import { supprimerMonCompte } from "@/lib/compte/actions";
 import { definirDebutPeriode } from "@/lib/courses/actions";
 import { debutPeriode, libellePeriode, normaliserJourDebut, JOUR_DEBUT_MAX } from "@/lib/courses/rythme";
 import { ActiverNotifications } from "@/components/activer-notifications";
+import { liensSoutien, Soutien } from "@/components/soutien";
 
 const ERROR_MESSAGES: Record<string, string> = {
   confirmation: "Tape exactement SUPPRIMER pour confirmer.",
@@ -25,7 +26,7 @@ export default async function ParametresPage({
 
   if (!user) redirect("/connexion");
 
-  const supportLinkUrl = process.env.SUPPORT_LINK_URL;
+  const soutien = liensSoutien();
 
   const { data: profil } = await supabase
     .from("profiles")
@@ -123,23 +124,14 @@ export default async function ParametresPage({
           </a>
         </div>
 
-        {supportLinkUrl && (
+        {(soutien.stripe || soutien.lydia) && (
           <div className="rounded-2xl bg-white p-5">
             <h2 className="font-heading text-lg font-semibold text-ardoise">
               Soutenir whaoo
             </h2>
-            <p className="mt-1 text-sm text-ardoise/75">
-              whaoo est gratuite à l&apos;usage de base et développée seule.
-              Si elle te rend service, une contribution libre est toujours
-              appréciée —{" "}
-              <strong className="text-ardoise">entièrement facultative,
-              sans aucune obligation</strong>. Le paiement passe par{" "}
-              <a href={supportLinkUrl} className="underline" target="_blank" rel="noreferrer">
-                Lydia
-              </a>
-              , une plateforme bancaire française sécurisée : whaoo ne voit
-              ni ne conserve aucune donnée bancaire.
-            </p>
+            <div className="mt-1">
+              <Soutien stripe={soutien.stripe} lydia={soutien.lydia} />
+            </div>
             <audio controls preload="none" className="mt-3 h-9 max-w-xs">
               <source src="/audio/soutien.mp3" type="audio/mpeg" />
             </audio>

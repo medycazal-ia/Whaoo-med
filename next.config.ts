@@ -4,6 +4,15 @@ const nextConfig: NextConfig = {
   // Évite que Next.js régénère AGENTS.md/CLAUDE.md à chaque `next dev`.
   agentRules: false,
 
+  // Protection contre le décalage de version : une page restée ouverte
+  // (appli installée sur le téléphone) pendant un déploiement garde les
+  // identifiants des Server Actions de l'ancienne version, que le nouveau
+  // serveur refuse — tous les boutons qui enregistrent échouent alors en
+  // silence. Avec un identifiant par déploiement, Next.js détecte l'écart
+  // et recharge la page. Render fournit le commit déployé dans
+  // RENDER_GIT_COMMIT (absent en local : protection simplement inactive).
+  deploymentId: process.env.RENDER_GIT_COMMIT,
+
   // La limite par défaut (1 Mo) est bien trop basse pour une photo de
   // ticket de caisse envoyée à Claude vision (voir scanner-ticket.tsx) —
   // même réduite côté client, elle reste souvent au-delà de 1 Mo.
@@ -32,12 +41,17 @@ const nextConfig: NextConfig = {
             value: "max-age=31536000; includeSubDomains",
           },
           // Restreint les origines autorisées à charger/exécuter sur la
-          // page — limite les dégâts d'une éventuelle faille XSS. 'self'
-          // uniquement partout : l'app n'appelle aucune API tierce
-          // directement depuis le navigateur (ElevenLabs/Claude/OpenAI
-          // sont appelés côté serveur, via nos propres routes /api/*), les
-          // polices sont auto-hébergées par next/font, et les avatars sont
-          // des SVG locaux.
+          // page — limite les dégâts d'une éventuelle faille XSS.
+          // ElevenLabs/Claude/OpenAI sont appelés côté serveur (nos routes
+          // /api/* et Server Actions), les polices sont auto-hébergées par
+          // next/font et les avatars sont des SVG locaux. Seules exceptions
+          // appelées depuis le navigateur, listées ci-dessous :
+          // - cdn.jsdelivr.net : lecture de ticket hors ligne (Tesseract.js)
+          //   charge son script, son moteur WebAssembly et le dictionnaire
+          //   français depuis ce CDN, dans un worker créé en blob: ;
+          // - nominatim.openstreetmap.org : ville approximative pour les
+          //   promotions locales ;
+          // - www.facebook.com : publication de l'accueil, après un clic.
           //
           // 'unsafe-inline' sur script-src ET style-src (et pas une CSP à
           // base de nonce, plus stricte) : testé en conditions réelles —
@@ -53,7 +67,7 @@ const nextConfig: NextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline'",
+              "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.jsdelivr.net",
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data:",
               "font-src 'self'",
@@ -61,11 +75,9 @@ const nextConfig: NextConfig = {
               // à la volée (URL.createObjectURL sur le résultat de
               // /api/voix).
               "media-src 'self' blob:",
-              "connect-src 'self'",
-              // Publication Facebook de la page d'accueil, chargée
-              // seulement après un clic du visiteur.
+              "connect-src 'self' https://cdn.jsdelivr.net https://nominatim.openstreetmap.org",
               "frame-src https://www.facebook.com",
-              "worker-src 'self'",
+              "worker-src 'self' blob:",
               "manifest-src 'self'",
               "object-src 'none'",
               "base-uri 'self'",

@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
-# Crée une sauvegarde complète et versionnée de whaoo : un zip daté
-# whaoo-vX.Y-AAAA-MM-JJ.zip contenant le code complet, tout l'historique Git
-# (bundle), la notice de restauration et le journal des versions.
+# Crée une sauvegarde complète et versionnée de whaoo, en deux archives
+# (l'envoi de fichiers à Medy est limité à 30 Mo par fichier) :
+#   - whaoo-vX.Y-AAAA-MM-JJ.zip : le code complet et fonctionnel, la notice
+#     de restauration, le journal des versions et les extras ;
+#   - whaoo-vX.Y-AAAA-MM-JJ-historique-git.zip (+ .z01, .z02… si besoin) :
+#     tout l'historique Git (bundle), découpé en volumes de 25 Mo.
 #
 # Usage : scripts/sauvegarde.sh [dossier-de-sortie] [dossier-extras]
 #   dossier-de-sortie  où écrire le zip (défaut : ../sauvegardes-whaoo)
@@ -42,15 +45,14 @@ git tag -f -a "$tag" -m "whaoo $tag — sauvegarde du $date_jour" >/dev/null
 travail=$(mktemp -d)
 trap 'rm -rf "$travail"' EXIT
 racine="$travail/$nom"
-mkdir -p "$racine/application" "$racine/historique-git"
+mkdir -p "$racine/application" "$travail/historique/$nom-historique-git"
 
 # Code complet tel qu'il est au tag (fichiers suivis uniquement : jamais
 # .env.local ni node_modules).
 git archive "$tag" | tar -x -C "$racine/application"
 
-# Tout l'historique : la branche de travail, la branche par défaut si elle
-# existe, et tous les tags de version.
-git bundle create "$racine/historique-git/whaoo.bundle" "$branche" --tags 2>/dev/null
+# Tout l'historique : la branche de travail et les tags de version.
+git bundle create "$travail/historique/$nom-historique-git/whaoo.bundle" HEAD "$branche" --tags 2>/dev/null
 
 cp sauvegardes/RESTAURATION.md "$racine/LISEZ-MOI-RESTAURATION.md"
 cp sauvegardes/SAUVEGARDES.md "$racine/JOURNAL-DES-VERSIONS.md"
@@ -68,6 +70,9 @@ fi
 
 mkdir -p "$sortie"
 sortie=$(cd "$sortie" && pwd)
+rm -f "$sortie/$nom.zip" "$sortie/$nom-historique-git".z*
 (cd "$travail" && zip -qr -9 "$sortie/$nom.zip" "$nom")
+(cd "$travail/historique" && zip -qr -9 -s 25m "$sortie/$nom-historique-git.zip" "$nom-historique-git")
 
-echo "Sauvegarde : $sortie/$nom.zip ($(du -h "$sortie/$nom.zip" | cut -f1))"
+echo "Sauvegarde :"
+ls -1sh "$sortie/$nom.zip" "$sortie/$nom-historique-git".z*

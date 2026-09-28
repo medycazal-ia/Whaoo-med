@@ -27,7 +27,8 @@ demande) :
 3. Lancer `scripts/sauvegarde.sh <dossier-scratchpad> [dossier-extras]` :
    il lit la version dans le journal. Les extras (fichiers hors dépôt, par
    exemple l'historique de conversation) doivent être expurgés des clés.
-4. Envoyer le zip à Medy avec SendUserFile.
+4. Envoyer à Medy avec SendUserFile le zip de l'application et les
+   volumes de l'historique (limite de 30 Mo par fichier).
 
 Pour rouvrir une version :
 `git checkout $(git log --format=%H -1 --grep='^Sauvegarde vX.Y ')`, ou

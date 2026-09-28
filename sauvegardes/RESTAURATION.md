@@ -1,11 +1,21 @@
 # Restaurer whaoo à partir de cette sauvegarde
 
-Ce zip contient :
+La sauvegarde tient en deux archives :
+
+- `whaoo-vX.Y-AAAA-MM-JJ.zip` : **l'application complète et
+  fonctionnelle**. Elle suffit à tout réinstaller.
+- `whaoo-vX.Y-AAAA-MM-JJ-historique-git.zip` : tout l'historique Git (chaque
+  modification depuis le début). Il peut être découpé en plusieurs volumes
+  (`.z01`, `.z02`…) : les garder dans le même dossier et ouvrir le `.zip`
+  avec 7-Zip (Windows) ou The Unarchiver (Mac). En ligne de commande :
+  `zip -s 0 archive.zip --out complet.zip && unzip complet.zip`.
+  L'historique est aussi conservé sur GitHub.
+
+Contenu du premier zip :
 
 | Dossier / fichier | Contenu |
 |---|---|
 | `application/` | Le code complet de l'application à cette version (prêt à installer). |
-| `historique-git/whaoo.bundle` | Tout l'historique Git (chaque modification depuis le début, et les tags de version). |
 | `VERSION.txt` | Numéro de version, date et commit exact. |
 | `JOURNAL-DES-VERSIONS.md` | Ce qui a été fait dans chaque version. |
 | `extras/` (si présent) | Fichiers hors code : historique de conversation, etc. |
@@ -16,8 +26,10 @@ renseigner à nouveau (voir étape 3).
 
 ## 1. Récupérer le code avec tout son historique (recommandé)
 
+Une fois l'archive d'historique extraite :
+
 ```bash
-git clone historique-git/whaoo.bundle whaoo
+git clone whaoo-vX.Y-AAAA-MM-JJ-historique-git/whaoo.bundle whaoo
 cd whaoo
 git checkout claude/whaoo-med-specs-8xx0r4
 ```

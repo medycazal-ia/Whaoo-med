@@ -38,20 +38,12 @@ demander à Medy le zip correspondant et suivre son
 ## Demandes en attente (à traiter en début de session suivante)
 
 - **Stripe** : Medy veut intégrer Stripe (connecteur validé côté claude.ai).
-- **Rangement Google Drive** (Medy est sur Chromebook) : le connecteur
-  Google Drive renvoyait « Insufficient scope » ; Medy doit l'avoir
-  reconnecté avec toutes les autorisations. Puis :
-  1. Créer dans Mon Drive l'arborescence `whaoo/` : `00 - À trier`,
-     `01 - Sauvegardes` (sous-dossiers par version), `02 - Sécurité`,
-     `03 - Vidéos et réseaux`, `04 - Logo et visuels`,
-     `05 - Juridique et RGPD`, `06 - Présentations`,
-     `07 - Support et emails`, et un dossier `Téléchargements` à la racine
-     de Mon Drive.
-  2. Ranger dans ces dossiers ce que Medy aura déposé dans `00 - À trier`.
-     Ne jamais y ranger le code de récupération du coffre des clés.
-  3. Mettre en place l'automatisation : les téléchargements du Chromebook
-     vont dans `Mon Drive/Téléchargements` (réglage à faire par Medy), et
-     un script Google Apps Script `rangerTelechargementsWhaoo`, déclenché
-     toutes les 10 minutes, déplace les fichiers dont le nom commence par
-     « whaoo » vers `whaoo/00 - À trier`. Si le connecteur ne peut pas
-     créer le projet Apps Script, guider Medy pas à pas.
+- **Rangement Google Drive** (Medy est sur Chromebook) : fait le
+  2026-09-28. Dans le dossier `WHAOO` de Mon Drive : `00 - À trier` à
+  `07 - Support et emails`, `01 - Sauvegardes/vX.Y - date`, et un dossier
+  `Téléchargements` à la racine. Le script Apps Script « whaoo - Rangement
+  automatique » (à installer par Medy : le connecteur ne peut pas créer de
+  projet Apps Script) classe toutes les 10 minutes les fichiers « whaoo… »
+  de `Téléchargements` et tout ce qui est dans `00 - À trier`. Restait à
+  vérifier que les fichiers de Medy sont bien arrivés et rangés. Ne jamais
+  ranger dans le Drive le code de récupération du coffre des clés.

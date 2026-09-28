@@ -141,7 +141,7 @@ export default async function Home({
             <source src="/audio/soutien.mp3" type="audio/mpeg" />
           </audio>
           <p className="mx-auto mt-1 max-w-md text-center text-xs text-ardoise/75">
-            🔊 Message vocal (15 secondes)
+            🔊 Message du fondateur (17 secondes)
           </p>
         </div>
       )}

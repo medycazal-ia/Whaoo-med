@@ -35,10 +35,12 @@ export function VideoExplicative() {
           preload="metadata"
           playsInline
           poster="/videos/whaoo-demo-poster.jpg"
-          className="w-full"
+          // Vidéo verticale : sa hauteur est limitée à celle de l'écran pour
+          // que le bandeau de sous-titres, en haut, reste toujours visible.
+          className="block max-h-[calc(100svh-2rem)] w-full object-contain"
           onPlay={() => {
             if (!demarree) {
-              containerRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+              containerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
             }
             setDemarree(true);
           }}
@@ -96,7 +98,7 @@ export function VideoExplicative() {
           </div>
         )}
       </div>
-      <p className="mt-2 text-center text-xs text-craie/50">
+      <p className="mt-2 text-center text-xs text-ardoise/75">
         Voir comment ça marche en 40 secondes
       </p>
     </div>

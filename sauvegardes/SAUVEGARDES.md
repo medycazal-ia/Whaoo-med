@@ -12,6 +12,27 @@ Pour rouvrir une version : revenir à son commit
 
 ---
 
+## v1.2 — 2026-09-28
+
+- **Contribution libre par carte avec Stripe** (mode test) : lien de
+  paiement à montant libre (1 à 500 €, 5 € proposé), boutons sur l'accueil
+  et dans les paramètres à côté de Lydia, page `/merci`, variable
+  `STRIPE_SUPPORT_LINK_URL`, FAQ et politique de confidentialité à jour.
+- **Vidéo « Soutiens whaoo »** : intro avatar de Medy + message dit avec sa
+  voix clonée (ElevenLabs), sous-titré, carton de fin ; ouverte par un coin
+  « Soutiens whaoo » en haut de l'appli et de la démo et par un bouton
+  « Je contribue librement » en bas ; le vrai bouton de paiement Stripe
+  apparaît dès le carton de fin.
+- Message vocal de soutien (accueil, paramètres) refait avec la voix de Medy.
+- Vidéo d'accueil : sous-titres toujours visibles sur téléphone.
+- Rangement Google Drive : arborescence `WHAOO/00…07`, script Apps Script
+  de rangement automatique, modèle réutilisable
+  (`livrables/outils/modele-rangement-drive.html`).
+- Coffre des clés : case pour le lien de paiement Stripe.
+
+**Prochaine étape prévue** : vidéos avec Arcads (connecteur MCP à ajouter),
+passage de Stripe en mode réel.
+
 ## v1.1 — 2026-09-28
 
 - Coffre des clés chiffré (`livrables/coffre-cles/whaoo-coffre-cles.html`) :

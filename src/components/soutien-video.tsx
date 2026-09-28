@@ -2,6 +2,9 @@
 
 import { useRef, useState } from "react";
 
+// Durée (en secondes) du carton « Merci » à la fin de whaoo-soutien.mp4.
+const DUREE_CARTON_FIN = 3.5;
+
 // Ouvre la vidéo « Soutiens whaoo » (message de Medy) dans une fenêtre ; à la
 // fin, ou si on la passe, elle laisse place au bouton de paiement Stripe.
 // Deux déclencheurs : le coin en haut de l'appli et le bouton du bas.
@@ -75,6 +78,15 @@ export function SoutienVideo({
             controls
             preload="none"
             onEnded={() => setFinie(true)}
+            onTimeUpdate={(e) => {
+              // Le carton « Merci » des dernières secondes montre un bouton
+              // dessiné : on le remplace dès son début par le vrai bouton.
+              const v = e.currentTarget;
+              if (!finie && v.duration && v.duration - v.currentTime <= DUREE_CARTON_FIN) {
+                v.pause();
+                setFinie(true);
+              }
+            }}
             className={`block aspect-video w-full rounded-t-2xl bg-black ${finie ? "invisible" : ""}`}
           />
           {finie && (

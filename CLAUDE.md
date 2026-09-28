@@ -44,12 +44,12 @@ demander à Medy le zip correspondant et suivre son
   9:16 en Reel. Règle : toujours annoncer le coût et obtenir l'accord de
   Medy avant toute génération payante (Arcads, ElevenLabs…).
 
-- **Stripe** : contribution libre faite le 2026-09-28, en mode test
-  (lien de paiement à montant libre, variable `STRIPE_SUPPORT_LINK_URL` sur
-  Render, page `/merci`). Pour passer en réel : recréer le produit, le prix
-  (montant libre 1 à 500 €, 5 € proposé) et le lien de paiement en mode live
-  (redirection vers https://whaoo.site/merci), puis remplacer la variable
-  sur Render. Abonnement premium : pas encore décidé.
+- **Stripe** : contribution libre en **mode réel** depuis le 2026-09-28,
+  sur un compte Stripe dédié « WHAOO » (distinct du compte medy.site). Lien
+  de paiement à montant libre (1 à 500 €, 5 € proposé, redirection vers
+  https://whaoo.site/merci), à mettre dans `STRIPE_SUPPORT_LINK_URL` sur
+  Render. Le compte « environnement de test WHAOO » sert aux essais.
+  Abonnement premium : pas encore décidé.
 - **Rangement Google Drive** (Medy est sur Chromebook) : fait le
   2026-09-28. Dans le dossier `WHAOO` de Mon Drive : `00 - À trier` à
   `07 - Support et emails`, `01 - Sauvegardes/vX.Y - date`, et un dossier

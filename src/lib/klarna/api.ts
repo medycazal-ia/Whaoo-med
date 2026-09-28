@@ -1,4 +1,4 @@
-import type { SiteKlarna } from "./sites";
+import type { Commande, SiteKlarna } from "./sites";
 
 // Paiement Klarna direct par la page de paiement hébergée par Klarna (Hosted
 // Payment Page, API « HPP merchant ») : on crée une session Klarna Payments,
@@ -42,8 +42,9 @@ async function appelKlarna<T>(chemin: string, init: { method: "GET" | "POST"; co
 }
 
 // Crée la session de paiement et renvoie l'adresse de la page Klarna.
-// `urlApp` : adresse publique de cette application (retours de Klarna).
-export async function creerPaiementKlarna(site: SiteKlarna, centimes: number, urlApp: string) {
+// `urlApp` : adresse publique de cette application (retours de Klarna) ;
+// `page` : adresse de /paiement/klarna à rouvrir en cas d'annulation.
+export async function creerPaiementKlarna(site: SiteKlarna, commande: Commande, urlApp: string, page: string) {
   const paiement = await appelKlarna<{ session_id: string }>("/payments/v1/sessions", {
     method: "POST",
     corps: {
@@ -52,25 +53,14 @@ export async function creerPaiementKlarna(site: SiteKlarna, centimes: number, ur
       purchase_country: "FR",
       purchase_currency: "EUR",
       locale: "fr-FR",
-      order_amount: centimes,
+      order_amount: commande.total,
       order_tax_amount: 0,
-      order_lines: [
-        {
-          type: "digital",
-          reference: site.id,
-          name: site.libelle,
-          quantity: 1,
-          unit_price: centimes,
-          tax_rate: 0,
-          total_amount: centimes,
-          total_tax_amount: 0,
-        },
-      ],
+      order_lines: commande.lignes,
       merchant_reference1: `${site.id}-${Date.now()}`,
+      merchant_reference2: commande.lignes[0].reference,
     },
   });
 
-  const page = `${urlApp}/paiement/klarna?site=${encodeURIComponent(site.id)}`;
   const hpp = await appelKlarna<{ session_id: string; redirect_url: string }>("/hpp/v1/sessions", {
     method: "POST",
     corps: {
@@ -85,7 +75,7 @@ export async function creerPaiementKlarna(site: SiteKlarna, centimes: number, ur
         error: `${page}&etat=erreur`,
       },
       // Commande créée et débitée directement, sans étape de notre côté.
-      options: { place_order_mode: "CAPTURE_ORDER", page_title: site.libelle },
+      options: { place_order_mode: "CAPTURE_ORDER", page_title: `${site.nom} — ${commande.titre}` },
     },
   });
 

@@ -52,9 +52,12 @@ demander à Medy le zip correspondant et suivre son
   Abonnement premium : pas encore décidé. Klarna est actif dans ce compte
   et proposé automatiquement par le lien (selon l'éligibilité du client) ;
   Google Pay y est désactivé alors que l'appli l'annonce.
-- **Klarna en direct** : page de paiement partagée entre plusieurs sites,
-  `/paiement/klarna?site=<id>&montant=<euros>` (API HPP de Klarna, sites et
-  pages de retour dans `src/lib/klarna/sites.ts`). Inactive tant que
+- **Klarna en direct** : page de paiement partagée entre plusieurs sites
+  pour tout produit numérique ou physique (catalogue à prix fixés par site)
+  ou un montant libre : `/paiement/klarna?site=<id>&produit=<id>` ou
+  `?site=<id>&montant=<euros>` (API HPP de Klarna ; sites, produits et
+  pages de retour dans `src/lib/klarna/sites.ts`, catalogues encore vides :
+  demander à Medy ses produits). Inactive tant que
   `KLARNA_API_USERNAME` / `KLARNA_API_PASSWORD` ne sont pas sur Render
   (contrat marchand Klarna nécessaire). Jamais testée contre la vraie API.
 - **Rangement Google Drive** (Medy est sur Chromebook) : fait le

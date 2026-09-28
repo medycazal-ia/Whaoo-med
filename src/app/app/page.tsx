@@ -12,12 +12,14 @@ import {
   basculerStatutArticle,
   contribuerPrixDepuisTicket,
   definirBudgetMensuel,
+  marquerSessionAchetee,
   modifierArticle,
   recupererIndexCommunautaire,
   supprimerArticle,
   supprimerListeNommee,
+  supprimerSessionAAcheter,
 } from "@/lib/courses/actions";
-import { premierJourDuMois } from "@/lib/courses/rythme";
+import { debutPeriode, dateISO, libellePeriode, normaliserJourDebut } from "@/lib/courses/rythme";
 import { calculerSessionActive } from "@/lib/courses/session";
 import { CoursesDashboard } from "@/components/courses-dashboard";
 import { avatarSrc } from "@/lib/avatars";
@@ -38,12 +40,16 @@ export default async function AppHomePage({
 
   if (!user) redirect("/connexion");
 
-  const moisISO = premierJourDuMois().toISOString().slice(0, 10);
   const { data: profile } = await supabase
     .from("profiles")
-    .select("prenom, avatar_id")
+    .select("prenom, avatar_id, jour_debut_periode")
     .eq("id", user.id)
     .single();
+
+  // Période de budget en cours, selon le jour de début choisi par
+  // l'utilisateur (1er du mois par défaut) — voir Paramètres.
+  const debut = debutPeriode(new Date(), normaliserJourDebut(profile?.jour_debut_periode));
+  const moisISO = dateISO(debut);
 
   const { data: periode } = await supabase
     .from("budget_periods")
@@ -52,19 +58,20 @@ export default async function AppHomePage({
     .eq("month", moisISO)
     .maybeSingle();
 
-  // La liste "à acheter" est un pense-bête permanent (pas lié à un mois) ;
-  // seuls les achats du mois en cours comptent dans le budget affiché.
+  // La liste "à acheter" est un pense-bête permanent (pas lié à une
+  // période) ; seuls les achats de la période en cours comptent dans le
+  // budget affiché.
   const [{ data: itemsAAcheter }, { data: itemsAchetesCeMois }] = await Promise.all([
     supabase
       .from("items")
-      .select("id, label, detail, price, quantity, status, prix_source, liste_nom, session_courses, created_at")
+      .select("id, label, detail, price, quantity, status, prix_source, liste_nom, session_courses, created_at, achete_le")
       .eq("user_id", user.id)
       .eq("status", "a_acheter")
       .order("created_at", { ascending: false }),
     periode
       ? supabase
           .from("items")
-          .select("id, label, detail, price, quantity, status, prix_source, liste_nom, session_courses, created_at")
+          .select("id, label, detail, price, quantity, status, prix_source, liste_nom, session_courses, created_at, achete_le")
           .eq("user_id", user.id)
           .eq("status", "achete")
           .eq("achat_mois", moisISO)
@@ -79,6 +86,7 @@ export default async function AppHomePage({
       listeNom: item.liste_nom,
       sessionCourses: item.session_courses,
       createdAt: item.created_at,
+      acheteLe: item.achete_le,
     }),
   );
   const indexCommunautaire = await recupererIndexCommunautaire();
@@ -89,7 +97,8 @@ export default async function AppHomePage({
   const { sessionActive, sessionsAujourdHui } = calculerSessionActive(
     (itemsAchetesCeMois ?? []).map((item) => ({
       sessionCourses: item.session_courses,
-      createdAt: item.created_at,
+      // Date réelle d'achat (création de la ligne pour les anciens achats).
+      createdAt: item.achete_le ?? item.created_at,
     })),
   );
 
@@ -146,11 +155,11 @@ export default async function AppHomePage({
       {!periode ? (
         <section className="mx-auto mt-8 w-full max-w-sm md:max-w-md rounded-2xl bg-white p-6 shadow">
           <h2 className="font-heading text-lg font-semibold text-ardoise">
-            Nouveau mois, quel budget ?
+            Nouvelle période, quel budget ?
           </h2>
           <p className="mt-1 text-sm text-ardoise/70">
-            Le mois précédent reste consultable dans ton historique — indique
-            ton budget pour démarrer celui-ci.
+            Indique ton budget pour la période {libellePeriode(debut)}. La
+            période précédente reste consultable dans ton historique.
           </p>
           <form action={definirBudgetMensuel} className="mt-4 flex gap-2">
             <input
@@ -174,6 +183,7 @@ export default async function AppHomePage({
         <CoursesDashboard
           baseHref="/app"
           budgetAmount={periode.budget_amount}
+          debutPeriode={moisISO}
           items={items}
           vueActive={vueActive}
           actions={{
@@ -187,6 +197,8 @@ export default async function AppHomePage({
             ajouterArticlesAcheteesTicket: ajouterArticlesAchetesDepuisTicket,
             ajouterArticleAvecRetour,
             modifierArticle,
+            marquerSessionAchetee,
+            supprimerSessionAAcheter,
           }}
           pdfHref="/app/export-pdf"
           listePdfHref="/app/export-liste-pdf"

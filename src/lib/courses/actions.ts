@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { premierJourDuMois } from "@/lib/courses/rythme";
+import { debutPeriode, debutPeriodeISO, dateISO, normaliserJourDebut } from "@/lib/courses/rythme";
 import { nomListeParDefaut } from "@/lib/courses/listes";
 import { estimerPrix, normaliserLabel, type IndexCommunautaire, type SourcePrix } from "@/lib/prix-estimes";
 
@@ -12,16 +12,13 @@ function lireSourcePrix(formData: FormData): SourcePrix {
   return valeur === "communaute" || valeur === "statique" ? valeur : "manuel";
 }
 
-// "Budget immédiat" : nom de session (ex. "Courses du 20/09") rattaché à
-// un achat, saisi par l'utilisateur (texte ou dictée) — ne concerne
-// jamais un article "à acheter", seulement un achat effectif.
+// "Budget immédiat" : nom de session (ex. "Courses du 20/09"), saisi par
+// l'utilisateur (texte ou dictée). Un article "à acheter" ajouté pendant
+// une session lui appartient aussi : il apparaît dans le sous-groupe de
+// cette date, et la facturette de la session le reprend une fois acheté.
 function lireSessionCourses(formData: FormData): string | null {
   const valeur = String(formData.get("sessionCourses") ?? "").trim();
   return valeur || null;
-}
-
-function moisEnDateISO(reference = new Date()): string {
-  return premierJourDuMois(reference).toISOString().slice(0, 10);
 }
 
 async function requireUser() {
@@ -34,6 +31,28 @@ async function requireUser() {
   return { supabase, user };
 }
 
+type ClientSupabase = Awaited<ReturnType<typeof createClient>>;
+
+async function jourDebutPeriode(supabase: ClientSupabase, userId: string): Promise<number> {
+  const { data } = await supabase
+    .from("profiles")
+    .select("jour_debut_periode")
+    .eq("id", userId)
+    .maybeSingle();
+  return normaliserJourDebut(data?.jour_debut_periode);
+}
+
+// Champs d'un achat effectif : date réelle, et premier jour de la période
+// de budget qui le contient (achat_mois), selon le jour de début choisi
+// par l'utilisateur.
+async function champsAchat(supabase: ClientSupabase, userId: string) {
+  const maintenant = new Date();
+  const jour = await jourDebutPeriode(supabase, userId);
+  return { achete_le: maintenant.toISOString(), achat_mois: debutPeriodeISO(maintenant, jour) };
+}
+
+const PAS_ACHETE = { achete_le: null, achat_mois: null };
+
 export async function definirBudgetMensuel(formData: FormData): Promise<void> {
   const { supabase, user } = await requireUser();
   const budgetAmount = Number(formData.get("budgetAmount"));
@@ -42,10 +61,11 @@ export async function definirBudgetMensuel(formData: FormData): Promise<void> {
     redirect("/app?error=budget_invalide");
   }
 
+  const jour = await jourDebutPeriode(supabase, user.id);
   await supabase.from("budget_periods").upsert(
     {
       user_id: user.id,
-      month: moisEnDateISO(),
+      month: debutPeriodeISO(new Date(), jour),
       budget_amount: budgetAmount,
     },
     { onConflict: "user_id,month" },
@@ -78,9 +98,9 @@ export async function ajouterArticle(formData: FormData): Promise<void> {
     price,
     quantity,
     status,
-    achat_mois: status === "achete" ? moisEnDateISO() : null,
+    ...(status === "achete" ? await champsAchat(supabase, user.id) : PAS_ACHETE),
     prix_source: prixSource,
-    session_courses: status === "achete" ? sessionCourses : null,
+    session_courses: sessionCourses,
   });
 
   // Contribution communautaire de prix (section "prix estimés", inspirée
@@ -126,9 +146,9 @@ export async function ajouterArticleAvecRetour(formData: FormData): Promise<stri
       price,
       quantity,
       status,
-      achat_mois: status === "achete" ? moisEnDateISO() : null,
+      ...(status === "achete" ? await champsAchat(supabase, user.id) : PAS_ACHETE),
       prix_source: prixSource,
-      session_courses: status === "achete" ? sessionCourses : null,
+      session_courses: sessionCourses,
     })
     .select("id")
     .single();
@@ -175,7 +195,7 @@ export async function ajouterArticlesEnLot(
         prix_source: estimation?.source ?? null,
         quantity: item.quantity,
         status: "a_acheter" as const,
-        achat_mois: null,
+        ...PAS_ACHETE,
         // Toujours nommée : si l'utilisateur ne donne pas de nom, whaoo en
         // propose un daté du jour plutôt que de laisser l'import se
         // perdre parmi les articles sans nom.
@@ -252,6 +272,7 @@ export async function ajouterArticlesAchetesDepuisTicket(
   const { supabase, user } = await requireUser();
   if (lignes.length === 0) return;
 
+  const achat = await champsAchat(supabase, user.id);
   await supabase.from("items").insert(
     lignes.map((ligne) => ({
       user_id: user.id,
@@ -260,7 +281,7 @@ export async function ajouterArticlesAchetesDepuisTicket(
       price: ligne.price,
       quantity: 1,
       status: "achete" as const,
-      achat_mois: moisEnDateISO(),
+      ...achat,
       prix_source: "manuel" as const,
       session_courses: sessionCourses,
     })),
@@ -273,14 +294,18 @@ export async function basculerStatutArticle(formData: FormData): Promise<void> {
   const { supabase, user } = await requireUser();
   const id = String(formData.get("id") ?? "");
   const nouveauStatut = formData.get("status") === "achete" ? "achete" : "a_acheter";
+  // Session envoyée par l'interface : celle de l'article s'il appartient
+  // déjà à une date, sinon la session en cours. Un article remis "à
+  // acheter" garde sa session, pour retrouver son sous-groupe.
   const sessionCourses = lireSessionCourses(formData);
 
   await supabase
     .from("items")
     .update({
       status: nouveauStatut,
-      achat_mois: nouveauStatut === "achete" ? moisEnDateISO() : null,
-      session_courses: nouveauStatut === "achete" ? sessionCourses : null,
+      ...(nouveauStatut === "achete"
+        ? { ...(await champsAchat(supabase, user.id)), session_courses: sessionCourses }
+        : PAS_ACHETE),
       updated_at: new Date().toISOString(),
     })
     .eq("id", id)
@@ -311,6 +336,115 @@ export async function supprimerListeNommee(formData: FormData): Promise<void> {
     .eq("user_id", user.id)
     .eq("status", "a_acheter")
     .eq("liste_nom", listeNom);
+
+  revalidatePath("/app");
+}
+
+// Jour de début de la période de budget (1 = mois calendaire, 25 = du 25
+// au 24). Chaque achat déjà enregistré est reclassé dans la période qui
+// le contient selon le nouveau jour, et le budget de la période en cours
+// est repris sur la nouvelle période s'il n'y en a pas encore.
+export async function definirDebutPeriode(formData: FormData): Promise<void> {
+  const { supabase, user } = await requireUser();
+  const nouveauJour = Number(formData.get("jourDebut"));
+  if (!Number.isInteger(nouveauJour) || normaliserJourDebut(nouveauJour) !== nouveauJour) {
+    redirect("/app/parametres?error=periode");
+  }
+
+  const ancienJour = await jourDebutPeriode(supabase, user.id);
+  if (ancienJour === nouveauJour) redirect("/app/parametres?ok=periode");
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ jour_debut_periode: nouveauJour })
+    .eq("id", user.id);
+  if (error) redirect("/app/parametres?error=periode");
+
+  const { data: achats } = await supabase
+    .from("items")
+    .select("id, achete_le")
+    .eq("user_id", user.id)
+    .eq("status", "achete")
+    .not("achete_le", "is", null);
+
+  const parPeriode = new Map<string, string[]>();
+  for (const achat of achats ?? []) {
+    const periode = dateISO(debutPeriode(new Date(achat.achete_le as string), nouveauJour));
+    parPeriode.set(periode, [...(parPeriode.get(periode) ?? []), achat.id]);
+  }
+  for (const [periode, ids] of parPeriode) {
+    for (let i = 0; i < ids.length; i += 200) {
+      await supabase
+        .from("items")
+        .update({ achat_mois: periode })
+        .eq("user_id", user.id)
+        .in("id", ids.slice(i, i + 200));
+    }
+  }
+
+  const maintenant = new Date();
+  const ancienDebut = debutPeriodeISO(maintenant, ancienJour);
+  const nouveauDebut = debutPeriodeISO(maintenant, nouveauJour);
+  const { data: budgetActuel } = await supabase
+    .from("budget_periods")
+    .select("budget_amount")
+    .eq("user_id", user.id)
+    .eq("month", ancienDebut)
+    .maybeSingle();
+  if (budgetActuel) {
+    const { data: dejaDefini } = await supabase
+      .from("budget_periods")
+      .select("id")
+      .eq("user_id", user.id)
+      .eq("month", nouveauDebut)
+      .maybeSingle();
+    if (!dejaDefini) {
+      await supabase.from("budget_periods").insert({
+        user_id: user.id,
+        month: nouveauDebut,
+        budget_amount: budgetActuel.budget_amount,
+      });
+    }
+  }
+
+  revalidatePath("/app");
+  redirect("/app/parametres?ok=periode");
+}
+
+// Traite d'un coup tous les articles "à acheter" d'une session datée
+// (ex. "Courses du 28/09") : ils deviennent la facturette de cette date.
+export async function marquerSessionAchetee(formData: FormData): Promise<void> {
+  const { supabase, user } = await requireUser();
+  const session = lireSessionCourses(formData);
+  if (!session) return;
+
+  await supabase
+    .from("items")
+    .update({
+      status: "achete",
+      ...(await champsAchat(supabase, user.id)),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("user_id", user.id)
+    .eq("status", "a_acheter")
+    .eq("session_courses", session);
+
+  revalidatePath("/app");
+}
+
+// Efface les articles "à acheter" d'une session datée — ne touche jamais
+// les articles déjà achetés de cette session (la facturette reste).
+export async function supprimerSessionAAcheter(formData: FormData): Promise<void> {
+  const { supabase, user } = await requireUser();
+  const session = lireSessionCourses(formData);
+  if (!session) return;
+
+  await supabase
+    .from("items")
+    .delete()
+    .eq("user_id", user.id)
+    .eq("status", "a_acheter")
+    .eq("session_courses", session);
 
   revalidatePath("/app");
 }

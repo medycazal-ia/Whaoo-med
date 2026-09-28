@@ -81,7 +81,7 @@ export function CarteArticle({
             name="status"
             value={item.status === "achete" ? "a_acheter" : "achete"}
           />
-          <input type="hidden" name="sessionCourses" value={sessionActive} />
+          <input type="hidden" name="sessionCourses" value={item.sessionCourses ?? sessionActive} />
           <button
             type="submit"
             className="rounded-lg border border-basilic/40 px-2 py-1 text-xs text-basilic"

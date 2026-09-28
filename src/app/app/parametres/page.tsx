@@ -2,19 +2,22 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { supprimerMonCompte } from "@/lib/compte/actions";
+import { definirDebutPeriode } from "@/lib/courses/actions";
+import { debutPeriode, libellePeriode, normaliserJourDebut, JOUR_DEBUT_MAX } from "@/lib/courses/rythme";
 import { ActiverNotifications } from "@/components/activer-notifications";
 
 const ERROR_MESSAGES: Record<string, string> = {
   confirmation: "Tape exactement SUPPRIMER pour confirmer.",
   suppression: "La suppression a échoué, réessaie ou contacte le support.",
+  periode: "La période n'a pas pu être modifiée, réessaie.",
 };
 
 export default async function ParametresPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; ok?: string }>;
 }) {
-  const { error } = await searchParams;
+  const { error, ok } = await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
@@ -23,6 +26,14 @@ export default async function ParametresPage({
   if (!user) redirect("/connexion");
 
   const supportLinkUrl = process.env.SUPPORT_LINK_URL;
+
+  const { data: profil } = await supabase
+    .from("profiles")
+    .select("jour_debut_periode")
+    .eq("id", user.id)
+    .maybeSingle();
+  const jourDebut = normaliserJourDebut(profil?.jour_debut_periode);
+  const periodeActuelle = libellePeriode(debutPeriode(new Date(), jourDebut));
 
   return (
     <main className="flex flex-1 flex-col fond-marche">
@@ -36,6 +47,57 @@ export default async function ParametresPage({
       </header>
 
       <section className="mx-auto flex w-full max-w-lg md:max-w-2xl lg:max-w-4xl flex-col gap-6 px-4 sm:px-6 py-6">
+        <div className="rounded-2xl bg-white p-5">
+          <h2 className="font-heading text-lg font-semibold text-ardoise">
+            Période du budget
+          </h2>
+          <p className="mt-1 text-sm text-ardoise/70">
+            Par défaut, ton budget suit le mois calendaire. Tu peux le caler
+            sur ton jour de paie : avec le 25, il court du 25 au 24 du mois
+            suivant. Tes totaux, ta cagnotte et tes factures suivent ces dates.
+          </p>
+          <p className="mt-2 text-sm text-ardoise">
+            Période en cours : <strong>{periodeActuelle}</strong>
+          </p>
+          {error === "periode" && (
+            <p className="mt-2 rounded-lg bg-tomate/10 px-3 py-2 text-sm text-tomate">
+              {ERROR_MESSAGES.periode}
+            </p>
+          )}
+          {ok === "periode" && (
+            <p className="mt-2 rounded-lg bg-basilic/10 px-3 py-2 text-sm text-basilic">
+              ✓ Période mise à jour.
+            </p>
+          )}
+          <form action={definirDebutPeriode} className="mt-3 flex flex-wrap items-center gap-2">
+            <label htmlFor="jourDebut" className="text-sm text-ardoise">
+              Mon mois commence le
+            </label>
+            <select
+              id="jourDebut"
+              name="jourDebut"
+              defaultValue={jourDebut}
+              className="rounded-lg border border-ardoise/20 bg-white px-3 py-2 text-sm text-ardoise"
+            >
+              {Array.from({ length: JOUR_DEBUT_MAX }, (_, i) => i + 1).map((jour) => (
+                <option key={jour} value={jour}>
+                  {jour === 1 ? "1er (mois calendaire)" : jour}
+                </option>
+              ))}
+            </select>
+            <button
+              type="submit"
+              className="rounded-lg border border-ardoise/20 px-4 py-2 text-sm font-medium text-ardoise hover:bg-ardoise/5"
+            >
+              Enregistrer
+            </button>
+          </form>
+          <p className="mt-2 text-xs text-ardoise/50">
+            Jusqu&apos;au 28 seulement, pour que chaque mois ait ce jour-là
+            (février compris).
+          </p>
+        </div>
+
         <div className="rounded-2xl bg-white p-5">
           <h2 className="font-heading text-lg font-semibold text-ardoise">
             Rappels
@@ -92,7 +154,7 @@ export default async function ParametresPage({
             Supprime définitivement ton compte et toutes tes données
             (profil, budgets, articles). Cette action est irréversible.
           </p>
-          {error && (
+          {error && error !== "periode" && (
             <p className="mt-3 rounded-lg bg-tomate/10 px-3 py-2 text-sm text-tomate">
               {ERROR_MESSAGES[error] ?? "Une erreur est survenue."}
             </p>

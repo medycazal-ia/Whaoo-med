@@ -51,7 +51,7 @@ export function LigneAttenteArticle({
         <form action={basculerStatutAction}>
           <input type="hidden" name="id" value={item.id} />
           <input type="hidden" name="status" value="achete" />
-          <input type="hidden" name="sessionCourses" value={sessionActive} />
+          <input type="hidden" name="sessionCourses" value={item.sessionCourses ?? sessionActive} />
           <button type="submit" className="rounded-lg bg-basilic px-2 py-1 text-xs font-medium text-craie">
             Acheté ✓
           </button>

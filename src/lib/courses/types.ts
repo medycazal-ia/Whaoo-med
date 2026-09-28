@@ -14,4 +14,6 @@ export type ArticleCourse = {
   // ajoutés en un seul lot — tous les articles d'un même appel partagent
   // exactement le même horodatage côté base de données.
   createdAt?: string | null;
+  // Moment réel de l'achat (null tant que l'article est à acheter).
+  acheteLe?: string | null;
 };

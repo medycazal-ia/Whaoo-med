@@ -62,13 +62,16 @@ function grouperParSession(articles: ArticleFacture[]): [string, ArticleFacture[
 }
 
 export function FacturePDF({
+  titre = "whaoo — Facture de la période",
   moisLabel,
   articles,
   budgetAmount,
 }: {
+  titre?: string;
   moisLabel: string;
   articles: ArticleFacture[];
-  budgetAmount: number;
+  // null pour une facturette (un seul passage en caisse) : pas de budget.
+  budgetAmount: number | null;
 }) {
   const total = articles.reduce((s, a) => s + a.price * a.quantity, 0);
   const groupes = grouperParSession(articles);
@@ -77,7 +80,7 @@ export function FacturePDF({
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        <Text style={styles.titre}>whaoo — Facture du mois</Text>
+        <Text style={styles.titre}>{titre}</Text>
         <Text style={styles.sousTitre}>{moisLabel}</Text>
 
         <View style={styles.ligne}>
@@ -117,9 +120,11 @@ export function FacturePDF({
           <Text>Total dépensé</Text>
           <Text>{total.toFixed(2)} €</Text>
         </View>
-        <Text style={styles.budgetLigne}>
-          Budget du mois : {budgetAmount.toFixed(2)} €
-        </Text>
+        {budgetAmount !== null && (
+          <Text style={styles.budgetLigne}>
+            Budget de la période : {budgetAmount.toFixed(2)} €
+          </Text>
+        )}
       </Page>
     </Document>
   );

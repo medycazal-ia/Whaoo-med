@@ -43,7 +43,9 @@ export async function ajouterArticleDemo(formData: FormData): Promise<void> {
     price,
     quantity,
     status,
-    sessionCourses: status === "achete" ? sessionCourses : null,
+    sessionCourses,
+    createdAt: new Date().toISOString(),
+    acheteLe: status === "achete" ? new Date().toISOString() : null,
   });
 
   await ecrireEtatDemo(state);
@@ -73,7 +75,9 @@ export async function ajouterArticleAvecRetourDemo(formData: FormData): Promise<
     price,
     quantity,
     status,
-    sessionCourses: status === "achete" ? sessionCourses : null,
+    sessionCourses,
+    createdAt: new Date().toISOString(),
+    acheteLe: status === "achete" ? new Date().toISOString() : null,
   });
 
   await ecrireEtatDemo(state);
@@ -139,10 +143,19 @@ export async function basculerStatutArticleDemo(formData: FormData): Promise<voi
   const state = lireEtatDemo(cookieStore);
   const id = String(formData.get("id") ?? "");
   const nouveauStatut = formData.get("status") === "achete" ? "achete" : "a_acheter";
-  const sessionCourses = nouveauStatut === "achete" ? lireSessionCoursesDemo(formData) : null;
 
+  // Comme dans l'appli : un article remis "à acheter" garde sa session.
   state.items = state.items.map((item) =>
-    item.id === id ? { ...item, status: nouveauStatut, sessionCourses } : item,
+    item.id !== id
+      ? item
+      : nouveauStatut === "achete"
+        ? {
+            ...item,
+            status: nouveauStatut,
+            sessionCourses: lireSessionCoursesDemo(formData),
+            acheteLe: new Date().toISOString(),
+          }
+        : { ...item, status: nouveauStatut, acheteLe: null },
   );
 
   await ecrireEtatDemo(state);
@@ -168,6 +181,37 @@ export async function supprimerListeNommeeDemo(formData: FormData): Promise<void
 
   state.items = state.items.filter(
     (item) => !(item.status === "a_acheter" && item.listeNom === listeNom),
+  );
+
+  await ecrireEtatDemo(state);
+  revalidatePath("/demo");
+}
+
+export async function marquerSessionAcheteeDemo(formData: FormData): Promise<void> {
+  const cookieStore = await cookies();
+  const state = lireEtatDemo(cookieStore);
+  const session = lireSessionCoursesDemo(formData);
+  if (!session) return;
+
+  const maintenant = new Date().toISOString();
+  state.items = state.items.map((item) =>
+    item.status === "a_acheter" && item.sessionCourses === session
+      ? { ...item, status: "achete", acheteLe: maintenant }
+      : item,
+  );
+
+  await ecrireEtatDemo(state);
+  revalidatePath("/demo");
+}
+
+export async function supprimerSessionAAcheterDemo(formData: FormData): Promise<void> {
+  const cookieStore = await cookies();
+  const state = lireEtatDemo(cookieStore);
+  const session = lireSessionCoursesDemo(formData);
+  if (!session) return;
+
+  state.items = state.items.filter(
+    (item) => !(item.status === "a_acheter" && item.sessionCourses === session),
   );
 
   await ecrireEtatDemo(state);

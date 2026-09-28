@@ -1,4 +1,5 @@
 import type { ArticleCourse } from "@/components/courses-dashboard";
+import { nomSessionParDefaut } from "@/lib/courses/session";
 
 export const DEMO_COOKIE = "whaoo_demo";
 
@@ -17,21 +18,41 @@ export type DemoMoisHistorique = {
 // Ne touche jamais la base de données réelle ni un connecteur externe :
 // tout vit dans un cookie de session, recréé à chaque nouvelle session.
 export function etatDemoParDefaut(): DemoState {
+  // Deux passages en caisse récents (deux facturettes) et une liste datée
+  // du jour à préparer, calculés par rapport à aujourd'hui.
+  const ilYa = (jours: number) => {
+    const date = new Date();
+    date.setDate(date.getDate() - jours);
+    date.setHours(10, 0, 0, 0);
+    return date;
+  };
+  const avantHier = ilYa(2);
+  const semaineDerniere = ilYa(6);
+  const sessionAvantHier = nomSessionParDefaut(avantHier);
+  const sessionSemaine = nomSessionParDefaut(semaineDerniere);
+  const sessionDuJour = nomSessionParDefaut(new Date());
+  const achat = (session: string, date: Date) => ({
+    status: "achete" as const,
+    sessionCourses: session,
+    acheteLe: date.toISOString(),
+    createdAt: date.toISOString(),
+  });
+
   return {
     budgetAmount: 350,
     items: [
-      { id: "d1", label: "Pommes", price: 3.2, quantity: 1, status: "achete" },
-      { id: "d2", label: "Pain de mie", price: 1.85, quantity: 1, status: "achete" },
-      { id: "d3", label: "Yaourts nature", price: 2.4, quantity: 2, status: "achete" },
-      { id: "d4", label: "Poulet fermier", price: 8.9, quantity: 1, status: "achete" },
-      { id: "d5", label: "Pâtes", price: 1.1, quantity: 3, status: "achete" },
-      { id: "d6", label: "Café moulu", price: 5.5, quantity: 1, status: "achete" },
-      { id: "d7", label: "Lait demi-écrémé", price: 1.15, quantity: 2, status: "achete" },
-      { id: "d8", label: "Savon", price: 2.3, quantity: 1, status: "achete" },
-      { id: "d9", label: "Papier toilette", price: 6.9, quantity: 1, status: "achete" },
-      { id: "d10", label: "Saumon fumé", price: 4.5, quantity: 1, status: "a_acheter" },
-      { id: "d11", label: "Fromage de chèvre", price: 3.6, quantity: 1, status: "a_acheter" },
-      { id: "d12", label: "Lessive", price: 9.9, quantity: 1, status: "a_acheter" },
+      { id: "d1", label: "Pommes", price: 3.2, quantity: 1, ...achat(sessionAvantHier, avantHier) },
+      { id: "d2", label: "Pain de mie", price: 1.85, quantity: 1, ...achat(sessionAvantHier, avantHier) },
+      { id: "d3", label: "Yaourts nature", price: 2.4, quantity: 2, ...achat(sessionAvantHier, avantHier) },
+      { id: "d4", label: "Poulet fermier", price: 8.9, quantity: 1, ...achat(sessionAvantHier, avantHier) },
+      { id: "d5", label: "Pâtes", price: 1.1, quantity: 3, ...achat(sessionSemaine, semaineDerniere) },
+      { id: "d6", label: "Café moulu", price: 5.5, quantity: 1, ...achat(sessionSemaine, semaineDerniere) },
+      { id: "d7", label: "Lait demi-écrémé", price: 1.15, quantity: 2, ...achat(sessionSemaine, semaineDerniere) },
+      { id: "d8", label: "Savon", price: 2.3, quantity: 1, ...achat(sessionSemaine, semaineDerniere) },
+      { id: "d9", label: "Papier toilette", price: 6.9, quantity: 1, ...achat(sessionSemaine, semaineDerniere) },
+      { id: "d10", label: "Saumon fumé", price: 4.5, quantity: 1, status: "a_acheter", sessionCourses: sessionDuJour },
+      { id: "d11", label: "Fromage de chèvre", price: 3.6, quantity: 1, status: "a_acheter", sessionCourses: sessionDuJour },
+      { id: "d12", label: "Lessive", price: 9.9, quantity: 1, status: "a_acheter", sessionCourses: sessionDuJour },
       { id: "d13", label: "Chocolat noir", price: 2.1, quantity: 2, status: "a_acheter" },
       { id: "d14", label: "Vin rouge", price: 7.5, quantity: 1, status: "a_acheter" },
       { id: "d15", label: "Bougies parfumées", price: 6.0, quantity: 1, status: "a_acheter" },

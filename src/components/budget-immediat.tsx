@@ -152,8 +152,9 @@ export function BudgetImmediat({
       )}
 
       <p className="text-[11px] text-ardoise/40">
-        Chaque achat validé (case cochée, ticket scanné, dicté) sera rattaché à
-        cette session, pour la retrouver facilement sur ta facture du mois.
+        Chaque article ajouté ou acheté (case cochée, ticket scanné, dicté) est
+        rattaché à cette session : elle forme un groupe dans ta liste, puis sa
+        propre facturette, comptée dans la facture de la période.
       </p>
     </div>
   );

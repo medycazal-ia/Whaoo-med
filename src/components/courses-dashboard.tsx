@@ -2,7 +2,8 @@
 
 import { useState, type ReactNode } from "react";
 import Link from "next/link";
-import { calculerRythme, premierJourDuMois } from "@/lib/courses/rythme";
+import { calculerRythme, libellePeriode } from "@/lib/courses/rythme";
+import { grouperParSession } from "@/lib/courses/groupes";
 import { nomSessionParDefaut } from "@/lib/courses/session";
 import type { ArticleCourse } from "@/lib/courses/types";
 import { SaisieVocale } from "@/components/saisie-vocale";
@@ -35,7 +36,23 @@ type CoursesActions = {
   ) => Promise<void>;
   ajouterArticleAvecRetour?: (formData: FormData) => Promise<string | null>;
   modifierArticle?: (formData: FormData) => Promise<void>;
+  // Actions sur une session datée entière (sous-groupe de la liste).
+  marquerSessionAchetee?: (formData: FormData) => Promise<void>;
+  supprimerSessionAAcheter?: (formData: FormData) => Promise<void>;
 };
+
+function lireDateISO(iso: string | undefined): Date {
+  if (!iso) {
+    const maintenant = new Date();
+    return new Date(maintenant.getFullYear(), maintenant.getMonth(), 1);
+  }
+  const [annee, mois, jour] = iso.split("-").map(Number);
+  return new Date(annee, mois - 1, jour);
+}
+
+function euros(montant: number): string {
+  return `${montant.toFixed(2)} €`;
+}
 
 // Pastilles pensées pour la carte budget au fond sombre (dégradé
 // kaki→ardoise) : un fond clair opaque garantit le contraste, quelle que
@@ -49,6 +66,7 @@ const STATUT_STYLES: Record<string, string> = {
 export function CoursesDashboard({
   baseHref,
   budgetAmount,
+  debutPeriode,
   items,
   vueActive,
   actions,
@@ -63,6 +81,9 @@ export function CoursesDashboard({
 }: {
   baseHref: string;
   budgetAmount: number;
+  // Premier jour de la période de budget (AAAA-MM-JJ) ; 1er du mois en
+  // cours si absent (démo).
+  debutPeriode?: string;
   items: ArticleCourse[];
   vueActive: "achete" | "a_acheter";
   actions: CoursesActions;
@@ -122,19 +143,25 @@ export function CoursesDashboard({
     .filter((item) => item.status === "achete")
     .reduce((total, item) => total + item.price * item.quantity, 0);
 
+  const debut = lireDateISO(debutPeriode);
   const rythme = calculerRythme({
     budgetAmount,
     totalDepense,
-    mois: premierJourDuMois(),
+    debut,
   });
 
   const itemsAffiches = items.filter((item) => item.status === vueActive);
+  const groupesGrille = grouperParSession(itemsAffiches);
   const itemsEnAttente = items.filter((item) => item.status === "a_acheter");
 
   // Regroupe les articles en attente par nom de liste (ex. une recette ou un
   // régime importé) — les articles sans nom restent affichés à part, sans
   // en-tête ni suppression groupée puisqu'il n'y a rien à nommer.
   const itemsSansNom = itemsEnAttente.filter((item) => !item.listeNom);
+  // Parmi eux, ceux ajoutés pendant une session datée ("Courses du 28/09")
+  // forment chacun un sous-groupe, traitable à part du reste de la liste.
+  const groupesAttente = grouperParSession(itemsSansNom);
+  const itemsSansSession = groupesAttente.find((groupe) => groupe.session === null)?.items ?? [];
   const groupesNommes = Array.from(
     itemsEnAttente.reduce((groupes, item) => {
       if (!item.listeNom) return groupes;
@@ -180,7 +207,7 @@ export function CoursesDashboard({
               {totalDepense.toFixed(2)} €
             </span>
             <span className="text-sm text-craie/60">
-              / {budgetAmount.toFixed(2)} € ce mois-ci
+              / {budgetAmount.toFixed(2)} €
             </span>
           </div>
           <div className="h-2 overflow-hidden rounded-full bg-craie/20">
@@ -196,6 +223,7 @@ export function CoursesDashboard({
           >
             {rythme.statutLabel}
           </span>
+          <p className="text-xs text-craie/70">📅 Période {libellePeriode(debut)}</p>
           <p className="text-sm text-craie/80">
             🐷 Cagnotte estimée : <strong>{rythme.cagnotte.toFixed(2)} €</strong>
           </p>
@@ -244,11 +272,84 @@ export function CoursesDashboard({
 
             {!rappelsMasques && (
               <>
-                {itemsSansNom.length > 0 && (
+                {groupesAttente
+                  .filter((groupe) => groupe.session !== null)
+                  .map((groupe) => {
+                    const session = groupe.session as string;
+                    const cle = `session:${session}`;
+                    const masquee = listesMasquees.has(cle);
+                    return (
+                      <div key={cle} className="mt-3 rounded-lg bg-craie/70 p-2">
+                        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+                          <p className="text-xs font-semibold text-ardoise">
+                            🛒 {session}{" "}
+                            <span className="font-normal text-ardoise/60">
+                              ({groupe.items.length} · ≈ {euros(groupe.total)})
+                            </span>
+                          </p>
+                          <div className="flex items-center gap-3">
+                            <button
+                              type="button"
+                              onClick={() => basculerMasquageListe(cle)}
+                              className="text-xs text-ardoise/60 underline"
+                            >
+                              {masquee ? "👁️ Afficher" : "🙈 Masquer"}
+                            </button>
+                            {actions.marquerSessionAchetee && (
+                              <form
+                                action={actions.marquerSessionAchetee}
+                                onSubmit={(e) => {
+                                  if (!window.confirm(`Marquer les ${groupe.items.length} articles de « ${session} » comme achetés ?`)) {
+                                    e.preventDefault();
+                                  }
+                                }}
+                              >
+                                <input type="hidden" name="sessionCourses" value={session} />
+                                <button type="submit" className="text-xs font-medium text-basilic underline">
+                                  ✓ Tout acheté
+                                </button>
+                              </form>
+                            )}
+                            {actions.supprimerSessionAAcheter && (
+                              <form
+                                action={actions.supprimerSessionAAcheter}
+                                onSubmit={(e) => {
+                                  if (!window.confirm(`Supprimer les ${groupe.items.length} articles à acheter de « ${session} » ?`)) {
+                                    e.preventDefault();
+                                  }
+                                }}
+                              >
+                                <input type="hidden" name="sessionCourses" value={session} />
+                                <button type="submit" className="text-xs text-tomate underline">
+                                  Supprimer
+                                </button>
+                              </form>
+                            )}
+                          </div>
+                        </div>
+                        {!masquee && (
+                          <ul className="mt-1 flex flex-col divide-y divide-ardoise/10">
+                            {groupe.items.map((item) => (
+                              <LigneAttenteArticle
+                                key={item.id}
+                                item={item}
+                                sessionActive={nomSessionActive}
+                                basculerStatutAction={actions.basculerStatutArticle}
+                                supprimerAction={actions.supprimerArticle}
+                                modifierAction={actions.modifierArticle}
+                              />
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    );
+                  })}
+
+                {itemsSansSession.length > 0 && (
                   <div className="mt-2">
                     <div className="flex items-center justify-between gap-2">
                       <p className="text-xs font-medium text-ardoise/50">
-                        Articles seuls ({itemsSansNom.length})
+                        Articles seuls ({itemsSansSession.length})
                       </p>
                       <button
                         type="button"
@@ -260,7 +361,7 @@ export function CoursesDashboard({
                     </div>
                     {!sansNomMasque && (
                       <ul className="mt-1 flex flex-col divide-y divide-ardoise/10">
-                        {itemsSansNom.map((item) => (
+                        {itemsSansSession.map((item) => (
                           <LigneAttenteArticle
                             key={item.id}
                             item={item}
@@ -378,7 +479,7 @@ export function CoursesDashboard({
         <div className="flex flex-wrap gap-x-4 gap-y-1">
           {pdfHref && (
             <a href={pdfHref} className="text-sm text-ardoise/60 underline">
-              🖨️ Facture PDF du mois
+              🖨️ Facture PDF de la période
             </a>
           )}
           {listePdfHref && (
@@ -427,24 +528,69 @@ export function CoursesDashboard({
             {itemsAffiches.length} article{itemsAffiches.length > 1 ? "s" : ""} masqué
             {itemsAffiches.length > 1 ? "s" : ""}.
           </p>
+        ) : itemsAffiches.length === 0 ? (
+          <p className="rounded-lg bg-white p-4 text-center text-sm text-ardoise/60">
+            Rien ici pour l&apos;instant.
+          </p>
         ) : (
-          <ul className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-3">
-            {itemsAffiches.length === 0 && (
-              <p className="col-span-full rounded-lg bg-white p-4 text-center text-sm text-ardoise/60">
-                Rien ici pour l&apos;instant.
+          // Un groupe par session datée : dans "Acheté", chaque groupe est
+          // une facturette (sous-total + PDF), et toutes s'additionnent
+          // dans la facture de la période.
+          <div className="flex flex-col gap-4">
+            {groupesGrille.map((groupe) => {
+              const facturette = vueActive === "achete";
+              const afficherEnTete = groupesGrille.length > 1 || groupe.session !== null;
+              return (
+                <div
+                  key={groupe.session ?? "__sans_date__"}
+                  className={facturette ? "rounded-2xl border border-ardoise/10 bg-white/70 p-3" : ""}
+                >
+                  {afficherEnTete && (
+                    <div className="mb-2 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+                      <p className="text-sm font-semibold text-ardoise">
+                        {facturette ? "🧾" : "🛒"} {groupe.session ?? "Sans date"}{" "}
+                        <span className="font-normal text-ardoise/60">
+                          · {groupe.items.length} article{groupe.items.length > 1 ? "s" : ""}
+                        </span>
+                      </p>
+                      {facturette && (
+                        <div className="flex items-baseline gap-3">
+                          <span className="font-mono text-sm font-semibold text-ardoise">
+                            {euros(groupe.total)}
+                          </span>
+                          {pdfHref && groupe.session && (
+                            <a
+                              href={`${pdfHref}?session=${encodeURIComponent(groupe.session)}`}
+                              className="text-xs text-ardoise/60 underline"
+                            >
+                              🖨️ Facturette PDF
+                            </a>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  <ul className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-3">
+                    {groupe.items.map((item) => (
+                      <CarteArticle
+                        key={item.id}
+                        item={item}
+                        sessionActive={nomSessionActive}
+                        basculerStatutAction={actions.basculerStatutArticle}
+                        supprimerAction={actions.supprimerArticle}
+                        modifierAction={actions.modifierArticle}
+                      />
+                    ))}
+                  </ul>
+                </div>
+              );
+            })}
+            {vueActive === "achete" && groupesGrille.length > 1 && (
+              <p className="text-right text-sm text-ardoise/70">
+                Total de la période : <strong className="font-mono">{euros(totalDepense)}</strong>
               </p>
             )}
-            {itemsAffiches.map((item) => (
-              <CarteArticle
-                key={item.id}
-                item={item}
-                sessionActive={nomSessionActive}
-                basculerStatutAction={actions.basculerStatutArticle}
-                supprimerAction={actions.supprimerArticle}
-                modifierAction={actions.modifierArticle}
-              />
-            ))}
-          </ul>
+          </div>
         )}
       </section>
 

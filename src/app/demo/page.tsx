@@ -15,6 +15,7 @@ import {
 } from "@/lib/demo/actions";
 import { historiqueDemo, lireEtatDemo } from "@/lib/demo/state";
 import { CoursesDashboard } from "@/components/courses-dashboard";
+import { SoutienVideo } from "@/components/soutien-video";
 
 export default async function DemoPage({
   searchParams,
@@ -26,12 +27,18 @@ export default async function DemoPage({
 
   const cookieStore = await cookies();
   const state = lireEtatDemo(cookieStore);
+  const stripeUrl = process.env.STRIPE_SUPPORT_LINK_URL || null;
 
   return (
     <main className="flex flex-1 flex-col fond-marche">
       <div className="bg-rose px-4 sm:px-6 py-2 text-center text-sm font-medium text-ardoise">
         Mode démo — tes modifications ne seront pas conservées
       </div>
+      {stripeUrl && (
+        <div className="flex justify-end bg-gradient-to-r from-menthe to-rose">
+          <SoutienVideo stripeUrl={stripeUrl} variante="coin" />
+        </div>
+      )}
 
       <header className="flex flex-wrap items-center justify-between gap-2 bg-gradient-to-r from-menthe to-rose px-3 py-3 sm:px-6 sm:py-4">
         <h1 className="truncate font-heading text-base font-semibold text-ardoise sm:text-xl">
@@ -110,6 +117,15 @@ export default async function DemoPage({
           </section>
         }
       />
+
+      {stripeUrl && (
+        <div className="flex flex-col items-center gap-2 px-4 pb-10 pt-4 text-center">
+          <SoutienVideo stripeUrl={stripeUrl} variante="bouton" />
+          <p className="text-xs text-ardoise/75">
+            Entièrement facultatif — whaoo reste gratuite.
+          </p>
+        </div>
+      )}
     </main>
   );
 }

@@ -24,6 +24,7 @@ import { calculerSessionActive } from "@/lib/courses/session";
 import { CoursesDashboard } from "@/components/courses-dashboard";
 import { avatarSrc } from "@/lib/avatars";
 import { estAdmin } from "@/lib/admin";
+import { SoutienVideo } from "@/components/soutien-video";
 
 export default async function AppHomePage({
   searchParams,
@@ -102,8 +103,15 @@ export default async function AppHomePage({
     })),
   );
 
+  const stripeUrl = process.env.STRIPE_SUPPORT_LINK_URL || null;
+
   return (
     <main className="flex flex-1 flex-col fond-marche">
+      {stripeUrl && (
+        <div className="flex justify-end bg-gradient-to-r from-menthe to-rose">
+          <SoutienVideo stripeUrl={stripeUrl} variante="coin" />
+        </div>
+      )}
       <header className="flex flex-wrap items-center justify-between gap-2 bg-gradient-to-r from-menthe to-rose px-3 py-3 sm:px-6 sm:py-4">
         <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           <Image
@@ -207,6 +215,15 @@ export default async function AppHomePage({
           sessionActive={sessionActive}
           sessionsAujourdHui={sessionsAujourdHui}
         />
+      )}
+
+      {stripeUrl && (
+        <div className="flex flex-col items-center gap-2 px-4 pb-10 pt-4 text-center">
+          <SoutienVideo stripeUrl={stripeUrl} variante="bouton" />
+          <p className="text-xs text-ardoise/75">
+            Entièrement facultatif — whaoo reste gratuite.
+          </p>
+        </div>
       )}
     </main>
   );

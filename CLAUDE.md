@@ -37,7 +37,12 @@ demander à Medy le zip correspondant et suivre son
 
 ## Demandes en attente (à traiter en début de session suivante)
 
-- **Stripe** : Medy veut intégrer Stripe (connecteur validé côté claude.ai).
+- **Stripe** : contribution libre faite le 2026-09-28, en mode test
+  (lien de paiement à montant libre, variable `STRIPE_SUPPORT_LINK_URL` sur
+  Render, page `/merci`). Pour passer en réel : recréer le produit, le prix
+  (montant libre 1 à 500 €, 5 € proposé) et le lien de paiement en mode live
+  (redirection vers https://whaoo.site/merci), puis remplacer la variable
+  sur Render. Abonnement premium : pas encore décidé.
 - **Rangement Google Drive** (Medy est sur Chromebook) : fait le
   2026-09-28. Dans le dossier `WHAOO` de Mon Drive : `00 - À trier` à
   `07 - Support et emails`, `01 - Sauvegardes/vX.Y - date`, et un dossier

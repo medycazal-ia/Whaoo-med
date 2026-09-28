@@ -21,3 +21,6 @@
   message dit avec la voix clonée de Medy sur ElevenLabs (remis par-dessus
   l'animation), sous-titres ASS, fond dégradé et masque du cadre arrondi,
   carton de fin. Vidéo finale : `public/videos/whaoo-soutien.mp4`.
+- `klarna/hpp-merchant-openapi.json` : spécification de l'API Klarna
+  « Hosted Payment Page » (HPP merchant) utilisée par la page de paiement
+  partagée `/paiement/klarna` (code : `src/lib/klarna/`).

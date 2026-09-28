@@ -49,7 +49,14 @@ demander à Medy le zip correspondant et suivre son
   de paiement à montant libre (1 à 500 €, 5 € proposé, redirection vers
   https://whaoo.site/merci), à mettre dans `STRIPE_SUPPORT_LINK_URL` sur
   Render. Le compte « environnement de test WHAOO » sert aux essais.
-  Abonnement premium : pas encore décidé.
+  Abonnement premium : pas encore décidé. Klarna est actif dans ce compte
+  et proposé automatiquement par le lien (selon l'éligibilité du client) ;
+  Google Pay y est désactivé alors que l'appli l'annonce.
+- **Klarna en direct** : page de paiement partagée entre plusieurs sites,
+  `/paiement/klarna?site=<id>&montant=<euros>` (API HPP de Klarna, sites et
+  pages de retour dans `src/lib/klarna/sites.ts`). Inactive tant que
+  `KLARNA_API_USERNAME` / `KLARNA_API_PASSWORD` ne sont pas sur Render
+  (contrat marchand Klarna nécessaire). Jamais testée contre la vraie API.
 - **Rangement Google Drive** (Medy est sur Chromebook) : fait le
   2026-09-28. Dans le dossier `WHAOO` de Mon Drive : `00 - À trier` à
   `07 - Support et emails`, `01 - Sauvegardes/vX.Y - date`, et un dossier

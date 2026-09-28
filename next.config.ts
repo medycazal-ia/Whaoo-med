@@ -81,7 +81,9 @@ const nextConfig: NextConfig = {
               "manifest-src 'self'",
               "object-src 'none'",
               "base-uri 'self'",
-              "form-action 'self'",
+              // Klarna : le formulaire de /paiement/klarna est redirigé vers
+              // la page de paiement hébergée par Klarna.
+              "form-action 'self' https://*.klarna.com",
               "frame-ancestors 'none'",
             ].join("; "),
           },

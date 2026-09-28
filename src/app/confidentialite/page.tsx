@@ -130,6 +130,12 @@ export default function ConfidentialitePage() {
             voit que le montant reçu.
           </li>
           <li>
+            <strong>Klarna</strong> : si tu paies avec Klarna, le paiement se
+            fait sur la page sécurisée de Klarna (Klarna Bank AB, Suède), qui
+            traite tes données de paiement et peut vérifier ton éligibilité ;
+            whaoo ne voit que le montant et l&apos;état du paiement.
+          </li>
+          <li>
             <strong>ElevenLabs</strong> : ton prénom est envoyé à ElevenLabs
             (États-Unis) à chaque connexion et déconnexion pour générer le
             message vocal de bienvenue/au revoir.

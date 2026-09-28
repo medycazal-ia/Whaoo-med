@@ -44,6 +44,7 @@ demander à Medy le zip correspondant et suivre son
   `Téléchargements` à la racine. Le script Apps Script « whaoo - Rangement
   automatique » (à installer par Medy : le connecteur ne peut pas créer de
   projet Apps Script) classe toutes les 10 minutes les fichiers « whaoo… »
-  de `Téléchargements` et tout ce qui est dans `00 - À trier`. Restait à
-  vérifier que les fichiers de Medy sont bien arrivés et rangés. Ne jamais
-  ranger dans le Drive le code de récupération du coffre des clés.
+  de `Téléchargements` et tout ce qui est dans `00 - À trier` ; il est
+  installé (rangé à la racine de `WHAOO`). Les fichiers existants de Medy
+  ont été rangés à la main le 2026-09-28. Ne jamais ranger dans le Drive le
+  code de récupération du coffre des clés.

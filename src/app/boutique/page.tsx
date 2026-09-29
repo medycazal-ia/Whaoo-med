@@ -29,6 +29,14 @@ export default async function BoutiquePage({
   });
   const produitsKlarna = klarnaConfigure() ? siteKlarna("whaoo").produits : [];
   const vide = produits.length === 0 && produitsKlarna.length === 0;
+  // Produits regroupés par rubrique (métadonnée « categorie »), dans l'ordre
+  // de leur premier produit.
+  const rubriques: [string, ProduitBoutique[]][] = [];
+  for (const p of produits) {
+    const rubrique = rubriques.find(([c]) => c === p.categorie);
+    if (rubrique) rubrique[1].push(p);
+    else rubriques.push([p.categorie, [p]]);
+  }
   // Lien de connexion au portail client Stripe (résiliation en ligne des
   // abonnements, obligatoire pour les particuliers).
   const portail = process.env.STRIPE_PORTAIL_URL || null;
@@ -61,72 +69,40 @@ export default async function BoutiquePage({
               : "La boutique arrive bientôt."}
           </p>
         ) : (
-          <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {produits.map((p) => (
-              <li key={p.id} className="flex flex-col overflow-hidden rounded-2xl bg-craie shadow-sm">
-                {p.image && (
-                  // eslint-disable-next-line @next/next/no-img-element -- image hébergée par Stripe
-                  <img src={p.image} alt="" className="aspect-[4/3] w-full bg-white object-contain" />
+          <div className="mt-8 space-y-10">
+            {rubriques.map(([categorie, liste]) => (
+              <section key={categorie}>
+                {rubriques.length > 1 && (
+                  <h2 className="mb-4 font-heading text-xl font-semibold">{categorie}</h2>
                 )}
-                <div className="flex flex-1 flex-col gap-2 p-4">
-                  {p.partenaire && (
-                    <p className="text-xs font-medium uppercase tracking-wide text-ardoise/75">
-                      Partenaire · {p.partenaire}
-                    </p>
-                  )}
+                <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {liste.map((p) => (
+                    <CarteProduit key={p.id} p={p} />
+                  ))}
+                </ul>
+              </section>
+            ))}
+            {produitsKlarna.length > 0 && (
+              <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {produitsKlarna.map((p) => (
+                <li key={`klarna-${p.id}`} className="flex flex-col gap-2 rounded-2xl bg-craie p-4 shadow-sm">
                   <h2 className="font-heading text-lg font-semibold">{p.nom}</h2>
-                  {p.description && <p className="text-sm text-ardoise/75">{p.description}</p>}
-                  <div className="mt-auto flex flex-wrap items-baseline gap-2 pt-2">
-                    {p.prix !== null && (
-                      <span className="text-xl font-semibold">
-                        {formatEuros(p.prix)}
-                        {p.recurrence && <span className="text-sm font-normal"> / {p.recurrence}</span>}
+                  <p className="mt-auto text-xl font-semibold">
+                    {formatEuros(Math.round(p.prix * 100))}
+                    {p.type === "physical" && p.fraisPort ? (
+                      <span className="ml-2 text-xs font-normal text-ardoise/75">
+                        + {formatEuros(Math.round(p.fraisPort * 100))} de livraison
                       </span>
-                    )}
-                    {p.prixBarre !== null && p.prix !== null && p.prixBarre > p.prix && (
-                      <span className="text-sm text-ardoise/75 line-through">{formatEuros(p.prixBarre)}</span>
-                    )}
-                    {p.physique && p.prix !== null && (
-                      <span className="text-xs text-ardoise/75">
-                        {p.fraisPort ? `+ ${formatEuros(p.fraisPort)} de livraison` : "Livraison offerte"}
-                      </span>
-                    )}
-                  </div>
-                  {p.prixId ? (
-                    <form action="/api/boutique/achat" method="post">
-                      <input type="hidden" name="produit" value={p.id} />
-                      <input type="hidden" name="quantite" value="1" />
-                      <button type="submit" className={BOUTON}>
-                        {p.recurrence ? "S'abonner" : "Acheter"}
-                      </button>
-                    </form>
-                  ) : (
-                    p.lien && (
-                      <a href={p.lien} target="_blank" rel="noopener sponsored" className={BOUTON}>
-                        Voir l&apos;offre ↗
-                      </a>
-                    )
-                  )}
-                </div>
-              </li>
-            ))}
-            {produitsKlarna.map((p) => (
-              <li key={`klarna-${p.id}`} className="flex flex-col gap-2 rounded-2xl bg-craie p-4 shadow-sm">
-                <h2 className="font-heading text-lg font-semibold">{p.nom}</h2>
-                <p className="mt-auto text-xl font-semibold">
-                  {formatEuros(Math.round(p.prix * 100))}
-                  {p.type === "physical" && p.fraisPort ? (
-                    <span className="ml-2 text-xs font-normal text-ardoise/75">
-                      + {formatEuros(Math.round(p.fraisPort * 100))} de livraison
-                    </span>
-                  ) : null}
-                </p>
-                <a href={`/paiement/klarna?site=whaoo&produit=${encodeURIComponent(p.id)}`} className={BOUTON}>
-                  Payer avec Klarna
-                </a>
-              </li>
-            ))}
-          </ul>
+                    ) : null}
+                  </p>
+                  <a href={`/paiement/klarna?site=whaoo&produit=${encodeURIComponent(p.id)}`} className={BOUTON}>
+                    Payer avec Klarna
+                  </a>
+                </li>
+              ))}
+              </ul>
+            )}
+          </div>
         )}
 
         {portail && (
@@ -150,5 +126,56 @@ export default async function BoutiquePage({
         </p>
       </div>
     </main>
+  );
+}
+
+function CarteProduit({ p }: { p: ProduitBoutique }) {
+  return (
+    <li className="flex flex-col overflow-hidden rounded-2xl bg-craie shadow-sm">
+      {p.image && (
+        // eslint-disable-next-line @next/next/no-img-element -- image hébergée par Stripe
+        <img src={p.image} alt="" className="aspect-[4/3] w-full bg-white object-contain" />
+      )}
+      <div className="flex flex-1 flex-col gap-2 p-4">
+        {p.partenaire && (
+          <p className="text-xs font-medium uppercase tracking-wide text-ardoise/75">
+            Partenaire · {p.partenaire}
+          </p>
+        )}
+        <h3 className="font-heading text-lg font-semibold">{p.nom}</h3>
+        {p.description && <p className="text-sm text-ardoise/75">{p.description}</p>}
+        <div className="mt-auto flex flex-wrap items-baseline gap-2 pt-2">
+          {p.prix !== null && (
+            <span className="text-xl font-semibold">
+              {formatEuros(p.prix)}
+              {p.recurrence && <span className="text-sm font-normal"> / {p.recurrence}</span>}
+            </span>
+          )}
+          {p.prixBarre !== null && p.prix !== null && p.prixBarre > p.prix && (
+            <span className="text-sm text-ardoise/75 line-through">{formatEuros(p.prixBarre)}</span>
+          )}
+          {p.physique && p.prix !== null && (
+            <span className="text-xs text-ardoise/75">
+              {p.fraisPort ? `+ ${formatEuros(p.fraisPort)} de livraison` : "Livraison offerte"}
+            </span>
+          )}
+        </div>
+        {p.prixId ? (
+          <form action="/api/boutique/achat" method="post">
+            <input type="hidden" name="produit" value={p.id} />
+            <input type="hidden" name="quantite" value="1" />
+            <button type="submit" className={BOUTON}>
+              {p.recurrence ? "S'abonner" : "Acheter"}
+            </button>
+          </form>
+        ) : (
+          p.lien && (
+            <a href={p.lien} target="_blank" rel="noopener sponsored" className={BOUTON}>
+              Voir l&apos;offre ↗
+            </a>
+          )
+        )}
+      </div>
+    </li>
   );
 }

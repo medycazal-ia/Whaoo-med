@@ -10,6 +10,8 @@
 //   lien          adresse d'une offre externe : bouton « Voir l'offre » au
 //                 lieu d'un paiement Stripe (bon plan chez un partenaire)
 //   ordre         nombre pour trier l'affichage (plus petit en premier)
+//   categorie     rubrique de la boutique, ex. « Sites web & hébergement »
+//                 (défaut : « Bons plans »)
 // Le prix est le « prix par défaut » du produit, en EUR : paiement unique,
 // ou abonnement (prix récurrent, ex. 19 €/mois) payé par Stripe Checkout en
 // mode abonnement.
@@ -20,6 +22,7 @@
 
 const API = "https://api.stripe.com/v1";
 export const ID_BOUTIQUE = "whaoo";
+export const CATEGORIE_DEFAUT = "Bons plans";
 
 export function boutiqueActive() {
   return Boolean(process.env.STRIPE_BOUTIQUE_KEY);
@@ -60,6 +63,7 @@ export type ProduitBoutique = {
   // Abonnement : « mois », « 3 mois », « an »… ; null pour un paiement unique.
   recurrence: string | null;
   ordre: number;
+  categorie: string;
 };
 
 async function appelStripe<T>(chemin: string, init?: { corps?: URLSearchParams; revalidate?: number }): Promise<T> {
@@ -132,6 +136,7 @@ function versProduitBoutique(p: ProduitStripe): ProduitBoutique | null {
     prixId: prixValide?.id ?? null,
     recurrence: prixValide?.type === "recurring" && prixValide.recurring ? libelleRecurrence(prixValide.recurring) : null,
     ordre: Number.isFinite(Number(m.ordre)) && m.ordre ? Number(m.ordre) : 1000,
+    categorie: m.categorie?.trim() || CATEGORIE_DEFAUT,
   };
 }
 

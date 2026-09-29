@@ -73,7 +73,12 @@ demander à Medy le zip correspondant et suivre son
   consommation (`MEDIATEUR` dans `src/lib/legal-info.ts`) et le lien du
   portail client Stripe (`STRIPE_PORTAIL_URL`, résiliation en ligne des
   abonnements). Boutique et appli se font la promotion mutuellement (CGU à
-  jour).
+  jour). Rubriques par la métadonnée `categorie` (ex. « Sites web &
+  hébergement »). Medy devient revendeur LWS (domaines, hébergement, gérés
+  techniquement par LWS) : CGV article 15 et annexe 2 (sous-traitance
+  RGPD) ; produits Stripe à créer quand il donnera ses prix. Médiateur
+  envisagé : ANM Consommation (à inscrire dans `MEDIATEUR` seulement une
+  fois l'adhésion confirmée).
 - **Rangement Google Drive** (Medy est sur Chromebook) : fait le
   2026-09-28. Dans le dossier `WHAOO` de Mon Drive : `00 - À trier` à
   `07 - Support et emails`, `01 - Sauvegardes/vX.Y - date`, et un dossier

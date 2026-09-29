@@ -242,7 +242,68 @@ export default function CgvPage() {
         </p>
       </Section>
 
-      <Section titre="Annexe — Formulaire de rétractation">
+      <Section titre="15. Noms de domaine et hébergement">
+        <p>
+          {EDITEUR.nom} revend des noms de domaine, des hébergements web et
+          des services associés en tant que revendeur de{" "}
+          <strong>LWS (Ligne Web Services)</strong>, qui en assure
+          l&apos;exploitation technique : infrastructure et serveurs situés
+          en France, enregistrement des noms de domaine auprès des
+          registres, sauvegardes, sécurité et traitement des signalements
+          d&apos;abus. {EDITEUR.nom} reste l&apos;interlocuteur contractuel
+          du client : commande, facturation, support et réclamations.
+        </p>
+        <p>
+          <strong>Noms de domaine.</strong> Le nom de domaine est attribué au
+          premier demandeur, sous réserve de sa disponibilité, et enregistré
+          pour la durée payée (en général un an), renouvelable. Le client
+          fournit des coordonnées de titulaire exactes et à jour, qu&apos;il
+          garde à jour pendant toute la durée de l&apos;enregistrement. Il
+          accepte les règles du registre concerné (charte de nommage de
+          l&apos;AFNIC pour les « .fr », règles de l&apos;ICANN et du
+          registre pour les « .com » et autres extensions) et reste seul
+          responsable du choix du nom, notamment au regard des marques et des
+          droits des tiers. Sauf résiliation, le renouvellement est facturé à
+          l&apos;échéance ; un nom de domaine non renouvelé peut être perdu
+          et réattribué à un tiers. Sur demande, le code de transfert est
+          communiqué au client pour changer de prestataire.
+        </p>
+        <p>
+          <strong>Rétractation.</strong> L&apos;enregistrement d&apos;un nom
+          de domaine est exécuté immédiatement et ne peut pas être annulé
+          auprès du registre : lorsque le consommateur demande
+          l&apos;enregistrement immédiat et renonce expressément à son droit
+          de rétractation, ce droit ne peut plus être exercé une fois le nom
+          enregistré. Pour l&apos;hébergement, le consommateur qui demande la
+          mise en service avant la fin du délai de 14 jours et se rétracte
+          paie la part du service déjà fournie.
+        </p>
+        <p>
+          <strong>Hébergement.</strong> L&apos;hébergement est fourni selon les
+          caractéristiques de l&apos;offre choisie (espace, nombre de sites,
+          adresses email…). {EDITEUR.nom} et LWS mettent en œuvre les moyens
+          raisonnables pour assurer sa disponibilité, sans garantir une
+          disponibilité continue : des interruptions peuvent survenir pour
+          maintenance ou incident. Le client reste responsable des contenus
+          qu&apos;il publie et de leur conformité à la loi ; il est
+          invité à conserver ses propres copies de sauvegarde. Tout contenu
+          manifestement illicite signalé peut être retiré ou rendu
+          inaccessible sans délai (loi n° 2004-575 du 21 juin 2004, dite
+          LCEN), et les données d&apos;identification du client sont
+          conservées dans les conditions prévues par la loi. En cas de
+          résiliation ou de non-renouvellement, le client dispose de 30
+          jours à compter de la fin du service pour récupérer ses données,
+          qui sont ensuite supprimées.
+        </p>
+        <p>
+          <strong>Données hébergées pour le client.</strong> Pour les données
+          personnelles contenues dans les sites et les emails du client,{" "}
+          {EDITEUR.nom} agit en qualité de sous-traitant au sens du RGPD,
+          selon l&apos;annexe 2 ci-dessous.
+        </p>
+      </Section>
+
+      <Section titre="Annexe 1 — Formulaire de rétractation">
         <p>
           À compléter et renvoyer uniquement si vous souhaitez vous
           rétracter, par email à {EDITEUR.emailContact} :
@@ -264,6 +325,68 @@ export default function CgvPage() {
             <li>Date et signature (en cas d&apos;envoi papier) : …………</li>
           </ul>
         </div>
+      </Section>
+
+      <Section titre="Annexe 2 — Sous-traitance des données personnelles (RGPD)">
+        <p>
+          La présente annexe s&apos;applique lorsque {EDITEUR.nom} (le
+          « sous-traitant ») héberge, pour un client (le « responsable du
+          traitement »), des sites, bases de données ou emails contenant des
+          données personnelles (article 28 du RGPD).
+        </p>
+        <ul className="list-disc space-y-1 pl-5">
+          <li>
+            <strong>Objet et durée :</strong> hébergement et services associés
+            commandés par le client, pour la durée de l&apos;abonnement puis
+            de la période de récupération des données.
+          </li>
+          <li>
+            <strong>Nature des données :</strong> celles que le client choisit
+            de mettre en ligne (par exemple les coordonnées de ses propres
+            clients ou visiteurs). Le client détermine seul les finalités et
+            les moyens de ses traitements.
+          </li>
+          <li>
+            <strong>Instructions :</strong> le sous-traitant ne traite ces
+            données que sur instruction documentée du client, pour fournir le
+            service, et informe le client si une instruction lui semble
+            contraire à la réglementation.
+          </li>
+          <li>
+            <strong>Confidentialité et sécurité :</strong> les personnes
+            autorisées sont tenues à la confidentialité ; des mesures de
+            sécurité adaptées sont mises en œuvre (accès protégés, chiffrement
+            des connexions, sauvegardes).
+          </li>
+          <li>
+            <strong>Sous-traitant ultérieur :</strong> le client autorise le
+            recours à LWS (Ligne Web Services), hébergeur en France, qui est
+            soumis aux mêmes obligations. Tout changement de sous-traitant
+            ultérieur est annoncé au client, qui peut s&apos;y opposer en
+            résiliant le service.
+          </li>
+          <li>
+            <strong>Assistance :</strong> le sous-traitant aide le client, dans
+            la mesure du possible, à répondre aux demandes d&apos;exercice des
+            droits des personnes et à respecter ses obligations de sécurité
+            et d&apos;analyse d&apos;impact.
+          </li>
+          <li>
+            <strong>Violation de données :</strong> le client est notifié dans
+            les meilleurs délais, et au plus tard 48 heures après sa
+            découverte, de toute violation de données le concernant.
+          </li>
+          <li>
+            <strong>Fin du contrat :</strong> à l&apos;issue du délai de
+            récupération de 30 jours, les données sont supprimées, sauf
+            obligation légale de conservation.
+          </li>
+          <li>
+            <strong>Audit :</strong> le sous-traitant met à disposition les
+            informations nécessaires pour démontrer le respect de ces
+            obligations.
+          </li>
+        </ul>
       </Section>
     </main>
   );

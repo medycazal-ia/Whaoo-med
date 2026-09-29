@@ -12,6 +12,30 @@ Pour rouvrir une version : revenir à son commit
 
 ---
 
+## v1.3 — 2026-09-29
+
+- **Vidéo « Soutiens whaoo » refaite avec Arcads** : avatar figurine animé
+  (OmniHuman, 800 crédits) sur la voix de Medy, dans un cadre arrondi sur
+  fond dégradé, sous-titrée ; sources dans `livrables/video-soutien/`.
+- **Stripe en mode réel** sur un compte dédié « WHAOO » (distinct de
+  medy.site) : lien de contribution libre réel (1 à 500 €) ; Klarna vérifié
+  actif et proposé automatiquement par le lien.
+- **Page de paiement Klarna partagée** (`/paiement/klarna`) utilisable par
+  plusieurs sites (whaoo, medy.site…) pour tout produit numérique ou
+  physique ou un montant libre, via l'API Hosted Payment Page de Klarna ;
+  inactive tant qu'un contrat marchand Klarna n'est pas signé.
+- **Boutique « Bons plans »** (`/boutique`, bouton 🛍️ dans l'appli) :
+  affiche automatiquement les produits du compte Stripe WHAOO marqués
+  `boutique = whaoo` (produits numériques ou physiques, frais de port, prix
+  barré, offres de partenaires en lien externe) ; paiement Stripe Checkout
+  (carte, Apple Pay, Klarna…). Clé restreinte `STRIPE_BOUTIQUE_KEY` mise
+  sur Render.
+- Politique de confidentialité : Klarna et la boutique ajoutés.
+
+**Prochaine étape prévue** : ajouter les premiers produits dans Stripe,
+CGV de vente, activer Google Pay dans Stripe, surveiller les heures
+gratuites Render (ou passer whaoo en offre payante).
+
 ## v1.2 — 2026-09-28
 
 - **Contribution libre par carte avec Stripe** (mode test) : lien de

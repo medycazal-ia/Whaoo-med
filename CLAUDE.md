@@ -1,7 +1,8 @@
 # whaoo — consignes pour les sessions Claude
 
 Application de liste de courses et de budget (Next.js App Router, Supabase,
-déployée sur Render à whaoo.site). Branche de travail :
+déployée sur Render à whaoo.site, offre payante Starter depuis le
+2026-09-29 : pas de mise en veille). Branche de travail :
 `claude/whaoo-med-specs-8xx0r4` (chaque push redéploie Render). Les
 migrations `supabase/migrations/` sont appliquées à la main par Medy dans
 le SQL Editor Supabase : le lui signaler à chaque nouvelle migration.

@@ -68,8 +68,12 @@ demander à Medy le zip correspondant et suivre son
   `src/lib/boutique/stripe.ts`) ; paiement par Stripe Checkout (Klarna
   inclus), unique ou par abonnement si le prix par défaut est récurrent. Masquée tant que `STRIPE_BOUTIQUE_KEY` (clé restreinte) n'est
   pas sur Render. Produit d'exemple dans « environnement de test WHAOO ».
-  Avant de vendre : CGV de vente à rédiger (les CGU actuelles ne couvrent
-  que l'appli gratuite).
+  CGV sur `/cgv` (2026-09-29, base à faire relire), rappelées sur la page
+  de paiement Stripe ; restent à fournir par Medy : le médiateur de la
+  consommation (`MEDIATEUR` dans `src/lib/legal-info.ts`) et le lien du
+  portail client Stripe (`STRIPE_PORTAIL_URL`, résiliation en ligne des
+  abonnements). Boutique et appli se font la promotion mutuellement (CGU à
+  jour).
 - **Rangement Google Drive** (Medy est sur Chromebook) : fait le
   2026-09-28. Dans le dossier `WHAOO` de Mon Drive : `00 - À trier` à
   `07 - Support et emails`, `01 - Sauvegardes/vX.Y - date`, et un dossier

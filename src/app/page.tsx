@@ -156,6 +156,9 @@ export default async function Home({
         <Link href="/cgu" className="underline">
           Conditions générales d&apos;utilisation
         </Link>
+        <Link href="/cgv" className="underline">
+          Conditions générales de vente
+        </Link>
       </footer>
     </main>
   );

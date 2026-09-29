@@ -171,6 +171,9 @@ export async function creerAchat(idProduit: string, quantiteDemandee: number, ur
     success_url: `${urlApp}/merci?achat=1`,
     cancel_url: `${urlApp}/boutique`,
     allow_promotion_codes: "true",
+    "custom_text[submit][message]": produit.recurrence
+      ? `En validant, tu acceptes les conditions générales de vente (${urlApp}/cgv). Abonnement sans engagement, résiliable à tout moment en ligne.`
+      : `En validant, tu acceptes les conditions générales de vente (${urlApp}/cgv).`,
     "metadata[boutique]": ID_BOUTIQUE,
     "metadata[produit]": produit.id,
   });

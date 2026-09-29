@@ -29,6 +29,9 @@ export default async function BoutiquePage({
   });
   const produitsKlarna = klarnaConfigure() ? siteKlarna("whaoo").produits : [];
   const vide = produits.length === 0 && produitsKlarna.length === 0;
+  // Lien de connexion au portail client Stripe (résiliation en ligne des
+  // abonnements, obligatoire pour les particuliers).
+  const portail = process.env.STRIPE_PORTAIL_URL || null;
 
   return (
     <main className="flex flex-1 flex-col fond-marche px-4 py-10 text-ardoise">
@@ -126,12 +129,24 @@ export default async function BoutiquePage({
           </ul>
         )}
 
-        <p className="mt-10 text-xs text-ardoise/75">
-          Vendu par {EDITEUR.nom}, éditeur de whaoo, sauf mention d&apos;un partenaire : l&apos;offre
-          et la livraison sont alors assurées par ce partenaire. Produits
-          numériques : accès immédiat après paiement. Produits physiques :
-          livraison en France, droit de rétractation de 14 jours à réception.
-          Contact : {EDITEUR.emailContact}.
+        {portail && (
+          <p className="mt-10 text-sm">
+            <a href={portail} className="underline underline-offset-2">
+              Gérer ou résilier mon abonnement
+            </a>
+          </p>
+        )}
+
+        <p className={`${portail ? "mt-4" : "mt-10"} text-xs text-ardoise/75`}>
+          Vendu par {EDITEUR.nom}, éditeur de whaoo, sauf mention d&apos;un
+          partenaire : l&apos;offre et la livraison sont alors assurées par ce
+          partenaire. Droit de rétractation de 14 jours pour les
+          particuliers, abonnements sans engagement résiliables à tout moment
+          en ligne.{" "}
+          <Link href="/cgv" className="underline">
+            Conditions générales de vente
+          </Link>{" "}
+          · Contact : {EDITEUR.emailContact}.
         </p>
       </div>
     </main>

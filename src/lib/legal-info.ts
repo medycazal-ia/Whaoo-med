@@ -31,3 +31,12 @@ export const HEBERGEUR = {
 // d'utilisation officielles (render.com/terms).
 
 export const NOM_APPLICATION = "whaoo";
+
+// Médiateur de la consommation (obligatoire pour vendre à des particuliers,
+// article L612-1 du Code de la consommation) : l'éditeur doit adhérer à un
+// médiateur agréé (liste sur economie.gouv.fr/mediation-conso) et renseigner
+// ici son nom et son site.
+export const MEDIATEUR = {
+  nom: "[À COMPLÉTER : nom du médiateur de la consommation]",
+  site: "[À COMPLÉTER : site web du médiateur]",
+};

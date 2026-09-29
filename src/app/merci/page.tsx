@@ -24,7 +24,7 @@ export default async function MerciPage({
       <p className="mt-3 max-w-md text-ardoise/75">
         {achat
           ? "Ton achat est confirmé. Tu vas recevoir ton reçu de paiement par email."
-          : "Ta contribution aide whaoo à rester simple, gratuite et sans publicité. Tu vas recevoir ton reçu de paiement par email."}
+          : "Ta contribution aide whaoo à rester simple et gratuite. Tu vas recevoir ton reçu de paiement par email."}
       </p>
       <div className="mt-6 flex flex-col gap-3 sm:flex-row">
         <Link

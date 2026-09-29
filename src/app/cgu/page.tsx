@@ -58,6 +58,18 @@ export default function CguPage() {
           la cagnotte interne décrite ci-dessus, et sans contrepartie sur
           les fonctionnalités du service.
         </p>
+        <p className="mt-2 text-sm leading-relaxed text-ardoise/80">
+          L&apos;application donne aussi accès à la boutique{" "}
+          <strong>« Bons plans »</strong> : des produits et services vendus
+          par {EDITEUR.nom} (régis par les{" "}
+          <a href="/cgv" className="underline">
+            conditions générales de vente
+          </a>
+          ), ainsi que des promotions et des offres de partenaires,
+          toujours signalées comme telles (mention « Partenaire »). Leur
+          consultation est libre et sans obligation d&apos;achat ; l&apos;usage
+          de base de l&apos;application reste gratuit.
+        </p>
       </section>
 
       <section className="mt-6">

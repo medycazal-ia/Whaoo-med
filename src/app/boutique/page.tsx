@@ -74,7 +74,12 @@ export default async function BoutiquePage({
                   <h2 className="font-heading text-lg font-semibold">{p.nom}</h2>
                   {p.description && <p className="text-sm text-ardoise/75">{p.description}</p>}
                   <div className="mt-auto flex flex-wrap items-baseline gap-2 pt-2">
-                    {p.prix !== null && <span className="text-xl font-semibold">{formatEuros(p.prix)}</span>}
+                    {p.prix !== null && (
+                      <span className="text-xl font-semibold">
+                        {formatEuros(p.prix)}
+                        {p.recurrence && <span className="text-sm font-normal"> / {p.recurrence}</span>}
+                      </span>
+                    )}
                     {p.prixBarre !== null && p.prix !== null && p.prixBarre > p.prix && (
                       <span className="text-sm text-ardoise/75 line-through">{formatEuros(p.prixBarre)}</span>
                     )}
@@ -89,7 +94,7 @@ export default async function BoutiquePage({
                       <input type="hidden" name="produit" value={p.id} />
                       <input type="hidden" name="quantite" value="1" />
                       <button type="submit" className={BOUTON}>
-                        Acheter
+                        {p.recurrence ? "S'abonner" : "Acheter"}
                       </button>
                     </form>
                   ) : (

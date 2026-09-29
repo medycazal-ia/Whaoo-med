@@ -10,7 +10,9 @@
 //   lien          adresse d'une offre externe : bouton « Voir l'offre » au
 //                 lieu d'un paiement Stripe (bon plan chez un partenaire)
 //   ordre         nombre pour trier l'affichage (plus petit en premier)
-// Le prix est le « prix par défaut » du produit (paiement unique, en EUR).
+// Le prix est le « prix par défaut » du produit, en EUR : paiement unique,
+// ou abonnement (prix récurrent, ex. 19 €/mois) payé par Stripe Checkout en
+// mode abonnement.
 //
 // Nécessite sur Render une clé restreinte Stripe (STRIPE_BOUTIQUE_KEY) avec
 // les droits : Products (lecture), Prices (lecture), Checkout Sessions
@@ -29,6 +31,7 @@ type PrixStripe = {
   type: "one_time" | "recurring";
   currency: string;
   unit_amount: number | null;
+  recurring: { interval: "day" | "week" | "month" | "year"; interval_count: number; usage_type?: string } | null;
 };
 
 type ProduitStripe = {
@@ -54,6 +57,8 @@ export type ProduitBoutique = {
   partenaire: string | null;
   lien: string | null;
   prixId: string | null;
+  // Abonnement : « mois », « 3 mois », « an »… ; null pour un paiement unique.
+  recurrence: string | null;
   ordre: number;
 };
 
@@ -87,6 +92,13 @@ const lienHttps = (url: string | undefined) => {
   }
 };
 
+const UNITES = { day: ["jour", "jours"], week: ["semaine", "semaines"], month: ["mois", "mois"], year: ["an", "ans"] };
+
+function libelleRecurrence(r: NonNullable<PrixStripe["recurring"]>) {
+  const [un, plusieurs] = UNITES[r.interval];
+  return r.interval_count > 1 ? `${r.interval_count} ${plusieurs}` : un;
+}
+
 // Produit Stripe → produit affichable, ou null s'il n'est pas dans la
 // boutique ou n'a ni prix utilisable ni lien externe.
 function versProduitBoutique(p: ProduitStripe): ProduitBoutique | null {
@@ -94,7 +106,11 @@ function versProduitBoutique(p: ProduitStripe): ProduitBoutique | null {
   if (!p.active || m.boutique !== ID_BOUTIQUE) return null;
   const prix = typeof p.default_price === "object" ? p.default_price : null;
   const prixValide =
-    prix && prix.active && prix.type === "one_time" && prix.currency === "eur" && prix.unit_amount
+    prix &&
+    prix.active &&
+    prix.currency === "eur" &&
+    prix.unit_amount &&
+    (prix.type === "one_time" || (prix.recurring && prix.recurring.usage_type !== "metered"))
       ? prix
       : null;
   const lien = lienHttps(m.lien);
@@ -114,6 +130,7 @@ function versProduitBoutique(p: ProduitStripe): ProduitBoutique | null {
     partenaire: m.partenaire?.trim() || null,
     lien,
     prixId: prixValide?.id ?? null,
+    recurrence: prixValide?.type === "recurring" && prixValide.recurring ? libelleRecurrence(prixValide.recurring) : null,
     ordre: Number.isFinite(Number(m.ordre)) && m.ordre ? Number(m.ordre) : 1000,
   };
 }
@@ -147,7 +164,7 @@ export async function creerAchat(idProduit: string, quantiteDemandee: number, ur
   const quantite = Math.min(Math.max(1, Math.floor(quantiteDemandee) || 1), produit.quantiteMax);
 
   const corps = new URLSearchParams({
-    mode: "payment",
+    mode: produit.recurrence ? "subscription" : "payment",
     locale: "fr",
     "line_items[0][price]": produit.prixId,
     "line_items[0][quantity]": String(quantite),

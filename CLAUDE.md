@@ -66,7 +66,7 @@ demander à Medy le zip correspondant et suivre son
   `boutique` = `whaoo` (autres métadonnées : `type`, `frais_port`,
   `quantite_max`, `prix_barre`, `partenaire`, `lien`, `ordre`, voir
   `src/lib/boutique/stripe.ts`) ; paiement par Stripe Checkout (Klarna
-  inclus). Masquée tant que `STRIPE_BOUTIQUE_KEY` (clé restreinte) n'est
+  inclus), unique ou par abonnement si le prix par défaut est récurrent. Masquée tant que `STRIPE_BOUTIQUE_KEY` (clé restreinte) n'est
   pas sur Render. Produit d'exemple dans « environnement de test WHAOO ».
   Avant de vendre : CGV de vente à rédiger (les CGU actuelles ne couvrent
   que l'appli gratuite).

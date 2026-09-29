@@ -50,9 +50,10 @@ demander à Medy le zip correspondant et suivre son
   de paiement à montant libre (1 à 500 €, 5 € proposé, redirection vers
   https://whaoo.site/merci), à mettre dans `STRIPE_SUPPORT_LINK_URL` sur
   Render. Le compte « environnement de test WHAOO » sert aux essais.
-  Abonnement premium : pas encore décidé. Klarna est actif dans ce compte
-  et proposé automatiquement par le lien (selon l'éligibilité du client) ;
-  Google Pay y est désactivé alors que l'appli l'annonce.
+  Abonnement premium : pas encore décidé. Klarna est actif et disponible
+  dans ce compte (boutique et contribution) mais n'est affiché qu'aux
+  clients d'un pays accepté : pas depuis la Martinique (MQ, où est Medy),
+  oui depuis la France métropolitaine. Google Pay actif depuis le 29/09.
 - **Klarna en direct** : page de paiement partagée entre plusieurs sites
   pour tout produit numérique ou physique (catalogue à prix fixés par site)
   ou un montant libre : `/paiement/klarna?site=<id>&produit=<id>` ou

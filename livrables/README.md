@@ -24,3 +24,5 @@
 - `klarna/hpp-merchant-openapi.json` : spécification de l'API Klarna
   « Hosted Payment Page » (HPP merchant) utilisée par la page de paiement
   partagée `/paiement/klarna` (code : `src/lib/klarna/`).
+- `boutique/` : dossier complet de la boutique en ligne (Stripe, Klarna,
+  CGV, domaines, partenaires, feuille de route), en HTML et en PDF.

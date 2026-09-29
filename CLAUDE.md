@@ -36,6 +36,22 @@ Pour rouvrir une version :
 demander à Medy le zip correspondant et suivre son
 `LISEZ-MOI-RESTAURATION.md`.
 
+## Dossier boutique versionné (demande de Medy)
+
+Tout ce qui touche à la boutique et à la vente en ligne (produits,
+paiements Stripe/Klarna, CGV, domaines et hébergement LWS, partenaires,
+feuille de route) est tenu à jour dans `livrables/boutique/`, avec ses
+propres versions (v1.0 du 2026-09-29, puis v1.1, v1.2…) :
+
+1. Mettre à jour `livrables/boutique/dossier-boutique.html` (état,
+   chronologie, mode d'emploi, feuille de route, actions restantes).
+2. Ajouter en tête de `livrables/boutique/VERSIONS.md` l'entrée
+   `## vX.Y — AAAA-MM-JJ` (version précédente + 0.1) avec les changements.
+3. Lancer `scripts/dossier-boutique.sh` : il génère
+   `whaoo-dossier-boutique-vX.Y-AAAA-MM-JJ.pdf` (les anciennes versions
+   restent dans le dossier), committer et pousser.
+4. Envoyer le PDF à Medy avec SendUserFile.
+
 ## Demandes en attente (à traiter en début de session suivante)
 
 - **Arcads** : connecteur MCP ajouté. Vidéo « Soutiens whaoo » refaite le

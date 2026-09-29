@@ -219,7 +219,43 @@
   <tr><td>Médiateurs agréés</td><td><a href="https://www.economie.gouv.fr/mediation-conso">economie.gouv.fr/mediation-conso</a></td></tr>
 </table>
 
-<h2>9. Historique des versions du dossier</h2>
+<h2>9. Étude : devenir revendeur LWS</h2>
+<p><em>Étude du 29 septembre 2026, faite sans accès direct au site de LWS (bloqué depuis l'environnement de travail) : informations issues des moteurs de recherche et des pages LWS référencées. Prix et conditions à confirmer sur <a href="https://www.lws.fr/hebergement_revendeur.php">lws.fr/hebergement_revendeur.php</a> avant de signer.</em></p>
+
+<h3>Ce que propose LWS</h3>
+<table>
+  <tr><th>Élément</th><th>Ce qu'on en sait</th></tr>
+  <tr><td>Hébergement revendeur</td><td>4 formules <strong>S, M, L, XL</strong>, d'environ <strong>19,99 € à 99,99 € par mois</strong> selon un comparatif (fourchette à vérifier, tarifs promotionnels et de renouvellement à distinguer).</td></tr>
+  <tr><td>Outils</td><td><strong>WHM</strong> pour créer les comptes de tes clients, <strong>cPanel</strong> pour chaque client ; mention de <strong>WHMCS</strong> (logiciel de facturation et de gestion clients).</td></tr>
+  <tr><td>Marque blanche</td><td>Tes propres formules d'hébergement sous ton nom ; interface personnalisable (logo, couleurs, adresse sur ton domaine).</td></tr>
+  <tr><td>Noms de domaine</td><td>Programme revendeur de domaines (.fr, .com et plus de 400 extensions) à tarif professionnel ; programme d'affiliation annoncé jusqu'à 50 % de commission.</td></tr>
+  <tr><td>API</td><td>API LWS pour automatiser domaines, hébergement, emails et certificats SSL, avec un <strong>mode test</strong> ; module WHMCS officiel pour les domaines.</td></tr>
+  <tr><td>Infrastructure</td><td>Datacenters <strong>en France</strong>, certification ISO 27001 annoncée, conformité RGPD.</td></tr>
+  <tr><td>Réputation</td><td>Avis globalement positifs : support français réactif, prix bas ; performances jugées moyennes face aux meilleurs hébergeurs.</td></tr>
+</table>
+
+<h3>Conseils</h3>
+<ol>
+  <li><strong>Démarrer petit.</strong> Sans client au départ, la formule revendeur est un coût fixe (environ 20 €/mois pour la plus petite). Deux clients à 19 €/mois la remboursent. Avant cela, l'<strong>affiliation</strong> ou la revente de domaines à l'unité ne coûtent rien.</li>
+  <li><strong>Facturer avec Stripe, pas WHMCS.</strong> La boutique whaoo gère déjà les abonnements mensuels et annuels, les reçus et la résiliation ; WHMCS ajoute une licence payante et un second outil. Création des comptes à la main dans WHM au début.</li>
+  <li><strong>Automatiser plus tard.</strong> Quand les ventes suivent, l'API LWS (testable sans risque) permettra de créer le compte d'hébergement ou le domaine automatiquement après le paiement Stripe.</li>
+  <li><strong>Une marque pour l'offre pro.</strong> whaoo parle aux particuliers (courses, budget) ; les sites et l'hébergement s'adressent aux commerçants. Utiliser la rubrique « Sites web &amp; hébergement » de la boutique ou un domaine dédié (ex. medy.site), avec des liens croisés.</li>
+  <li><strong>Grille de prix simple</strong> (exemple, à ajuster à tes coûts LWS) : domaine .fr ou .com à l'année, hébergement au mois ou à l'année, et un pack « site vitrine tout compris » au mois, qui est le produit phare.</li>
+  <li><strong>whaoo reste sur Render</strong> : l'hébergement cPanel convient aux sites vitrines et WordPress, pas à une application Node.js comme whaoo.</li>
+  <li><strong>Mentions légales des clients</strong> : chaque site client doit nommer son hébergeur (toi, via LWS) ; fournir un modèle de mentions légales avec le site vitrine.</li>
+</ol>
+
+<h3>À vérifier dans le contrat revendeur avant de signer</h3>
+<ul>
+  <li>Durée d'engagement, prix de renouvellement (souvent plus élevés que le prix d'appel), conditions de résiliation et de migration des clients.</li>
+  <li>Ressources de chaque formule : espace disque, nombre de comptes cPanel, emails, bases de données.</li>
+  <li>Sauvegardes : fréquence, durée de conservation, restauration gratuite ou payante.</li>
+  <li>Engagements de LWS envers toi : traitement des abus, conservation des données d'identification (LCEN), disponibilité, et un <strong>contrat de sous-traitance RGPD</strong> (pendant de l'annexe 2 des CGV).</li>
+  <li>Horaires du support au regard du décalage horaire avec la Martinique.</li>
+  <li>Droit de fixer librement tes prix et d'utiliser ta propre marque ; tarifs revendeur des domaines .fr et .com.</li>
+</ul>
+
+<h2>10. Historique des versions du dossier</h2>
 <!-- VERSIONS -->
 
 <footer>

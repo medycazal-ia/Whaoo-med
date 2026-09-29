@@ -81,6 +81,13 @@ demander à Medy le zip correspondant et suivre son
   fois l'adhésion confirmée). Domaine dédié possible : `BOUTIQUE_DOMAINES`
   (accueil = boutique, retour après paiement sur ce domaine, voir
   `src/lib/boutique/domaines.ts` et `src/proxy.ts`).
+- **Partenaires commerçants** (stratégie de promotion croisée, 2026-09-29) :
+  page `/partenaires` (mise en avant dans la boutique + site vitrine contre
+  promotion de whaoo) et affiche A4 imprimable avec QR code
+  `/partenaires/affiche?nom=…` (lien `whaoo.site/?partenaire=<id>`, pas
+  encore mesuré). Feuille de route : parrainage avec code promo Stripe,
+  mesure du trafic, Reel 9:16. Dossier complet de la boutique :
+  `livrables/boutique/`.
 - **Rangement Google Drive** (Medy est sur Chromebook) : fait le
   2026-09-28. Dans le dossier `WHAOO` de Mon Drive : `00 - À trier` à
   `07 - Support et emails`, `01 - Sauvegardes/vX.Y - date`, et un dossier

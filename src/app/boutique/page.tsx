@@ -129,7 +129,10 @@ export default async function BoutiquePage({
           <Link href="/cgv" className="underline">
             Conditions générales de vente
           </Link>{" "}
-          · Contact : {EDITEUR.emailContact}.
+          · Contact : {EDITEUR.emailContact} ·{" "}
+          <Link href="/partenaires" className="underline">
+            Commerçant ? Devenez partenaire
+          </Link>
         </p>
       </div>
     </main>

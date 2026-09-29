@@ -1,7 +1,24 @@
-import { type NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
+import { estDomaineBoutique } from "@/lib/boutique/domaines";
 import { updateSession } from "@/lib/supabase/middleware";
 
+const URL_APP = (process.env.NEXT_PUBLIC_APP_URL || "https://whaoo.site").replace(/\/$/, "");
+
+// Pages de l'appli (comptes) qui n'ont pas leur place sur un domaine dédié à
+// la boutique : renvoyées vers whaoo.site.
+const PAGES_APPLI = ["/app", "/connexion", "/inscription", "/mot-de-passe-oublie", "/demo"];
+
 export async function proxy(request: NextRequest) {
+  if (estDomaineBoutique(request.headers.get("host"))) {
+    const { pathname, search } = request.nextUrl;
+    if (pathname === "/") {
+      return NextResponse.rewrite(new URL(`/boutique${search}`, request.url));
+    }
+    if (PAGES_APPLI.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
+      return NextResponse.redirect(`${URL_APP}${pathname}${search}`);
+    }
+    return NextResponse.next();
+  }
   return updateSession(request);
 }
 

@@ -163,7 +163,14 @@ async function produitBoutique(id: string) {
 // renvoie son adresse, ou null si le produit ne se paie pas ici. Prix,
 // frais de port et quantité maximale sont relus chez Stripe, jamais pris du
 // formulaire.
-export async function creerAchat(idProduit: string, quantiteDemandee: number, urlApp: string) {
+// `urlApp` : adresse de base (whaoo.site ou domaine de la boutique) ;
+// `cheminBoutique` : page où revient le client s'il annule.
+export async function creerAchat(
+  idProduit: string,
+  quantiteDemandee: number,
+  urlApp: string,
+  cheminBoutique = "/boutique",
+) {
   const produit = await produitBoutique(idProduit);
   if (!produit?.prixId) return null;
   const quantite = Math.min(Math.max(1, Math.floor(quantiteDemandee) || 1), produit.quantiteMax);
@@ -174,7 +181,7 @@ export async function creerAchat(idProduit: string, quantiteDemandee: number, ur
     "line_items[0][price]": produit.prixId,
     "line_items[0][quantity]": String(quantite),
     success_url: `${urlApp}/merci?achat=1`,
-    cancel_url: `${urlApp}/boutique`,
+    cancel_url: `${urlApp}${cheminBoutique}`,
     allow_promotion_codes: "true",
     "custom_text[submit][message]": produit.recurrence
       ? `En validant, tu acceptes les conditions générales de vente (${urlApp}/cgv). Abonnement sans engagement, résiliable à tout moment en ligne.`

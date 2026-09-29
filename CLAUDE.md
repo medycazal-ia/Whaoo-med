@@ -78,7 +78,9 @@ demander à Medy le zip correspondant et suivre son
   techniquement par LWS) : CGV article 15 et annexe 2 (sous-traitance
   RGPD) ; produits Stripe à créer quand il donnera ses prix. Médiateur
   envisagé : ANM Consommation (à inscrire dans `MEDIATEUR` seulement une
-  fois l'adhésion confirmée).
+  fois l'adhésion confirmée). Domaine dédié possible : `BOUTIQUE_DOMAINES`
+  (accueil = boutique, retour après paiement sur ce domaine, voir
+  `src/lib/boutique/domaines.ts` et `src/proxy.ts`).
 - **Rangement Google Drive** (Medy est sur Chromebook) : fait le
   2026-09-28. Dans le dossier `WHAOO` de Mon Drive : `00 - À trier` à
   `07 - Support et emails`, `01 - Sauvegardes/vX.Y - date`, et un dossier

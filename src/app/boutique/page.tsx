@@ -4,6 +4,8 @@ import { boutiqueActive, formatEuros, produitsBoutique, type ProduitBoutique } f
 import { klarnaConfigure } from "@/lib/klarna/api";
 import { siteKlarna } from "@/lib/klarna/sites";
 import { EDITEUR } from "@/lib/legal-info";
+import { headers } from "next/headers";
+import { estDomaineBoutique } from "@/lib/boutique/domaines";
 
 export const metadata: Metadata = {
   title: "Bons plans — whaoo",
@@ -23,6 +25,9 @@ export default async function BoutiquePage({
   searchParams: Promise<{ erreur?: string }>;
 }) {
   const { erreur } = await searchParams;
+  // Sur un domaine dédié, la boutique est autonome : pas de lien vers
+  // l'appli de courses.
+  const surBoutique = estDomaineBoutique((await headers()).get("host"));
   const produits = await produitsBoutique().catch((e) => {
     console.error(e);
     return [] as ProduitBoutique[];
@@ -44,10 +49,12 @@ export default async function BoutiquePage({
   return (
     <main className="flex flex-1 flex-col fond-marche px-4 py-10 text-ardoise">
       <div className="mx-auto w-full max-w-4xl">
-        <Link href="/app" className="text-sm text-ardoise/75 underline underline-offset-2">
-          ← Retour à mes courses
-        </Link>
-        <h1 className="mt-4 font-heading text-3xl font-semibold">Bons plans 🛍️</h1>
+        {!surBoutique && (
+          <Link href="/app" className="text-sm text-ardoise/75 underline underline-offset-2">
+            ← Retour à mes courses
+          </Link>
+        )}
+        <h1 className="mt-4 font-heading text-3xl font-semibold">{surBoutique ? "Boutique" : "Bons plans"} 🛍️</h1>
         <p className="mt-2 max-w-2xl text-ardoise/75">
           Des promotions et des produits choisis pour toi, parfois proposés par
           des partenaires de whaoo (c&apos;est alors indiqué). Le paiement se

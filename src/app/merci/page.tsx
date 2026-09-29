@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+import { headers } from "next/headers";
+import { estDomaineBoutique } from "@/lib/boutique/domaines";
 
 export const metadata: Metadata = {
   title: "Merci — whaoo",
@@ -16,6 +18,7 @@ export default async function MerciPage({
   searchParams: Promise<{ achat?: string }>;
 }) {
   const achat = Boolean((await searchParams).achat);
+  const surBoutique = estDomaineBoutique((await headers()).get("host"));
 
   return (
     <main className="flex flex-1 flex-col items-center justify-center fond-marche px-4 py-16 text-center text-ardoise">
@@ -26,6 +29,14 @@ export default async function MerciPage({
           ? "Ton achat est confirmé. Tu vas recevoir ton reçu de paiement par email."
           : "Ta contribution aide whaoo à rester simple et gratuite. Tu vas recevoir ton reçu de paiement par email."}
       </p>
+      {surBoutique ? (
+        <Link
+          href="/"
+          className="mt-6 rounded-lg bg-basilic px-5 py-3 font-medium text-craie hover:opacity-90"
+        >
+          Retour à la boutique
+        </Link>
+      ) : (
       <div className="mt-6 flex flex-col gap-3 sm:flex-row">
         <Link
           href="/app"
@@ -40,6 +51,7 @@ export default async function MerciPage({
           Page d&apos;accueil
         </Link>
       </div>
+      )}
     </main>
   );
 }
